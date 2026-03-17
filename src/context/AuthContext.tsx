@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { login as apiLogin, switchContext as apiSwitchContext } from '../services/auth.service';
-import { TOKEN_STORAGE_KEY } from '../services/api';
+import { TOKEN_STORAGE_KEY, getOrCreateDeviceId } from '../services/api';
 import { decodeToken, isTokenExpired, JwtPayload } from '../utils/jwt';
 
 export interface CurrentUser {
@@ -60,7 +60,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (username: string, password: string): Promise<void> => {
-    const resp = await apiLogin(username, password);
+    const deviceId = getOrCreateDeviceId();
+    const deviceLabel = `${navigator.platform} – ${navigator.userAgent.split(' ').slice(-1)[0]}`;
+    const resp = await apiLogin(username, password, deviceId, deviceLabel);
     localStorage.setItem(TOKEN_STORAGE_KEY, resp.token);
     setToken(resp.token);
     setCurrentUser({

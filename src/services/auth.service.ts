@@ -14,8 +14,8 @@ export interface LoginResponse {
   };
 }
 
-export async function login(username: string, password: string): Promise<LoginResponse> {
-  const { data } = await api.post<LoginResponse>('/auth/login', { username, password });
+export async function login(username: string, password: string, deviceId?: string, deviceLabel?: string): Promise<LoginResponse> {
+  const { data } = await api.post<LoginResponse>('/auth/login', { username, password, deviceId, deviceLabel });
   return data;
 }
 

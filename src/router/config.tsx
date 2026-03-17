@@ -19,6 +19,7 @@ const ClientsPage = lazy(() => import('../pages/clients/page'));
 const SelectBranchPage = lazy(() => import('../pages/select-branch/page'));
 const SetupPage = lazy(() => import('../pages/setup/page'));
 const StockPage = lazy(() => import('../pages/stock/page'));
+const SuperAdminPage = lazy(() => import('../pages/superadmin/page'));
 
 const routes: RouteObject[] = [
   {
@@ -66,7 +67,7 @@ const routes: RouteObject[] = [
   {
     path: '/stock',
     element: (
-      <RoleRoute allowedRoleIds={[ROLE_IDS.OWNER, ROLE_IDS.VENDEDOR]}>
+      <RoleRoute allowedRoleIds={[ROLE_IDS.ADMIN, ROLE_IDS.OWNER, ROLE_IDS.VENDEDOR]}>
         <StockPage />
       </RoleRoute>
     ),
@@ -92,6 +93,14 @@ const routes: RouteObject[] = [
     element: (
       <RoleRoute allowedRoleIds={[ROLE_IDS.ADMIN, ROLE_IDS.OWNER]}>
         <SettingsPage />
+      </RoleRoute>
+    ),
+  },
+  {
+    path: '/superadmin',
+    element: (
+      <RoleRoute allowedRoleIds={[ROLE_IDS.ADMIN]}>
+        <SuperAdminPage />
       </RoleRoute>
     ),
   },
