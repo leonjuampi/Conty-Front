@@ -26,7 +26,7 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
   const [isCombo, setIsCombo] = useState(false);
   const [comboItems, setComboItems] = useState<ComboItem[]>([]);
   const [comboSearch, setComboSearch] = useState('');
-  const [comboResults, setComboResults] = useState<{ variantId: number; variantName: string; productName: string; price: number }[]>([]);
+  const [comboResults, setComboResults] = useState<{ variantId: number; variantName: string; productName: string; price: number; cost: number }[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
 
   useEffect(() => {
@@ -60,6 +60,7 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
               variantName: v.name === 'default' ? '' : v.name,
               productName: p.name,
               price: v.price,
+              cost: v.cost ?? 0,
             }))
           );
         setComboResults(results);
@@ -69,9 +70,9 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
     return () => clearTimeout(timeout);
   }, [comboSearch]);
 
-  const addComboItem = (item: { variantId: number; variantName: string; productName: string; price: number }) => {
+  const addComboItem = (item: { variantId: number; variantName: string; productName: string; price: number; cost: number }) => {
     if (comboItems.some(c => c.variantId === item.variantId)) return;
-    setComboItems([...comboItems, { variantId: item.variantId, qty: 1, variantName: item.variantName, productName: item.productName }]);
+    setComboItems([...comboItems, { variantId: item.variantId, qty: 1, variantName: item.variantName, productName: item.productName, price: item.price, cost: item.cost }]);
     setComboSearch('');
     setComboResults([]);
   };
@@ -83,6 +84,16 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
   const updateComboQty = (variantId: number, qty: number) => {
     setComboItems(comboItems.map(c => c.variantId === variantId ? { ...c, qty } : c));
   };
+
+  // Recalcular costo y precio al cambiar los componentes del combo.
+  // Solo cuando los items tienen precio (agregados desde el buscador, no cargados del backend).
+  useEffect(() => {
+    if (!isCombo || comboItems.length === 0) return;
+    if (comboItems.every(c => c.price === undefined)) return;
+    const totalCost = comboItems.reduce((sum, c) => sum + ((c.cost ?? 0) * c.qty), 0);
+    const totalPrice = comboItems.reduce((sum, c) => sum + ((c.price ?? 0) * c.qty), 0);
+    setFormData(prev => ({ ...prev, cost: totalCost.toString(), price: totalPrice.toString() }));
+  }, [comboItems, isCombo]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -17,6 +17,8 @@ export interface ComboItem {
   variantName?: string | null;
   productName?: string | null;
   productId?: number;
+  price?: number;
+  cost?: number;
 }
 
 export interface Product {

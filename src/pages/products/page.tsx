@@ -4,6 +4,7 @@ import { ProductForm } from './components/ProductForm';
 import { CategoryModal } from './components/CategoryModal';
 import {
   listProducts,
+  getProduct,
   createProduct,
   updateProduct,
   deleteProduct,
@@ -113,6 +114,20 @@ export default function ProductsPage() {
     } catch {
       alert('Error al guardar el producto');
     }
+  };
+
+  const handleEditProduct = async (product: LocalProduct) => {
+    if (product.isCombo) {
+      try {
+        const full = await getProduct(product.id);
+        setSelectedProduct({ ...product, comboItems: full.comboItems ?? [] });
+      } catch {
+        setSelectedProduct(product);
+      }
+    } else {
+      setSelectedProduct(product);
+    }
+    setShowForm(true);
   };
 
   const handleDelete = async (id: number) => {
@@ -289,7 +304,7 @@ export default function ProductsPage() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-center gap-2">
-                      <button onClick={() => { setSelectedProduct(product); setShowForm(true); }}
+                      <button onClick={() => handleEditProduct(product)}
                         className="w-8 h-8 flex items-center justify-center text-orange-600 hover:bg-orange-50 rounded-lg cursor-pointer">
                         <i className="ri-edit-line text-lg"></i>
                       </button>
@@ -325,7 +340,7 @@ export default function ProductsPage() {
                 <span className="text-lg font-bold text-gray-800">${product.price.toLocaleString('es-AR')}</span>
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={() => { setSelectedProduct(product); setShowForm(true); }}
+                <button onClick={() => handleEditProduct(product)}
                   className="flex-1 flex items-center justify-center gap-1 px-2 py-2 bg-orange-50 text-orange-600 rounded-lg hover:bg-orange-100 cursor-pointer text-xs font-medium">
                   <i className="ri-edit-line"></i><span>Editar</span>
                 </button>
