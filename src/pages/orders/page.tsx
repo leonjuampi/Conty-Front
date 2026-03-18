@@ -130,7 +130,7 @@ export default function OrdersPage() {
       })),
       payments: data.pendingPayment
         ? []
-        : [{ method: data.paymentMethod, amount: data.amountPaid, note: data.notes || undefined }],
+        : [{ method: data.paymentMethod, amount: calculateTotal(), note: data.notes || undefined }],
       note: data.pendingPayment ? (data.notes || undefined) : undefined,
       deliveryPlatform: data.deliveryPlatform,
     });
