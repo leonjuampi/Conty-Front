@@ -13,7 +13,7 @@ const ALL_MENU_ITEMS = [
   { path: '/orders', icon: 'ri-shopping-cart-line', label: 'Panel de Pedidos', roleIds: [1, 2, 3] },
   { path: '/clients', icon: 'ri-group-line', label: 'Clientes', roleIds: [1, 2, 3] },
   { path: '/cash', icon: 'ri-safe-line', label: 'Módulo de Caja', roleIds: [1, 2, 3] },
-  { path: '/reports', icon: 'ri-bar-chart-box-line', label: 'Reportes', roleIds: [1, 2] },
+  { path: '/reports', icon: 'ri-bar-chart-box-line', label: 'Reportes', roleIds: [1, 2, 3] },
   { path: '/products', icon: 'ri-product-hunt-line', label: 'Productos', roleIds: [1, 2] },
   { path: '/stock', icon: 'ri-stack-line', label: 'Stock', roleIds: [1, 2, 3] },
   { path: '/inventory', icon: 'ri-box-3-line', label: 'Mercadería y Costos', roleIds: [1, 2] },

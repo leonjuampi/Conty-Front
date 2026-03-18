@@ -75,7 +75,7 @@ const routes: RouteObject[] = [
   {
     path: '/reports',
     element: (
-      <RoleRoute allowedRoleIds={[ROLE_IDS.ADMIN, ROLE_IDS.OWNER]}>
+      <RoleRoute allowedRoleIds={[ROLE_IDS.ADMIN, ROLE_IDS.OWNER, ROLE_IDS.VENDEDOR]}>
         <ReportsPage />
       </RoleRoute>
     ),
