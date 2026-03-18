@@ -9,6 +9,16 @@ export interface ProductVariant {
   stock?: number;
 }
 
+export interface ComboItem {
+  id?: number;
+  variantId: number;
+  qty: number;
+  variantSku?: string | null;
+  variantName?: string | null;
+  productName?: string | null;
+  productId?: number;
+}
+
 export interface Product {
   id: number;
   name: string;
@@ -17,6 +27,8 @@ export interface Product {
   categoryName: string | null;
   status: 'ACTIVE' | 'INACTIVE';
   imageUrl: string | null;
+  isCombo: boolean;
+  comboItems: ComboItem[];
   variants: ProductVariant[];
   createdAt: string;
 }
@@ -43,6 +55,8 @@ function mapProduct(row: any): Product {
     categoryName: row.categoryName ?? row.category_name ?? null,
     status:       row.status,
     imageUrl:     row.imageUrl     ?? row.image_url     ?? null,
+    isCombo:      row.isCombo      ?? row.is_combo      ? true : false,
+    comboItems:   Array.isArray(row.comboItems) ? row.comboItems : [],
     createdAt:    row.createdAt    ?? row.created_at    ?? '',
     variants: variantId ? [{
       id:    variantId,
@@ -79,13 +93,15 @@ export async function createProduct(payload: {
   description?: string;
   categoryId?: number;
   status?: string;
+  isCombo?: boolean;
+  comboItems?: ComboItem[];
   variants?: Partial<ProductVariant>[];
 }): Promise<{ id: number }> {
   const { data } = await api.post('/products', payload);
   return data;
 }
 
-export async function updateProduct(id: number, payload: Partial<Product>): Promise<void> {
+export async function updateProduct(id: number, payload: Partial<Product> & { comboItems?: ComboItem[] }): Promise<void> {
   await api.put(`/products/${id}`, payload);
 }
 
@@ -105,4 +121,23 @@ export async function createCategory(payload: { name: string; description?: stri
 
 export async function deleteCategory(id: number): Promise<void> {
   await api.delete(`/categories/${id}`);
+}
+
+export async function downloadProductTemplate(): Promise<void> {
+  const { data } = await api.get('/products/template.csv', { responseType: 'blob' });
+  const url = URL.createObjectURL(new Blob([data], { type: 'text/csv;charset=utf-8;' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'products_template.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+export async function importProducts(file: File): Promise<{ successCount: number; errorCount: number; errors: { row: number; message: string }[] }> {
+  const form = new FormData();
+  form.append('file', file);
+  const { data } = await api.post('/products/import', form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return data;
 }

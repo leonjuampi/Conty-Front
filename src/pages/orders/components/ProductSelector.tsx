@@ -10,6 +10,7 @@ export interface PosProduct {
   stock: number;
   image: string | null;
   active: boolean;
+  isCombo?: boolean;
 }
 
 interface ProductSelectorProps {
@@ -88,14 +89,17 @@ export function ProductSelector({ products, isLoading = false, onSelectProduct, 
                   : 'hover:shadow-lg hover:border-orange-300 border-gray-100 cursor-pointer'
               }`}
             >
-              <div className="aspect-square w-full h-32 mb-3 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+              <div className={`aspect-square w-full h-32 mb-3 rounded-lg overflow-hidden flex items-center justify-center ${product.isCombo ? 'bg-purple-50' : 'bg-gray-100'}`}>
                 {product.image ? (
                   <img src={product.image} alt={product.name} className={`w-full h-full object-cover transition-transform ${!cashBlocked ? 'group-hover:scale-105' : ''}`} />
                 ) : (
-                  <i className="ri-store-2-line text-4xl text-gray-300"></i>
+                  <i className={`text-4xl ${product.isCombo ? 'ri-gift-line text-purple-300' : 'ri-store-2-line text-gray-300'}`}></i>
                 )}
               </div>
-              <h3 className="font-semibold text-gray-800 mb-1 text-sm line-clamp-2">{product.name}</h3>
+              <div className="flex items-start gap-1 mb-1">
+                <h3 className="font-semibold text-gray-800 text-sm line-clamp-2 flex-1">{product.name}</h3>
+                {product.isCombo && <span className="px-1 py-0.5 bg-purple-100 text-purple-700 rounded text-xs font-bold shrink-0 leading-tight">COMBO</span>}
+              </div>
               <p className="text-xs text-gray-500 mb-2">{product.category}</p>
               <div className="flex items-center justify-between">
                 <span className="text-lg font-bold text-orange-600">${product.price.toLocaleString()}</span>

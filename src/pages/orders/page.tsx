@@ -49,6 +49,7 @@ export default function OrdersPage() {
             stock: p.variants[0].stock ?? 0,
             image: p.imageUrl,
             active: p.status === 'ACTIVE',
+            isCombo: p.isCombo ?? false,
           }));
         setProducts(mapped);
       })
