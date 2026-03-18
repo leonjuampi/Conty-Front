@@ -1,6 +1,8 @@
 import { useState, useMemo, useEffect } from 'react';
 import { AppLayout } from '../../components/feature/AppLayout';
-import { listSales, getSale, type Sale } from '../../services/sales.service';
+import { useAuth } from '../../context/AuthContext';
+import { ROLE_IDS } from '../../utils/roles';
+import { listSales, getSale, addPayments, listPaymentMethods, type Sale } from '../../services/sales.service';
 import { listCustomers, type Customer } from '../../services/customers.service';
 import { listSessions, type CashSession } from '../../services/cash.service';
 import { getReports, type TopSeller, type TopProduct } from '../../services/reports.service';
@@ -19,6 +21,7 @@ interface DisplaySale {
   deliveryPlatform: string | null;
   seller: string;
   status: string;
+  hasPendingPayment: boolean;
 }
 
 interface DisplaySession {
@@ -72,6 +75,7 @@ function toDisplaySale(s: Sale): DisplaySale {
     deliveryPlatform: s.deliveryPlatform ?? null,
     seller: '—',
     status: s.status,
+    hasPendingPayment: s.hasPendingPayment,
   };
 }
 
@@ -116,7 +120,18 @@ function toDisplaySession(s: CashSession): DisplaySession {
 
 // ── Page ───────────────────────────────────────────────────────────
 
+const METHOD_LABELS: Record<string, string> = {
+  CASH: 'Efectivo',
+  BANK_TRANSFER: 'Transferencia',
+  CREDIT_CARD: 'Tarjeta de Crédito',
+  DEBIT_CARD: 'Tarjeta de Débito',
+  MERCADO_PAGO: 'Mercado Pago',
+};
+
 export default function ReportsPage() {
+  const { currentUser } = useAuth();
+  const isVendedor = currentUser?.roleId === ROLE_IDS.VENDEDOR;
+
   const todayStr = new Date().toISOString().slice(0, 10);
   const firstOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0, 10);
 
@@ -127,6 +142,12 @@ export default function ReportsPage() {
   const [selectedOrder, setSelectedOrder] = useState<DisplaySale | null>(null);
   const [saleDetail, setSaleDetail] = useState<{ items: { nameSnapshot: string; qty: number; unitPrice: number; total: number }[]; payments: { method: string; amount: number }[] } | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
+  const [registerPaymentSale, setRegisterPaymentSale] = useState<DisplaySale | null>(null);
+  const [paymentModalMethod, setPaymentModalMethod] = useState('CASH');
+  const [paymentModalAmount, setPaymentModalAmount] = useState('');
+  const [paymentModalLoading, setPaymentModalLoading] = useState(false);
+  const [paymentModalError, setPaymentModalError] = useState('');
+  const [availableMethods, setAvailableMethods] = useState<{ id: number; name: string }[]>([]);
   const [selectedCashSession, setSelectedCashSession] = useState<DisplaySession | null>(null);
   const [typeDetailFilter, setTypeDetailFilter] = useState<'Particular' | 'Pedidos Ya' | 'Rappi'>('Particular');
 
@@ -141,6 +162,7 @@ export default function ReportsPage() {
 
   useEffect(() => {
     listCustomers({ limit: 500 }).then(res => setCustomers(res.items)).catch(() => {});
+    listPaymentMethods().then(res => setAvailableMethods(res.items)).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -273,15 +295,16 @@ export default function ReportsPage() {
       .finally(() => setLoadingDetail(false));
   };
 
-  const tabs = [
-    { id: 'clients', label: 'Mejores Clientes', icon: 'ri-user-star-line' },
-    { id: 'sellers', label: 'Mejores Vendedores', icon: 'ri-team-line' },
-    { id: 'products', label: 'Más Vendidos', icon: 'ri-shopping-bag-line' },
-    { id: 'cash', label: 'Estado de Caja', icon: 'ri-money-dollar-circle-line' },
-    { id: 'ordertype', label: 'Por Tipo de Pedido', icon: 'ri-pie-chart-line' },
-    { id: 'history', label: 'Historial', icon: 'ri-file-list-line' },
-    { id: 'cashhistory', label: 'Cierres de Caja', icon: 'ri-safe-line' }
+  const allTabs = [
+    { id: 'clients', label: 'Mejores Clientes', icon: 'ri-user-star-line', sellerVisible: false },
+    { id: 'sellers', label: 'Mejores Vendedores', icon: 'ri-team-line', sellerVisible: false },
+    { id: 'products', label: 'Más Vendidos', icon: 'ri-shopping-bag-line', sellerVisible: false },
+    { id: 'cash', label: 'Estado de Caja', icon: 'ri-money-dollar-circle-line', sellerVisible: false },
+    { id: 'ordertype', label: 'Por Tipo de Pedido', icon: 'ri-pie-chart-line', sellerVisible: false },
+    { id: 'history', label: 'Historial', icon: 'ri-file-list-line', sellerVisible: true },
+    { id: 'cashhistory', label: 'Cierres de Caja', icon: 'ri-safe-line', sellerVisible: false },
   ];
+  const tabs = isVendedor ? allTabs.filter(t => t.sellerVisible) : allTabs;
 
   const detailTabs: { id: 'Particular' | 'Pedidos Ya' | 'Rappi'; label: string; icon: string; color: string; activeClass: string }[] = [
     { id: 'Particular', label: 'Particular', icon: 'ri-store-2-line', color: 'text-orange-600', activeClass: 'bg-orange-500 text-white shadow' },
@@ -674,14 +697,15 @@ export default function ReportsPage() {
                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Cliente</th>
                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Total</th>
                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Estado</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Pago</th>
                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Ver</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {historyOrders.length === 0 ? (
-                      <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400 text-sm">No hay pedidos que coincidan con los filtros</td></tr>
+                      <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-400 text-sm">No hay pedidos que coincidan con los filtros</td></tr>
                     ) : historyOrders.map(order => (
-                      <tr key={order.id} className="hover:bg-orange-50 transition-colors">
+                      <tr key={order.id} className={`hover:bg-orange-50 transition-colors ${order.hasPendingPayment ? 'bg-amber-50/40' : ''}`}>
                         <td className="px-3 py-2.5 text-xs font-medium text-gray-800">{order.id}</td>
                         <td className="px-3 py-2.5 text-xs text-gray-600 whitespace-nowrap">
                           <p>{new Date(order.date).toLocaleDateString('es-AR')}</p>
@@ -690,9 +714,23 @@ export default function ReportsPage() {
                         <td className="px-3 py-2.5 text-xs text-gray-600">{order.clientName}</td>
                         <td className="px-3 py-2.5 text-xs font-semibold text-gray-800 whitespace-nowrap">${order.total.toLocaleString()}</td>
                         <td className="px-3 py-2.5">
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap ${order.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : order.status === 'CANCELLED' ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'}`}>
-                            {order.status === 'COMPLETED' ? 'Completado' : order.status === 'CANCELLED' ? 'Cancelado' : order.status}
-                          </span>
+                          {order.hasPendingPayment ? (
+                            <span className="px-2 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap bg-amber-100 text-amber-700 flex items-center gap-1 w-fit">
+                              <i className="ri-time-line text-xs"></i>Pago pendiente
+                            </span>
+                          ) : (
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap ${order.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : order.status === 'CANCELLED' ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'}`}>
+                              {order.status === 'COMPLETED' ? 'Completado' : order.status === 'CANCELLED' ? 'Cancelado' : order.status}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-3 py-2.5">
+                          {order.hasPendingPayment && order.status !== 'CANCELLED' && (
+                            <button onClick={() => { setRegisterPaymentSale(order); setPaymentModalAmount(String(order.total)); setPaymentModalMethod(availableMethods[0]?.name || 'CASH'); setPaymentModalError(''); }}
+                              className="flex items-center gap-1 px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-lg transition-colors cursor-pointer text-xs font-semibold whitespace-nowrap">
+                              <i className="ri-money-dollar-circle-line text-sm"></i>Registrar pago
+                            </button>
+                          )}
                         </td>
                         <td className="px-3 py-2.5">
                           <button onClick={() => openOrderDetail(order)} className="w-7 h-7 flex items-center justify-center bg-orange-100 hover:bg-orange-200 text-orange-600 rounded-lg transition-colors cursor-pointer">
@@ -809,6 +847,73 @@ export default function ReportsPage() {
           )}
         </div>
       </div>
+
+      {/* Modal Registrar Pago */}
+      {registerPaymentSale && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm">
+            <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-t-2xl p-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-white font-bold text-base">Registrar Pago</h2>
+                <p className="text-amber-100 text-xs mt-0.5">{registerPaymentSale.id} — ${registerPaymentSale.total.toLocaleString()}</p>
+              </div>
+              <button onClick={() => setRegisterPaymentSale(null)} className="w-8 h-8 flex items-center justify-center bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors cursor-pointer">
+                <i className="ri-close-line text-lg"></i>
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-2">Método de pago</label>
+                <select value={paymentModalMethod} onChange={e => setPaymentModalMethod(e.target.value)}
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-400 outline-none">
+                  {availableMethods.length > 0
+                    ? availableMethods.map(m => <option key={m.id} value={m.name}>{METHOD_LABELS[m.name] ?? m.name}</option>)
+                    : ['CASH', 'BANK_TRANSFER', 'CREDIT_CARD', 'MERCADO_PAGO'].map(m => <option key={m} value={m}>{METHOD_LABELS[m] ?? m}</option>)
+                  }
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-2">Monto</label>
+                <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-amber-400 overflow-hidden">
+                  <span className="px-3 py-2.5 bg-gray-50 border-r border-gray-300 text-sm font-semibold text-gray-500">$</span>
+                  <input type="number" value={paymentModalAmount} onChange={e => setPaymentModalAmount(e.target.value)}
+                    className="flex-1 px-3 py-2.5 text-sm outline-none" step="0.01" min="0.01" />
+                </div>
+              </div>
+              {paymentModalError && (
+                <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 text-xs px-3 py-2.5 rounded-lg">
+                  <i className="ri-error-warning-line"></i>{paymentModalError}
+                </div>
+              )}
+              <div className="flex gap-3 pt-1">
+                <button onClick={() => setRegisterPaymentSale(null)}
+                  className="flex-1 bg-gray-100 text-gray-700 font-semibold py-2.5 rounded-xl hover:bg-gray-200 cursor-pointer text-sm">
+                  Cancelar
+                </button>
+                <button disabled={paymentModalLoading || !paymentModalAmount || parseFloat(paymentModalAmount) <= 0}
+                  onClick={async () => {
+                    setPaymentModalLoading(true);
+                    setPaymentModalError('');
+                    try {
+                      await addPayments(registerPaymentSale.saleId, [{ method: paymentModalMethod, amount: parseFloat(paymentModalAmount) }]);
+                      setRegisterPaymentSale(null);
+                      // Refrescar ventas
+                      listSales({ from: dateFrom, to: dateTo, limit: 500 }).then(res => setRawSales(res.items)).catch(() => {});
+                    } catch (e: unknown) {
+                      const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
+                      setPaymentModalError(msg || 'Error al registrar el pago');
+                    } finally {
+                      setPaymentModalLoading(false);
+                    }
+                  }}
+                  className="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold py-2.5 rounded-xl hover:from-amber-600 hover:to-orange-600 cursor-pointer text-sm disabled:opacity-60 flex items-center justify-center gap-2">
+                  {paymentModalLoading ? <><i className="ri-loader-4-line animate-spin"></i>Guardando...</> : 'Confirmar'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal Detalle Pedido */}
       {selectedOrder && (

@@ -1,15 +1,18 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { AppLayout } from '../../components/feature/AppLayout';
 import { ProductForm } from './components/ProductForm';
 import { CategoryModal } from './components/CategoryModal';
 import {
   listProducts,
+  getProduct,
   createProduct,
   updateProduct,
   deleteProduct,
   listCategories,
   createCategory,
   deleteCategory,
+  downloadProductTemplate,
+  importProducts,
   type Category,
 } from '../../services/products.service';
 
@@ -24,6 +27,8 @@ interface LocalProduct {
   price: number;
   image: string;
   active: boolean;
+  isCombo: boolean;
+  comboItems: any[];
 }
 
 export default function ProductsPage() {
@@ -35,6 +40,9 @@ export default function ProductsPage() {
   const [selectedProduct, setSelectedProduct] = useState<LocalProduct | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [importLoading, setImportLoading] = useState(false);
+  const [importResult, setImportResult] = useState<{ successCount: number; errorCount: number; errors: { row: number; message: string }[] } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const categoryNames = categories.map(c => c.name);
   const filterCategories = ['all', ...categoryNames];
@@ -53,6 +61,8 @@ export default function ProductsPage() {
         price: p.variants[0]?.price || 0,
         image: p.imageUrl || '',
         active: p.status === 'ACTIVE',
+        isCombo: p.isCombo ?? false,
+        comboItems: p.comboItems ?? [],
       })));
     } catch {}
   }, []);
@@ -83,6 +93,8 @@ export default function ProductsPage() {
       categoryId: catId ?? null,
       status: data.active ? 'ACTIVE' : 'INACTIVE',
       imageUrl: data.image || null,
+      isCombo: data.isCombo ?? false,
+      comboItems: data.comboItems ?? [],
       variants: [{
         name: 'default',
         sku: data.barcode || null,
@@ -102,6 +114,20 @@ export default function ProductsPage() {
     } catch {
       alert('Error al guardar el producto');
     }
+  };
+
+  const handleEditProduct = async (product: LocalProduct) => {
+    if (product.isCombo) {
+      try {
+        const full = await getProduct(product.id);
+        setSelectedProduct({ ...product, comboItems: full.comboItems ?? [] });
+      } catch {
+        setSelectedProduct(product);
+      }
+    } else {
+      setSelectedProduct(product);
+    }
+    setShowForm(true);
   };
 
   const handleDelete = async (id: number) => {
@@ -135,6 +161,24 @@ export default function ProductsPage() {
     }
   };
 
+  const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImportLoading(true);
+    setImportResult(null);
+    try {
+      const result = await importProducts(file);
+      setImportResult(result);
+      if (result.successCount > 0) await fetchProducts();
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || 'Error al importar el archivo';
+      alert(msg);
+    } finally {
+      setImportLoading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   if (loading) {
     return (
       <AppLayout>
@@ -153,43 +197,68 @@ export default function ProductsPage() {
             <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Productos</h1>
             <p className="text-sm text-gray-600 mt-1">Gestión de productos del catálogo</p>
           </div>
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <button
-              onClick={() => setShowCategoryModal(true)}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 bg-white border border-orange-400 text-orange-600 rounded-lg hover:bg-orange-50 transition-all cursor-pointer whitespace-nowrap font-medium"
-            >
-              <i className="ri-price-tag-3-line text-lg"></i>
-              <span>Nueva Categoría</span>
+          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+            <button onClick={() => setShowCategoryModal(true)}
+              className="flex items-center gap-2 px-3 py-2.5 bg-white border border-orange-400 text-orange-600 rounded-lg hover:bg-orange-50 cursor-pointer whitespace-nowrap font-medium text-sm">
+              <i className="ri-price-tag-3-line"></i>
+              <span>Categorías</span>
             </button>
-            <button
-              onClick={() => { setSelectedProduct(null); setShowForm(true); }}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:shadow-lg transition-all cursor-pointer whitespace-nowrap font-medium"
-            >
-              <i className="ri-add-line text-lg"></i>
+            <button onClick={() => downloadProductTemplate()}
+              className="flex items-center gap-2 px-3 py-2.5 bg-white border border-teal-400 text-teal-600 rounded-lg hover:bg-teal-50 cursor-pointer whitespace-nowrap font-medium text-sm">
+              <i className="ri-download-line"></i>
+              <span>Plantilla CSV</span>
+            </button>
+            <label className={`flex items-center gap-2 px-3 py-2.5 bg-white border border-teal-500 text-teal-700 rounded-lg hover:bg-teal-50 cursor-pointer whitespace-nowrap font-medium text-sm ${importLoading ? 'opacity-60 pointer-events-none' : ''}`}>
+              {importLoading
+                ? <><i className="ri-loader-4-line animate-spin"></i><span>Importando...</span></>
+                : <><i className="ri-upload-line"></i><span>Importar CSV</span></>}
+              <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleImportFile} />
+            </label>
+            <button onClick={() => { setSelectedProduct(null); setShowForm(true); }}
+              className="flex items-center gap-2 px-3 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:shadow-lg cursor-pointer whitespace-nowrap font-medium text-sm">
+              <i className="ri-add-line"></i>
               <span>Nuevo Producto</span>
             </button>
           </div>
         </div>
+
+        {/* Resultado de importación */}
+        {importResult && (
+          <div className={`mb-4 p-4 rounded-xl border ${importResult.errorCount === 0 ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200'}`}>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="font-semibold text-sm text-gray-800 mb-1">
+                  <i className={`${importResult.errorCount === 0 ? 'ri-checkbox-circle-line text-green-600' : 'ri-error-warning-line text-amber-600'} mr-1`}></i>
+                  Importación completada: {importResult.successCount} productos agregados
+                  {importResult.errorCount > 0 && `, ${importResult.errorCount} con error`}
+                </p>
+                {importResult.errors.length > 0 && (
+                  <ul className="mt-2 space-y-0.5">
+                    {importResult.errors.slice(0, 5).map((err, i) => (
+                      <li key={i} className="text-xs text-red-600">Fila {err.row}: {err.message}</li>
+                    ))}
+                    {importResult.errors.length > 5 && <li className="text-xs text-gray-500">...y {importResult.errors.length - 5} errores más</li>}
+                  </ul>
+                )}
+              </div>
+              <button onClick={() => setImportResult(null)} className="text-gray-400 hover:text-gray-600 cursor-pointer shrink-0">
+                <i className="ri-close-line text-lg"></i>
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <i className="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
-            <input
-              type="text"
-              placeholder="Buscar productos..."
-              value={searchTerm}
+            <input type="text" placeholder="Buscar productos..." value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
-            />
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 text-sm" />
           </div>
-          <select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm cursor-pointer"
-          >
+          <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}
+            className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 text-sm cursor-pointer">
             <option value="all">Todas las categorías</option>
-            {filterCategories.filter(c => c !== 'all').map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
+            {filterCategories.filter(c => c !== 'all').map(cat => (<option key={cat} value={cat}>{cat}</option>))}
           </select>
         </div>
       </div>
@@ -211,15 +280,18 @@ export default function ProductsPage() {
                 <tr key={product.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 flex items-center justify-center bg-gradient-to-br from-orange-100 to-red-100 rounded-lg shrink-0 overflow-hidden">
-                        {product.image ? (
-                          <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
-                        ) : (
-                          <i className="ri-restaurant-line text-orange-500 text-xl"></i>
-                        )}
+                      <div className={`w-12 h-12 flex items-center justify-center rounded-lg shrink-0 overflow-hidden ${product.isCombo ? 'bg-gradient-to-br from-purple-100 to-violet-100' : 'bg-gradient-to-br from-orange-100 to-red-100'}`}>
+                        {product.image
+                          ? <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                          : <i className={`${product.isCombo ? 'ri-gift-line text-purple-500' : 'ri-restaurant-line text-orange-500'} text-xl`}></i>}
                       </div>
                       <div>
-                        <p className="font-semibold text-gray-800">{product.name}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-gray-800">{product.name}</p>
+                          {product.isCombo && (
+                            <span className="px-1.5 py-0.5 bg-purple-100 text-purple-700 rounded text-xs font-bold">COMBO</span>
+                          )}
+                        </div>
                         {product.description && <p className="text-xs text-gray-500 line-clamp-1">{product.description}</p>}
                       </div>
                     </div>
@@ -232,8 +304,14 @@ export default function ProductsPage() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-center gap-2">
-                      <button onClick={() => { setSelectedProduct(product); setShowForm(true); }} className="w-8 h-8 flex items-center justify-center text-orange-600 hover:bg-orange-50 rounded-lg transition-colors cursor-pointer"><i className="ri-edit-line text-lg"></i></button>
-                      <button onClick={() => handleDelete(product.id)} className="w-8 h-8 flex items-center justify-center text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"><i className="ri-delete-bin-line text-lg"></i></button>
+                      <button onClick={() => handleEditProduct(product)}
+                        className="w-8 h-8 flex items-center justify-center text-orange-600 hover:bg-orange-50 rounded-lg cursor-pointer">
+                        <i className="ri-edit-line text-lg"></i>
+                      </button>
+                      <button onClick={() => handleDelete(product.id)}
+                        className="w-8 h-8 flex items-center justify-center text-red-600 hover:bg-red-50 rounded-lg cursor-pointer">
+                        <i className="ri-delete-bin-line text-lg"></i>
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -247,22 +325,29 @@ export default function ProductsPage() {
       <div className="md:hidden grid grid-cols-2 gap-3">
         {filteredProducts.map((product) => (
           <div key={product.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="aspect-square bg-gradient-to-br from-orange-100 to-red-100 flex items-center justify-center overflow-hidden">
-              {product.image ? (
-                <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
-              ) : (
-                <i className="ri-restaurant-line text-orange-500 text-4xl"></i>
-              )}
+            <div className={`aspect-square flex items-center justify-center overflow-hidden ${product.isCombo ? 'bg-gradient-to-br from-purple-100 to-violet-100' : 'bg-gradient-to-br from-orange-100 to-red-100'}`}>
+              {product.image
+                ? <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                : <i className={`${product.isCombo ? 'ri-gift-line text-purple-400' : 'ri-restaurant-line text-orange-500'} text-4xl`}></i>}
             </div>
             <div className="p-3">
-              <h3 className="font-bold text-gray-800 text-sm line-clamp-1 mb-1">{product.name}</h3>
+              <div className="flex items-center gap-1 mb-1">
+                <h3 className="font-bold text-gray-800 text-sm line-clamp-1">{product.name}</h3>
+                {product.isCombo && <span className="px-1 py-0.5 bg-purple-100 text-purple-700 rounded text-xs font-bold shrink-0">C</span>}
+              </div>
               <span className="inline-block px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium mb-2">{product.category || '—'}</span>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-lg font-bold text-gray-800">${product.price.toLocaleString('es-AR')}</span>
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={() => { setSelectedProduct(product); setShowForm(true); }} className="flex-1 flex items-center justify-center gap-1 px-2 py-2 bg-orange-50 text-orange-600 rounded-lg hover:bg-orange-100 transition-colors cursor-pointer text-xs font-medium"><i className="ri-edit-line"></i><span>Editar</span></button>
-                <button onClick={() => handleDelete(product.id)} className="w-9 h-9 flex items-center justify-center bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors cursor-pointer shrink-0"><i className="ri-delete-bin-line"></i></button>
+                <button onClick={() => handleEditProduct(product)}
+                  className="flex-1 flex items-center justify-center gap-1 px-2 py-2 bg-orange-50 text-orange-600 rounded-lg hover:bg-orange-100 cursor-pointer text-xs font-medium">
+                  <i className="ri-edit-line"></i><span>Editar</span>
+                </button>
+                <button onClick={() => handleDelete(product.id)}
+                  className="w-9 h-9 flex items-center justify-center bg-red-50 text-red-600 rounded-lg hover:bg-red-100 cursor-pointer shrink-0">
+                  <i className="ri-delete-bin-line"></i>
+                </button>
               </div>
             </div>
           </div>

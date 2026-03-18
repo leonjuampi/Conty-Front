@@ -38,6 +38,7 @@ export interface Sale {
   status: string;
   deliveryPlatform: string | null;
   createdAt: string;
+  hasPendingPayment: boolean;
 }
 
 export async function listSales(params?: {
@@ -65,6 +66,10 @@ export async function createSale(payload: CreateSalePayload): Promise<{ id: numb
 
 export async function cancelSale(id: number, reason?: string): Promise<void> {
   await api.post(`/sales/${id}/cancel`, { reason });
+}
+
+export async function addPayments(id: number, payments: SalePayment[]): Promise<void> {
+  await api.post(`/sales/${id}/payments`, { payments });
 }
 
 export async function listPaymentMethods(): Promise<{ items: { id: number; name: string; isActive: boolean }[] }> {

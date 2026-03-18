@@ -11,7 +11,7 @@ interface PaymentModalProps {
   client: { firstName: string; lastName: string; phone?: string; address?: string } | null;
   receiptNumber: string;
   onClose: () => void;
-  onComplete: (data: { paymentMethod: string; amountPaid: number; notes: string; deliveryPlatform: string | null }) => Promise<void>;
+  onComplete: (data: { paymentMethod: string; amountPaid: number; notes: string; deliveryPlatform: string | null; pendingPayment: boolean }) => Promise<void>;
 }
 
 const PAYMENT_METHOD_MAP: Record<string, string> = {
@@ -22,7 +22,7 @@ const PAYMENT_METHOD_MAP: Record<string, string> = {
 };
 
 export function PaymentModal({ total, orderItems, client, receiptNumber, onClose, onComplete }: PaymentModalProps) {
-  const [paymentMethod, setPaymentMethod] = useState<'efectivo' | 'tarjeta' | 'transferencia' | 'mercadopago'>('efectivo');
+  const [paymentMethod, setPaymentMethod] = useState<'efectivo' | 'tarjeta' | 'transferencia' | 'mercadopago' | 'al_retirar'>('efectivo');
   const [orderType, setOrderType] = useState<'particular' | 'aplicacion'>('particular');
   const [appPlatform, setAppPlatform] = useState<'pedidosya' | 'rappi'>('pedidosya');
   const [amountPaid, setAmountPaid] = useState<string>('');
@@ -50,6 +50,7 @@ export function PaymentModal({ total, orderItems, client, receiptNumber, onClose
         amountPaid: parseFloat(amountPaid) || total,
         notes,
         deliveryPlatform: orderType === 'aplicacion' ? appPlatform.toUpperCase() : null,
+        pendingPayment: paymentMethod === 'al_retirar',
       });
       setShowReceipt(true);
     } catch (err: unknown) {
@@ -66,6 +67,7 @@ export function PaymentModal({ total, orderItems, client, receiptNumber, onClose
       tarjeta: 'Tarjeta',
       transferencia: 'Transferencia',
       mercadopago: 'Mercado Pago',
+      al_retirar: 'PAGO PENDIENTE',
     };
 
     const rows = orderItems.map(item => `
@@ -222,7 +224,11 @@ export function PaymentModal({ total, orderItems, client, receiptNumber, onClose
               </div>
               <div className="flex justify-between text-sm pt-2 border-t border-gray-200">
                 <span className="text-gray-600">Método de pago:</span>
-                <span className="font-semibold text-gray-800 capitalize">{paymentMethod === 'mercadopago' ? 'Mercado Pago' : paymentMethod}</span>
+                {paymentMethod === 'al_retirar' ? (
+                  <span className="font-semibold text-amber-600 flex items-center gap-1"><i className="ri-time-line text-xs"></i>Pago pendiente</span>
+                ) : (
+                  <span className="font-semibold text-gray-800 capitalize">{paymentMethod === 'mercadopago' ? 'Mercado Pago' : paymentMethod}</span>
+                )}
               </div>
               {paymentMethod === 'efectivo' && amountPaid && (
                 <>
@@ -309,6 +315,14 @@ export function PaymentModal({ total, orderItems, client, receiptNumber, onClose
                   <p className="font-semibold text-xs">{m.label}</p>
                 </button>
               ))}
+              <button onClick={() => setPaymentMethod('al_retirar')}
+                className={`col-span-2 p-3 rounded-lg border-2 cursor-pointer transition-all flex items-center justify-center gap-3 ${paymentMethod === 'al_retirar' ? 'border-amber-500 bg-amber-50 text-amber-700' : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'}`}>
+                <i className="ri-time-line text-xl"></i>
+                <div className="text-left">
+                  <p className="font-semibold text-sm">Pago al retirar</p>
+                  <p className="text-xs opacity-70">Registrá el pago cuando venga a buscar el pedido</p>
+                </div>
+              </button>
             </div>
           </div>
 
@@ -362,7 +376,7 @@ export function PaymentModal({ total, orderItems, client, receiptNumber, onClose
           </button>
           <button onClick={handleConfirmPayment} disabled={loading}
             className="flex-1 bg-gradient-to-r from-orange-600 to-red-600 text-white font-bold py-3 md:py-4 rounded-lg hover:from-orange-700 hover:to-red-700 cursor-pointer min-h-[48px] disabled:opacity-60 flex items-center justify-center gap-2">
-            {loading ? <><i className="ri-loader-4-line animate-spin"></i>Procesando...</> : 'Confirmar Pago'}
+            {loading ? <><i className="ri-loader-4-line animate-spin"></i>Procesando...</> : paymentMethod === 'al_retirar' ? 'Confirmar pedido' : 'Confirmar Pago'}
           </button>
         </div>
       </div>
