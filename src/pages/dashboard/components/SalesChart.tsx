@@ -36,20 +36,20 @@ export function SalesChart({ data }: SalesChartProps) {
       ) : (
         <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
           <div className="min-w-[400px] md:min-w-0">
-            <div className="flex items-end justify-between gap-2 md:gap-4" style={{ height: '200px' }}>
+            <div className="flex items-end justify-between gap-2 md:gap-4" style={{ height: '220px' }}>
               {data.map((item, index) => {
-                const barHeight = Math.round((item.total / maxSales) * 180);
-                const dayLabel = DAY_LABELS[new Date(item.date + 'T12:00:00').getDay()] ?? item.date.slice(5);
+                const barHeight = Math.round((item.total / maxSales) * 160);
+                const dayLabel = DAY_LABELS[new Date(item.date + 'T12:00:00').getDay()] ?? item.date.slice(5, 10);
                 return (
                   <div key={index} className="flex-1 flex flex-col items-center gap-1">
-                    <span className="text-xs md:text-sm font-semibold text-gray-700">
+                    <span className="text-xs font-semibold text-gray-700 text-center leading-tight">
                       {item.total >= 1000 ? `$${(item.total / 1000).toFixed(1)}k` : `$${item.total}`}
                     </span>
                     <div
                       className="w-full bg-gradient-to-t from-orange-500 to-red-500 rounded-t-lg transition-all hover:opacity-80 cursor-pointer"
                       style={{ height: `${barHeight}px` }}
                     ></div>
-                    <span className="text-xs md:text-sm font-medium text-gray-600">{dayLabel}</span>
+                    <span className="text-xs font-medium text-gray-600">{dayLabel}</span>
                   </div>
                 );
               })}
