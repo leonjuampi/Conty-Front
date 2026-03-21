@@ -19,8 +19,8 @@ export interface ReportsData {
 
 export async function getReports(params?: {
   branchId?: number;
-  from?: string;
-  to?: string;
+  from?: string;  // datetime: 'YYYY-MM-DD HH:mm:ss'
+  to?: string;    // datetime: 'YYYY-MM-DD HH:mm:ss'
 }): Promise<ReportsData> {
   const { data } = await api.get('/reports', { params });
   return data;

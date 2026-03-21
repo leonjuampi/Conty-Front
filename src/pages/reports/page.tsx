@@ -134,9 +134,14 @@ export default function ReportsPage() {
 
   const todayStr = new Date().toISOString().slice(0, 10);
   const firstOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0, 10);
+  const defaultDateFrom = `${firstOfMonth}T00:00`;
+  const defaultDateTo = `${todayStr}T23:59`;
 
-  const [dateFrom, setDateFrom] = useState(firstOfMonth);
-  const [dateTo, setDateTo] = useState(todayStr);
+  // Convierte el valor de datetime-local ('YYYY-MM-DDTHH:mm') a formato MySQL ('YYYY-MM-DD HH:mm:00')
+  const toMysql = (dt: string) => dt.replace('T', ' ') + ':00';
+
+  const [dateFrom, setDateFrom] = useState(defaultDateFrom);
+  const [dateTo, setDateTo] = useState(defaultDateTo);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedReport, setSelectedReport] = useState<'clients' | 'sellers' | 'products' | 'cash' | 'ordertype' | 'history' | 'cashhistory'>('history');
   const [selectedOrder, setSelectedOrder] = useState<DisplaySale | null>(null);
@@ -169,12 +174,12 @@ export default function ReportsPage() {
     setLoading(true);
     setLoadError('');
     Promise.all([
-      listSales({ from: dateFrom, to: dateTo, limit: 500 }).then(res => setRawSales(res.items)).catch(() => setRawSales([])),
-      listSessions({ from: dateFrom, to: dateTo, limit: 200 }).then(res => setRawSessions(res.items)).catch((e) => {
+      listSales({ from: toMysql(dateFrom), to: toMysql(dateTo), limit: 500 }).then(res => setRawSales(res.items)).catch(() => setRawSales([])),
+      listSessions({ from: toMysql(dateFrom), to: toMysql(dateTo), limit: 200 }).then(res => setRawSessions(res.items)).catch((e) => {
         setRawSessions([]);
         setLoadError((e as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Error al cargar los datos');
       }),
-      getReports({ from: dateFrom, to: dateTo }).then(res => {
+      getReports({ from: toMysql(dateFrom), to: toMysql(dateTo) }).then(res => {
         setTopSellers(res.bySeller ?? []);
         setTopProducts(res.topProducts ?? []);
       }).catch(() => {}),
@@ -333,7 +338,7 @@ export default function ReportsPage() {
               <i className="ri-calendar-line text-gray-400 text-sm"></i>
             </div>
             <span className="text-xs text-gray-500 whitespace-nowrap">Desde</span>
-            <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="text-sm text-gray-700 bg-transparent outline-none cursor-pointer w-full" />
+            <input type="datetime-local" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="text-sm text-gray-700 bg-transparent outline-none cursor-pointer w-full" />
           </div>
           <div className="hidden sm:block w-3 h-px bg-gray-300"></div>
           <div className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 w-full sm:w-auto">
@@ -341,7 +346,7 @@ export default function ReportsPage() {
               <i className="ri-calendar-line text-gray-400 text-sm"></i>
             </div>
             <span className="text-xs text-gray-500 whitespace-nowrap">Hasta</span>
-            <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="text-sm text-gray-700 bg-transparent outline-none cursor-pointer w-full" />
+            <input type="datetime-local" value={dateTo} onChange={e => setDateTo(e.target.value)} className="text-sm text-gray-700 bg-transparent outline-none cursor-pointer w-full" />
           </div>
         </div>
         <div className="flex-1 min-w-0 md:min-w-[200px]">
@@ -357,8 +362,8 @@ export default function ReportsPage() {
             )}
           </div>
         </div>
-        {(searchQuery || dateFrom !== firstOfMonth || dateTo !== todayStr) && (
-          <button onClick={() => { setSearchQuery(''); setDateFrom(firstOfMonth); setDateTo(todayStr); }} className="flex items-center gap-1.5 text-xs text-orange-600 hover:text-orange-700 font-medium cursor-pointer whitespace-nowrap bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 transition-colors">
+        {(searchQuery || dateFrom !== defaultDateFrom || dateTo !== defaultDateTo) && (
+          <button onClick={() => { setSearchQuery(''); setDateFrom(defaultDateFrom); setDateTo(defaultDateTo); }} className="flex items-center gap-1.5 text-xs text-orange-600 hover:text-orange-700 font-medium cursor-pointer whitespace-nowrap bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 transition-colors">
             <div className="w-3 h-3 flex items-center justify-center"><i className="ri-refresh-line text-xs"></i></div>
             Limpiar filtros
           </button>
@@ -635,7 +640,7 @@ export default function ReportsPage() {
                         const url = URL.createObjectURL(blob);
                         const a = document.createElement('a');
                         a.href = url;
-                        a.download = `pedidos_${typeDetailFilter.replace(/ /g, '_')}_${dateFrom}_${dateTo}.csv`;
+                        a.download = `pedidos_${typeDetailFilter.replace(/ /g, '_')}_${dateFrom.replace('T', '_')}_${dateTo.replace('T', '_')}.csv`;
                         a.click();
                         URL.revokeObjectURL(url);
                       }}
@@ -898,7 +903,7 @@ export default function ReportsPage() {
                       await addPayments(registerPaymentSale.saleId, [{ method: paymentModalMethod, amount: parseFloat(paymentModalAmount) }]);
                       setRegisterPaymentSale(null);
                       // Refrescar ventas
-                      listSales({ from: dateFrom, to: dateTo, limit: 500 }).then(res => setRawSales(res.items)).catch(() => {});
+                      listSales({ from: toMysql(dateFrom), to: toMysql(dateTo), limit: 500 }).then(res => setRawSales(res.items)).catch(() => {});
                     } catch (e: unknown) {
                       const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
                       setPaymentModalError(msg || 'Error al registrar el pago');
