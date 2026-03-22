@@ -37,7 +37,7 @@ export default function StockPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-5 py-4 text-sm font-medium whitespace-nowrap transition-colors cursor-pointer border-b-2 -mb-px ${
                   activeTab === tab.id
-                    ? 'border-orange-500 text-orange-600 bg-orange-50/40'
+                    ? 'border-brand-500 text-brand-600 bg-brand-50/40'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                 }`}
               >

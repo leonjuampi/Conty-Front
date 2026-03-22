@@ -112,8 +112,8 @@ export default function SettingsPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 md:px-5 py-3 md:py-4 font-semibold transition-all whitespace-nowrap cursor-pointer text-sm min-h-[52px] ${
                   activeTab === tab.id
-                    ? 'text-orange-600 border-b-2 border-orange-600 bg-orange-50'
-                    : 'text-gray-600 hover:text-orange-600 hover:bg-orange-50'
+                    ? 'text-brand-600 border-b-2 border-brand-600 bg-brand-50'
+                    : 'text-gray-600 hover:text-brand-600 hover:bg-brand-50'
                 }`}
               >
                 <i className={`${tab.icon} text-lg`}></i>
@@ -133,7 +133,7 @@ export default function SettingsPage() {
                       <select
                         value={settings.currency}
                         onChange={(e) => setSettings({ ...settings, currency: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]"
                       >
                         <option value="ARS">Peso Argentino (ARS)</option>
                         <option value="USD">Dólar (USD)</option>
@@ -145,7 +145,7 @@ export default function SettingsPage() {
                       <select
                         value={settings.timezone}
                         onChange={(e) => setSettings({ ...settings, timezone: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]"
                       >
                         <option value="America/Argentina/Buenos_Aires">Buenos Aires (GMT-3)</option>
                         <option value="America/New_York">Nueva York (GMT-5)</option>
@@ -354,7 +354,7 @@ export default function SettingsPage() {
                 <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-4">Datos del Negocio</h2>
                 {loadingOrg ? (
                   <div className="flex justify-center py-8">
-                    <i className="ri-loader-4-line animate-spin text-3xl text-orange-500"></i>
+                    <i className="ri-loader-4-line animate-spin text-3xl text-brand-500"></i>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -364,7 +364,7 @@ export default function SettingsPage() {
                         type="text"
                         value={settings.businessName}
                         onChange={(e) => setSettings({ ...settings, businessName: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]"
                       />
                     </div>
                     <div>
@@ -373,7 +373,7 @@ export default function SettingsPage() {
                         type="text"
                         value={settings.address}
                         onChange={(e) => setSettings({ ...settings, address: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]"
                       />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -383,7 +383,7 @@ export default function SettingsPage() {
                           type="email"
                           value={settings.email}
                           onChange={(e) => setSettings({ ...settings, email: e.target.value })}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]"
                         />
                       </div>
                       <div>
@@ -392,7 +392,7 @@ export default function SettingsPage() {
                           type="text"
                           value={settings.taxId}
                           onChange={(e) => setSettings({ ...settings, taxId: e.target.value })}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]"
                         />
                       </div>
                     </div>
@@ -425,7 +425,7 @@ export default function SettingsPage() {
               <button
                 onClick={handleSave}
                 disabled={saving || (activeTab === 'general' && totalAlertMinutes === 0)}
-                className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 md:py-4 rounded-lg font-semibold hover:from-orange-600 hover:to-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all whitespace-nowrap cursor-pointer text-sm md:text-base min-h-[52px]"
+                className="w-full bg-gradient-to-r from-brand-500 to-brand-600 text-white py-3 md:py-4 rounded-lg font-semibold hover:from-brand-600 hover:to-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all whitespace-nowrap cursor-pointer text-sm md:text-base min-h-[52px]"
               >
                 {saving ? <><i className="ri-loader-4-line animate-spin mr-2"></i>Guardando...</> : <><i className="ri-save-line mr-2"></i>Guardar Configuracion</>}
               </button>

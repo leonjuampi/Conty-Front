@@ -27,7 +27,7 @@ const TYPE_BADGE: Record<string, string> = {
   ENTRY: 'bg-green-100 text-green-700',
   SALE: 'bg-blue-100 text-blue-700',
   ADJUSTMENT: 'bg-yellow-100 text-yellow-700',
-  TRANSFER_OUT: 'bg-orange-100 text-orange-700',
+  TRANSFER_OUT: 'bg-brand-100 text-brand-700',
   TRANSFER_IN: 'bg-teal-100 text-teal-700',
   INVENTORY: 'bg-purple-100 text-purple-700',
 };
@@ -215,7 +215,7 @@ export default function MovementsTab({ currentUser }: Props) {
             <select
               value={typeFilter}
               onChange={e => { setTypeFilter(e.target.value); setOffset(0); }}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
             >
               {MOVEMENT_TYPE_OPTIONS.map(o => (
                 <option key={o.value} value={o.value}>{o.label}</option>
@@ -228,7 +228,7 @@ export default function MovementsTab({ currentUser }: Props) {
               type="date"
               value={dateFrom}
               onChange={e => { setDateFrom(e.target.value); setOffset(0); }}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
             />
           </div>
           <div>
@@ -237,7 +237,7 @@ export default function MovementsTab({ currentUser }: Props) {
               type="date"
               value={dateTo}
               onChange={e => { setDateTo(e.target.value); setOffset(0); }}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
             />
           </div>
           <div className="flex-1 min-w-[160px]">
@@ -247,12 +247,12 @@ export default function MovementsTab({ currentUser }: Props) {
               placeholder="Producto, ref..."
               value={searchQ}
               onChange={e => { setSearchQ(e.target.value); setOffset(0); }}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
             />
           </div>
           <button
             onClick={openModal}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
+            className="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
           >
             <i className="ri-add-line"></i>
             Registrar Movimiento
@@ -271,7 +271,7 @@ export default function MovementsTab({ currentUser }: Props) {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {loading ? (
           <div className="flex justify-center py-10">
-            <i className="ri-loader-4-line animate-spin text-orange-500 text-3xl"></i>
+            <i className="ri-loader-4-line animate-spin text-brand-500 text-3xl"></i>
           </div>
         ) : movements.length === 0 ? (
           <div className="py-12 text-center text-gray-400">
@@ -293,7 +293,7 @@ export default function MovementsTab({ currentUser }: Props) {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {movements.map(m => (
-                  <tr key={m.id} className="hover:bg-orange-50/40 transition-colors">
+                  <tr key={m.id} className="hover:bg-brand-50/40 transition-colors">
                     <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
                       {new Date(m.createdAt).toLocaleString('es-AR', {
                         day: '2-digit', month: '2-digit', year: 'numeric',
@@ -373,7 +373,7 @@ export default function MovementsTab({ currentUser }: Props) {
                   <select
                     value={movType}
                     onChange={e => { setMovType(e.target.value as 'ENTRY' | 'ADJUSTMENT'); setMovDirection('in'); }}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
                   >
                     <option value="ENTRY">Entrada</option>
                     <option value="ADJUSTMENT">Ajuste</option>
@@ -385,7 +385,7 @@ export default function MovementsTab({ currentUser }: Props) {
                     <select
                       value={movBranchId}
                       onChange={e => setMovBranchId(Number(e.target.value))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
                     >
                       <option value="">Seleccionar</option>
                       {branches.map(b => (
@@ -433,7 +433,7 @@ export default function MovementsTab({ currentUser }: Props) {
                       placeholder="Buscar por nombre o SKU..."
                       value={productSearch}
                       onChange={e => setProductSearch(e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
                     />
                     {productSearchLoading && (
                       <div className="absolute right-3 top-2.5">
@@ -446,7 +446,7 @@ export default function MovementsTab({ currentUser }: Props) {
                           <li
                             key={p.variantId}
                             onClick={() => addToCart(p)}
-                            className="px-3 py-2 hover:bg-orange-50 cursor-pointer text-sm flex justify-between items-center"
+                            className="px-3 py-2 hover:bg-brand-50 cursor-pointer text-sm flex justify-between items-center"
                           >
                             <span>{p.productName}{p.variantName ? ` — ${p.variantName}` : ''}</span>
                             <span className="text-gray-400 font-mono text-xs ml-2 shrink-0">{p.variantSku || p.productSku || ''}</span>
@@ -460,7 +460,7 @@ export default function MovementsTab({ currentUser }: Props) {
                     min={1}
                     value={cartQty}
                     onChange={e => setCartQty(Math.max(1, Number(e.target.value)))}
-                    className="w-20 border border-gray-300 rounded-lg px-3 py-2 text-sm text-center focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    className="w-20 border border-gray-300 rounded-lg px-3 py-2 text-sm text-center focus:outline-none focus:ring-2 focus:ring-brand-400"
                     title="Cantidad"
                   />
                 </div>
@@ -485,7 +485,7 @@ export default function MovementsTab({ currentUser }: Props) {
                           min={movType === 'ENTRY' ? 1 : undefined}
                           value={item.qty}
                           onChange={e => updateCartQty(item.variantId, Number(e.target.value))}
-                          className="w-20 border border-gray-300 rounded-lg px-2 py-1 text-sm text-center focus:outline-none focus:ring-2 focus:ring-orange-400"
+                          className="w-20 border border-gray-300 rounded-lg px-2 py-1 text-sm text-center focus:outline-none focus:ring-2 focus:ring-brand-400"
                         />
                         <button
                           onClick={() => setCart(prev => prev.filter(i => i.variantId !== item.variantId))}
@@ -507,7 +507,7 @@ export default function MovementsTab({ currentUser }: Props) {
                   placeholder="Nota para todo el movimiento..."
                   value={movNote}
                   onChange={e => setMovNote(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
                 />
               </div>
             </div>
@@ -526,7 +526,7 @@ export default function MovementsTab({ currentUser }: Props) {
                 <button
                   onClick={handleSubmit}
                   disabled={modalLoading || cart.length === 0}
-                  className="px-4 py-2 text-sm bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium flex items-center gap-2 transition-colors disabled:opacity-60"
+                  className="px-4 py-2 text-sm bg-brand-500 hover:bg-brand-600 text-white rounded-lg font-medium flex items-center gap-2 transition-colors disabled:opacity-60"
                 >
                   {modalLoading && <i className="ri-loader-4-line animate-spin"></i>}
                   Guardar {cart.length > 0 ? `(${cart.length})` : ''}

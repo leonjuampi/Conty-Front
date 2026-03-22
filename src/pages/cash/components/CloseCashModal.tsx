@@ -118,10 +118,10 @@ export function CloseCashModal() {
           <p className="text-xs text-red-100 mt-1">Tiempo transcurrido: {getOpenDuration()}</p>
         </div>
 
-        <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-5 md:p-6 text-white">
+        <div className="bg-gradient-to-br from-brand-500 to-brand-600 rounded-xl p-5 md:p-6 text-white">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-orange-100">Total de Ventas</span>
-            <i className="ri-money-dollar-circle-line text-2xl text-orange-200"></i>
+            <span className="text-sm text-brand-100">Total de Ventas</span>
+            <i className="ri-money-dollar-circle-line text-2xl text-brand-200"></i>
           </div>
           <p className="text-2xl md:text-3xl font-bold">
             ${(activeSession?.totalSales || 0).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
@@ -138,7 +138,7 @@ export function CloseCashModal() {
 
       <div className="space-y-4 mb-4 md:mb-6">
         <h2 className="text-lg md:text-xl font-bold text-gray-800 flex items-center">
-          <i className="ri-bank-card-line mr-2 text-orange-600"></i>
+          <i className="ri-bank-card-line mr-2 text-brand-600"></i>
           Verificación de Montos por Método de Pago
         </h2>
 
@@ -148,10 +148,10 @@ export function CloseCashModal() {
           const isConfirmed = confirmed[row.key];
 
           return (
-            <div key={row.key} className="bg-white rounded-xl p-4 md:p-6 border-2 border-gray-100 hover:border-orange-200 transition-colors">
+            <div key={row.key} className="bg-white rounded-xl p-4 md:p-6 border-2 border-gray-100 hover:border-brand-200 transition-colors">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
                 <div className="flex items-center">
-                  <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center mr-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-brand-500 to-brand-600 rounded-lg flex items-center justify-center mr-3">
                     <i className={`${row.icon} text-xl text-white`}></i>
                   </div>
                   <div>
@@ -175,7 +175,7 @@ export function CloseCashModal() {
                       onChange={(e) => handleAmountChange(row.key, e.target.value)}
                       disabled={isConfirmed}
                       className={`w-full pl-8 pr-4 py-3 md:py-4 border-2 rounded-lg text-base font-bold focus:outline-none transition-colors min-h-[52px] ${
-                        isConfirmed ? 'bg-gray-50 border-gray-200 text-gray-500' : 'border-gray-200 focus:border-orange-500 text-gray-800'
+                        isConfirmed ? 'bg-gray-50 border-gray-200 text-gray-500' : 'border-gray-200 focus:border-brand-500 text-gray-800'
                       }`}
                     />
                   </div>
@@ -186,7 +186,7 @@ export function CloseCashModal() {
                   className={`px-4 md:px-6 py-3 md:py-4 rounded-lg font-bold whitespace-nowrap transition-all text-sm min-h-[52px] ${
                     isConfirmed
                       ? 'bg-green-500 text-white cursor-default'
-                      : 'bg-gradient-to-r from-orange-500 to-red-600 text-white hover:from-orange-600 hover:to-red-700 cursor-pointer'
+                      : 'bg-gradient-to-r from-brand-500 to-brand-600 text-white hover:from-brand-600 hover:to-brand-700 cursor-pointer'
                   }`}
                 >
                   {isConfirmed ? <><i className="ri-check-line mr-1"></i>Confirmado</> : 'Confirmar'}
@@ -212,7 +212,7 @@ export function CloseCashModal() {
           disabled={!allConfirmed || loading}
           className={`w-full py-4 md:py-5 rounded-xl font-bold text-base md:text-lg whitespace-nowrap transition-all min-h-[56px] ${
             allConfirmed && !loading
-              ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white hover:from-orange-600 hover:to-red-700 shadow-lg cursor-pointer'
+              ? 'bg-gradient-to-r from-brand-500 to-brand-600 text-white hover:from-brand-600 hover:to-brand-700 shadow-lg cursor-pointer'
               : 'bg-gray-200 text-gray-400 cursor-not-allowed'
           }`}
         >

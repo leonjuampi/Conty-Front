@@ -107,9 +107,9 @@ export default function DashboardPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6">
         {[
           { title: 'Ventas del Mes', value: kpis?.totalSales != null ? formatCurrency(kpis.totalSales) : '—', icon: 'ri-money-dollar-circle-line', color: 'from-green-400 to-emerald-500' },
-          { title: 'Pedidos Totales', value: kpis?.salesCount != null ? String(kpis.salesCount) : '—', icon: 'ri-shopping-cart-line', color: 'from-orange-400 to-red-500' },
+          { title: 'Pedidos Totales', value: kpis?.salesCount != null ? String(kpis.salesCount) : '—', icon: 'ri-shopping-cart-line', color: 'from-brand-400 to-brand-600' },
           { title: 'Ticket Promedio', value: kpis?.averageTicket != null ? formatCurrency(kpis.averageTicket) : '—', icon: 'ri-bar-chart-box-line', color: 'from-teal-400 to-cyan-500' },
-          { title: 'Unidades Vendidas', value: kpis?.unitsSold != null ? String(kpis.unitsSold) : '—', icon: 'ri-shopping-bag-line', color: 'from-orange-400 to-red-500' }
+          { title: 'Unidades Vendidas', value: kpis?.unitsSold != null ? String(kpis.unitsSold) : '—', icon: 'ri-shopping-bag-line', color: 'from-brand-400 to-brand-600' }
         ].map((stat, index) => (
           <StatCard key={index} {...stat} />
         ))}

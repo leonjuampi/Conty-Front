@@ -98,7 +98,7 @@ export default function BranchesManagement() {
           <h2 className="text-lg md:text-xl font-bold text-gray-800">Puntos de Venta</h2>
           <p className="text-xs md:text-sm text-gray-500 mt-1">Sucursales y puntos de venta de tu organización</p>
         </div>
-        <button onClick={openCreate} className="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-3 rounded-lg font-semibold text-sm transition-all whitespace-nowrap cursor-pointer min-h-[48px] w-full sm:w-auto">
+        <button onClick={openCreate} className="flex items-center justify-center gap-2 bg-brand-500 hover:bg-brand-600 text-white px-4 py-3 rounded-lg font-semibold text-sm transition-all whitespace-nowrap cursor-pointer min-h-[48px] w-full sm:w-auto">
           <i className="ri-add-line"></i>
           Nueva Sucursal
         </button>
@@ -113,7 +113,7 @@ export default function BranchesManagement() {
 
       {loading ? (
         <div className="flex justify-center py-10">
-          <i className="ri-loader-4-line animate-spin text-3xl text-orange-500"></i>
+          <i className="ri-loader-4-line animate-spin text-3xl text-brand-500"></i>
         </div>
       ) : branches.length === 0 ? (
         <div className="text-center py-10 text-gray-400 text-sm">No hay sucursales. Crea la primera.</div>
@@ -133,7 +133,7 @@ export default function BranchesManagement() {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {branches.map(b => (
-                  <tr key={b.id} className="hover:bg-orange-50/40 transition-colors">
+                  <tr key={b.id} className="hover:bg-brand-50/40 transition-colors">
                     <td className="px-4 py-3 font-medium text-gray-800">{b.name}</td>
                     <td className="px-4 py-3 text-gray-500 text-xs">{b.address || '—'}</td>
                     <td className="px-4 py-3 text-gray-500 text-xs">{b.phone || '—'}</td>
@@ -149,7 +149,7 @@ export default function BranchesManagement() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex gap-2">
-                        <button onClick={() => openEdit(b)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-orange-100 text-orange-600 cursor-pointer">
+                        <button onClick={() => openEdit(b)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-brand-100 text-brand-600 cursor-pointer">
                           <i className="ri-edit-line"></i>
                         </button>
                         <button onClick={() => setDeleteId(b.id)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-100 text-red-500 cursor-pointer">
@@ -177,7 +177,7 @@ export default function BranchesManagement() {
                   </div>
                 </div>
                 <div className="flex gap-2 mt-3 border-t border-gray-100 pt-3">
-                  <button onClick={() => openEdit(b)} className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg border border-orange-200 text-orange-600 text-xs font-semibold hover:bg-orange-50 cursor-pointer">
+                  <button onClick={() => openEdit(b)} className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg border border-brand-200 text-brand-600 text-xs font-semibold hover:bg-brand-50 cursor-pointer">
                     <i className="ri-edit-line"></i> Editar
                   </button>
                   <button onClick={() => setDeleteId(b.id)} className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg border border-red-200 text-red-500 text-xs font-semibold hover:bg-red-50 cursor-pointer">
@@ -203,20 +203,20 @@ export default function BranchesManagement() {
             <div className="p-4 md:p-6 space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Nombre *</label>
-                <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Ej: Sucursal Centro" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]" />
+                <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Ej: Sucursal Centro" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]" />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Dirección</label>
-                <input type="text" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} placeholder="Ej: Av. Corrientes 1234" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]" />
+                <input type="text" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} placeholder="Ej: Av. Corrientes 1234" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Teléfono</label>
-                  <input type="text" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="Ej: 11-4444-5555" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]" />
+                  <input type="text" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="Ej: 11-4444-5555" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]" />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Canal</label>
-                  <select value={form.channel} onChange={e => setForm({ ...form, channel: e.target.value as Branch['channel'] })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]">
+                  <select value={form.channel} onChange={e => setForm({ ...form, channel: e.target.value as Branch['channel'] })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]">
                     <option value="LOCAL">Local</option>
                     <option value="ONLINE">Online</option>
                   </select>
@@ -225,16 +225,16 @@ export default function BranchesManagement() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Nombre Impresora</label>
-                  <input type="text" value={form.printerName} onChange={e => setForm({ ...form, printerName: e.target.value })} placeholder="Ej: Ticket POS-001" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]" />
+                  <input type="text" value={form.printerName} onChange={e => setForm({ ...form, printerName: e.target.value })} placeholder="Ej: Ticket POS-001" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]" />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Código POS</label>
-                  <input type="text" value={form.printerCode} onChange={e => setForm({ ...form, printerCode: e.target.value })} placeholder="Ej: POS-001" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]" />
+                  <input type="text" value={form.printerCode} onChange={e => setForm({ ...form, printerCode: e.target.value })} placeholder="Ej: POS-001" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]" />
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Estado</label>
-                <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value as Branch['status'] })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]">
+                <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value as Branch['status'] })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]">
                   <option value="ACTIVE">Activo</option>
                   <option value="INACTIVE">Inactivo</option>
                 </select>
@@ -248,7 +248,7 @@ export default function BranchesManagement() {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 p-4 md:p-6 border-t border-gray-100 bg-gray-50">
               <button onClick={() => setShowModal(false)} className="flex-1 py-3 rounded-lg border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-all text-sm cursor-pointer min-h-[48px]">Cancelar</button>
-              <button onClick={handleSave} disabled={saving} className="flex-1 py-3 rounded-lg bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white font-semibold transition-all text-sm cursor-pointer min-h-[48px]">
+              <button onClick={handleSave} disabled={saving} className="flex-1 py-3 rounded-lg bg-brand-500 hover:bg-brand-600 disabled:opacity-60 text-white font-semibold transition-all text-sm cursor-pointer min-h-[48px]">
                 {saving ? <><i className="ri-loader-4-line animate-spin mr-1"></i>Guardando...</> : (editing ? 'Guardar Cambios' : 'Crear Sucursal')}
               </button>
             </div>

@@ -312,7 +312,7 @@ export default function ReportsPage() {
   const tabs = isVendedor ? allTabs.filter(t => t.sellerVisible) : allTabs;
 
   const detailTabs: { id: 'Particular' | 'Pedidos Ya' | 'Rappi'; label: string; icon: string; color: string; activeClass: string }[] = [
-    { id: 'Particular', label: 'Particular', icon: 'ri-store-2-line', color: 'text-orange-600', activeClass: 'bg-orange-500 text-white shadow' },
+    { id: 'Particular', label: 'Particular', icon: 'ri-store-2-line', color: 'text-brand-600', activeClass: 'bg-brand-500 text-white shadow' },
     { id: 'Pedidos Ya', label: 'Pedidos Ya', icon: 'ri-motorbike-line', color: 'text-yellow-600', activeClass: 'bg-yellow-500 text-white shadow' },
     { id: 'Rappi', label: 'Rappi', icon: 'ri-e-bike-line', color: 'text-red-600', activeClass: 'bg-red-500 text-white shadow' }
   ];
@@ -328,7 +328,7 @@ export default function ReportsPage() {
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 px-4 py-3 mb-4 flex flex-col md:flex-row md:flex-wrap md:items-center gap-3">
         <div className="flex items-center gap-2 text-sm font-semibold text-gray-600 shrink-0">
           <div className="w-5 h-5 flex items-center justify-center">
-            <i className="ri-filter-3-line text-orange-500 text-base"></i>
+            <i className="ri-filter-3-line text-brand-500 text-base"></i>
           </div>
           Filtros
         </div>
@@ -350,7 +350,7 @@ export default function ReportsPage() {
           </div>
         </div>
         <div className="flex-1 min-w-0 md:min-w-[200px]">
-          <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus-within:border-orange-400 focus-within:ring-1 focus-within:ring-orange-200 transition-all">
+          <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus-within:border-brand-400 focus-within:ring-1 focus-within:ring-brand-200 transition-all">
             <div className="w-4 h-4 flex items-center justify-center shrink-0">
               <i className="ri-search-line text-gray-400 text-sm"></i>
             </div>
@@ -363,12 +363,12 @@ export default function ReportsPage() {
           </div>
         </div>
         {(searchQuery || dateFrom !== defaultDateFrom || dateTo !== defaultDateTo) && (
-          <button onClick={() => { setSearchQuery(''); setDateFrom(defaultDateFrom); setDateTo(defaultDateTo); }} className="flex items-center gap-1.5 text-xs text-orange-600 hover:text-orange-700 font-medium cursor-pointer whitespace-nowrap bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 transition-colors">
+          <button onClick={() => { setSearchQuery(''); setDateFrom(defaultDateFrom); setDateTo(defaultDateTo); }} className="flex items-center gap-1.5 text-xs text-brand-600 hover:text-brand-700 font-medium cursor-pointer whitespace-nowrap bg-brand-50 border border-brand-200 rounded-lg px-3 py-2 transition-colors">
             <div className="w-3 h-3 flex items-center justify-center"><i className="ri-refresh-line text-xs"></i></div>
             Limpiar filtros
           </button>
         )}
-        {loading && <i className="ri-loader-4-line animate-spin text-orange-500 text-lg ml-auto"></i>}
+        {loading && <i className="ri-loader-4-line animate-spin text-brand-500 text-lg ml-auto"></i>}
       </div>
 
       {/* Contenedor principal */}
@@ -379,7 +379,7 @@ export default function ReportsPage() {
           <div className="flex gap-1 px-3 py-2 min-w-max">
             {tabs.map(tab => (
               <button key={tab.id} onClick={() => setSelectedReport(tab.id as any)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium text-xs transition-all cursor-pointer whitespace-nowrap ${selectedReport === tab.id ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-md' : 'text-gray-600 bg-gray-50 hover:bg-orange-50 hover:text-orange-600'}`}>
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium text-xs transition-all cursor-pointer whitespace-nowrap ${selectedReport === tab.id ? 'bg-gradient-to-r from-brand-500 to-brand-600 text-white shadow-md' : 'text-gray-600 bg-gray-50 hover:bg-brand-50 hover:text-brand-600'}`}>
                 <i className={`${tab.icon} text-sm`}></i>
                 {tab.label}
               </button>
@@ -391,7 +391,7 @@ export default function ReportsPage() {
         <div className="hidden md:flex w-56 shrink-0 border-r border-gray-100 py-4 flex-col gap-1">
           {tabs.map(tab => (
             <button key={tab.id} onClick={() => setSelectedReport(tab.id as any)}
-              className={`flex items-center gap-3 px-4 py-3 mx-2 rounded-lg font-medium text-sm transition-all cursor-pointer text-left whitespace-nowrap ${selectedReport === tab.id ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-md' : 'text-gray-600 hover:bg-orange-50 hover:text-orange-600'}`}>
+              className={`flex items-center gap-3 px-4 py-3 mx-2 rounded-lg font-medium text-sm transition-all cursor-pointer text-left whitespace-nowrap ${selectedReport === tab.id ? 'bg-gradient-to-r from-brand-500 to-brand-600 text-white shadow-md' : 'text-gray-600 hover:bg-brand-50 hover:text-brand-600'}`}>
               <div className="w-5 h-5 flex items-center justify-center shrink-0">
                 <i className={`${tab.icon} text-base`}></i>
               </div>
@@ -415,9 +415,9 @@ export default function ReportsPage() {
               ) : (
                 <div className="space-y-3">
                   {topClients.map((client, index) => (
-                    <div key={client.id} className="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg p-3 md:p-4 border border-orange-200 flex justify-between items-center gap-3">
+                    <div key={client.id} className="bg-gradient-to-r from-brand-50 to-brand-100 rounded-lg p-3 md:p-4 border border-brand-200 flex justify-between items-center gap-3">
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-10 h-10 md:w-12 md:h-12 shrink-0 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center text-white font-bold text-base md:text-lg">{index + 1}</div>
+                        <div className="w-10 h-10 md:w-12 md:h-12 shrink-0 bg-gradient-to-r from-brand-500 to-brand-600 rounded-full flex items-center justify-center text-white font-bold text-base md:text-lg">{index + 1}</div>
                         <div className="min-w-0">
                           <h3 className="font-semibold text-gray-800 text-sm md:text-base truncate">{client.firstName} {client.lastName}</h3>
                           <p className="text-xs md:text-sm text-gray-600">{client.phone}</p>
@@ -425,7 +425,7 @@ export default function ReportsPage() {
                         </div>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-lg md:text-2xl font-bold text-orange-600">${client.totalSpent.toLocaleString()}</p>
+                        <p className="text-lg md:text-2xl font-bold text-brand-600">${client.totalSpent.toLocaleString()}</p>
                         <p className="text-xs md:text-sm text-gray-600">{client.totalOrders} pedidos</p>
                       </div>
                     </div>
@@ -462,8 +462,8 @@ export default function ReportsPage() {
                           <td className="px-3 py-2.5 text-gray-400 font-medium">{i + 1}</td>
                           <td className="px-3 py-2.5 font-medium text-gray-800">
                             <div className="flex items-center gap-2">
-                              <div className="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
-                                <i className="ri-user-line text-orange-500 text-sm"></i>
+                              <div className="w-7 h-7 rounded-full bg-brand-100 flex items-center justify-center shrink-0">
+                                <i className="ri-user-line text-brand-500 text-sm"></i>
                               </div>
                               {s.sellerName || 'Sin asignar'}
                             </div>
@@ -506,8 +506,8 @@ export default function ReportsPage() {
                           <td className="px-3 py-2.5 text-gray-400 font-medium">{i + 1}</td>
                           <td className="px-3 py-2.5 font-medium text-gray-800">
                             <div className="flex items-center gap-2">
-                              <div className="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
-                                <i className="ri-shopping-bag-line text-orange-500 text-sm"></i>
+                              <div className="w-7 h-7 rounded-full bg-brand-100 flex items-center justify-center shrink-0">
+                                <i className="ri-shopping-bag-line text-brand-500 text-sm"></i>
                               </div>
                               {p.productName}
                             </div>
@@ -538,7 +538,7 @@ export default function ReportsPage() {
                 <div className="space-y-3">
                   {[
                     { icon: 'ri-money-dollar-circle-line', color: 'text-green-600', label: 'Efectivo', value: cashStatus.cash },
-                    { icon: 'ri-bank-card-line', color: 'text-orange-600', label: 'Tarjeta', value: cashStatus.creditCard },
+                    { icon: 'ri-bank-card-line', color: 'text-brand-600', label: 'Tarjeta', value: cashStatus.creditCard },
                     { icon: 'ri-smartphone-line', color: 'text-teal-600', label: 'Mercado Pago', value: cashStatus.mercadoPago }
                   ].map((item, i) => (
                     <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -556,22 +556,22 @@ export default function ReportsPage() {
             <div>
               <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-4 md:mb-5">Reporte por Tipo de Pedido</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-                <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-200 p-4 md:p-5">
+                <div className="bg-gradient-to-br from-brand-50 to-amber-50 rounded-xl border border-brand-200 p-4 md:p-5">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center bg-orange-500 rounded-lg text-white shrink-0">
+                    <div className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center bg-brand-500 rounded-lg text-white shrink-0">
                       <i className="ri-store-2-line text-lg md:text-xl"></i>
                     </div>
                     <h3 className="text-base md:text-lg font-bold text-gray-800">Particular</h3>
-                    <span className="ml-auto bg-orange-100 text-orange-700 text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap">{particularPct}% del total</span>
+                    <span className="ml-auto bg-brand-100 text-brand-700 text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap">{particularPct}% del total</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2 md:gap-3">
-                    <div className="bg-white rounded-lg p-3 border border-orange-100"><p className="text-xs text-gray-500 mb-1">Pedidos</p><p className="text-xl md:text-2xl font-bold text-orange-600">{typeStats.particular.count}</p></div>
-                    <div className="bg-white rounded-lg p-3 border border-orange-100"><p className="text-xs text-gray-500 mb-1">Total facturado</p><p className="text-base md:text-xl font-bold text-gray-800">${typeStats.particular.total.toLocaleString()}</p></div>
-                    <div className="bg-white rounded-lg p-3 border border-orange-100 col-span-2"><p className="text-xs text-gray-500 mb-1">Ticket promedio</p><p className="text-base md:text-xl font-bold text-gray-800">${typeStats.particular.avg.toLocaleString()}</p></div>
+                    <div className="bg-white rounded-lg p-3 border border-brand-100"><p className="text-xs text-gray-500 mb-1">Pedidos</p><p className="text-xl md:text-2xl font-bold text-brand-600">{typeStats.particular.count}</p></div>
+                    <div className="bg-white rounded-lg p-3 border border-brand-100"><p className="text-xs text-gray-500 mb-1">Total facturado</p><p className="text-base md:text-xl font-bold text-gray-800">${typeStats.particular.total.toLocaleString()}</p></div>
+                    <div className="bg-white rounded-lg p-3 border border-brand-100 col-span-2"><p className="text-xs text-gray-500 mb-1">Ticket promedio</p><p className="text-base md:text-xl font-bold text-gray-800">${typeStats.particular.avg.toLocaleString()}</p></div>
                   </div>
                   <div className="mt-4">
                     <div className="flex justify-between text-xs text-gray-500 mb-1"><span>Participación en ventas</span><span>{particularPct}%</span></div>
-                    <div className="w-full bg-orange-100 rounded-full h-2"><div className="bg-orange-500 h-2 rounded-full transition-all" style={{ width: `${particularPct}%` }}></div></div>
+                    <div className="w-full bg-brand-100 rounded-full h-2"><div className="bg-brand-500 h-2 rounded-full transition-all" style={{ width: `${particularPct}%` }}></div></div>
                   </div>
                 </div>
                 <div className="flex flex-col gap-3">
@@ -666,7 +666,7 @@ export default function ReportsPage() {
                       {detailOrders.length === 0 ? (
                         <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-400 text-sm">No hay pedidos que coincidan con los filtros</td></tr>
                       ) : detailOrders.map(order => (
-                        <tr key={order.id} className="hover:bg-orange-50 transition-colors">
+                        <tr key={order.id} className="hover:bg-brand-50 transition-colors">
                           <td className="px-3 py-2.5 text-xs font-medium text-gray-800">{order.id}</td>
                           <td className="px-3 py-2.5 text-xs text-gray-600 whitespace-nowrap">
                             <p>{new Date(order.date).toLocaleDateString('es-AR')}</p>
@@ -676,7 +676,7 @@ export default function ReportsPage() {
                           <td className="px-3 py-2.5 text-xs font-semibold text-gray-800 whitespace-nowrap">${order.total.toLocaleString()}</td>
                           <td className="px-3 py-2.5">
                             <button onClick={() => openOrderDetail(order)}
-                              className="w-7 h-7 flex items-center justify-center bg-orange-100 hover:bg-orange-200 text-orange-600 rounded-lg transition-colors cursor-pointer">
+                              className="w-7 h-7 flex items-center justify-center bg-brand-100 hover:bg-brand-200 text-brand-600 rounded-lg transition-colors cursor-pointer">
                               <i className="ri-eye-line text-sm"></i>
                             </button>
                           </td>
@@ -710,7 +710,7 @@ export default function ReportsPage() {
                     {historyOrders.length === 0 ? (
                       <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-400 text-sm">No hay pedidos que coincidan con los filtros</td></tr>
                     ) : historyOrders.map(order => (
-                      <tr key={order.id} className={`hover:bg-orange-50 transition-colors ${order.hasPendingPayment ? 'bg-amber-50/40' : ''}`}>
+                      <tr key={order.id} className={`hover:bg-brand-50 transition-colors ${order.hasPendingPayment ? 'bg-amber-50/40' : ''}`}>
                         <td className="px-3 py-2.5 text-xs font-medium text-gray-800">{order.id}</td>
                         <td className="px-3 py-2.5 text-xs text-gray-600 whitespace-nowrap">
                           <p>{new Date(order.date).toLocaleDateString('es-AR')}</p>
@@ -724,7 +724,7 @@ export default function ReportsPage() {
                               <i className="ri-time-line text-xs"></i>Pago pendiente
                             </span>
                           ) : (
-                            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap ${order.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : order.status === 'CANCELLED' ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'}`}>
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap ${order.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : order.status === 'CANCELLED' ? 'bg-red-100 text-red-700' : 'bg-brand-100 text-brand-700'}`}>
                               {order.status === 'COMPLETED' ? 'Completado' : order.status === 'CANCELLED' ? 'Cancelado' : order.status}
                             </span>
                           )}
@@ -738,7 +738,7 @@ export default function ReportsPage() {
                           )}
                         </td>
                         <td className="px-3 py-2.5">
-                          <button onClick={() => openOrderDetail(order)} className="w-7 h-7 flex items-center justify-center bg-orange-100 hover:bg-orange-200 text-orange-600 rounded-lg transition-colors cursor-pointer">
+                          <button onClick={() => openOrderDetail(order)} className="w-7 h-7 flex items-center justify-center bg-brand-100 hover:bg-brand-200 text-brand-600 rounded-lg transition-colors cursor-pointer">
                             <i className="ri-eye-line text-sm"></i>
                           </button>
                         </td>
@@ -755,9 +755,9 @@ export default function ReportsPage() {
             <div>
               <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-4 md:mb-5">Historial de Cierres de Caja</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mb-5 md:mb-6">
-                <div className="bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200 rounded-xl p-3 md:p-4">
+                <div className="bg-gradient-to-br from-brand-50 to-amber-50 border border-brand-200 rounded-xl p-3 md:p-4">
                   <p className="text-xs text-gray-500 mb-1">Total Facturado</p>
-                  <p className="text-base md:text-xl font-bold text-orange-600">${cashSessionTotals.totalSales.toLocaleString('es-AR')}</p>
+                  <p className="text-base md:text-xl font-bold text-brand-600">${cashSessionTotals.totalSales.toLocaleString('es-AR')}</p>
                   <p className="text-xs text-gray-400 mt-1">{filteredCashSessions.length} turnos</p>
                 </div>
                 <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl p-3 md:p-4">
@@ -806,11 +806,11 @@ export default function ReportsPage() {
                       {filteredCashSessions.map(session => {
                         const hasDiff = session.cashDifference !== 0;
                         return (
-                          <tr key={session.id} className="hover:bg-orange-50 transition-colors">
+                          <tr key={session.id} className="hover:bg-brand-50 transition-colors">
                             <td className="px-3 py-2.5 text-xs font-medium text-gray-700">{session.id}</td>
                             <td className="px-3 py-2.5">
                               <div className="flex items-center gap-1.5">
-                                <div className="w-6 h-6 flex items-center justify-center bg-orange-100 rounded-full shrink-0"><i className="ri-user-line text-orange-600 text-xs"></i></div>
+                                <div className="w-6 h-6 flex items-center justify-center bg-brand-100 rounded-full shrink-0"><i className="ri-user-line text-brand-600 text-xs"></i></div>
                                 <span className="text-xs text-gray-700 whitespace-nowrap">{session.userName}</span>
                               </div>
                             </td>
@@ -823,7 +823,7 @@ export default function ReportsPage() {
                               <p className="text-gray-400">{new Date(session.closedAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</p>
                             </td>
                             <td className="px-3 py-2.5 text-xs text-center font-semibold text-gray-700">{session.totalOrders}</td>
-                            <td className="px-3 py-2.5 text-xs font-bold text-orange-600 whitespace-nowrap">${session.totalSales.toLocaleString('es-AR')}</td>
+                            <td className="px-3 py-2.5 text-xs font-bold text-brand-600 whitespace-nowrap">${session.totalSales.toLocaleString('es-AR')}</td>
                             <td className="px-3 py-2.5">
                               {hasDiff ? (
                                 <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap ${session.cashDifference > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
@@ -837,7 +837,7 @@ export default function ReportsPage() {
                               )}
                             </td>
                             <td className="px-3 py-2.5">
-                              <button onClick={() => setSelectedCashSession(session)} className="w-7 h-7 flex items-center justify-center bg-orange-100 hover:bg-orange-200 text-orange-600 rounded-lg transition-colors cursor-pointer">
+                              <button onClick={() => setSelectedCashSession(session)} className="w-7 h-7 flex items-center justify-center bg-brand-100 hover:bg-brand-200 text-brand-600 rounded-lg transition-colors cursor-pointer">
                                 <i className="ri-eye-line text-sm"></i>
                               </button>
                             </td>
@@ -857,7 +857,7 @@ export default function ReportsPage() {
       {registerPaymentSale && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm">
-            <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-t-2xl p-4 flex items-center justify-between">
+            <div className="bg-gradient-to-r from-amber-500 to-brand-500 rounded-t-2xl p-4 flex items-center justify-between">
               <div>
                 <h2 className="text-white font-bold text-base">Registrar Pago</h2>
                 <p className="text-amber-100 text-xs mt-0.5">{registerPaymentSale.id} — ${registerPaymentSale.total.toLocaleString()}</p>
@@ -911,7 +911,7 @@ export default function ReportsPage() {
                       setPaymentModalLoading(false);
                     }
                   }}
-                  className="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold py-2.5 rounded-xl hover:from-amber-600 hover:to-orange-600 cursor-pointer text-sm disabled:opacity-60 flex items-center justify-center gap-2">
+                  className="flex-1 bg-gradient-to-r from-amber-500 to-brand-500 text-white font-bold py-2.5 rounded-xl hover:from-amber-600 hover:to-brand-600 cursor-pointer text-sm disabled:opacity-60 flex items-center justify-center gap-2">
                   {paymentModalLoading ? <><i className="ri-loader-4-line animate-spin"></i>Guardando...</> : 'Confirmar'}
                 </button>
               </div>
@@ -924,10 +924,10 @@ export default function ReportsPage() {
       {selectedOrder && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-t-2xl p-4 md:p-5 flex items-center justify-between">
+            <div className="bg-gradient-to-r from-brand-500 to-brand-600 rounded-t-2xl p-4 md:p-5 flex items-center justify-between">
               <div>
                 <h2 className="text-white font-bold text-base md:text-lg">Detalle del Pedido</h2>
-                <p className="text-orange-100 text-sm">{selectedOrder.id}</p>
+                <p className="text-brand-100 text-sm">{selectedOrder.id}</p>
               </div>
               <button onClick={() => setSelectedOrder(null)} className="w-8 h-8 flex items-center justify-center bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors cursor-pointer">
                 <i className="ri-close-line text-lg"></i>
@@ -945,7 +945,7 @@ export default function ReportsPage() {
               <div>
                 <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Productos</h3>
                 {loadingDetail ? (
-                  <div className="flex justify-center py-4"><i className="ri-loader-4-line animate-spin text-xl text-orange-500"></i></div>
+                  <div className="flex justify-center py-4"><i className="ri-loader-4-line animate-spin text-xl text-brand-500"></i></div>
                 ) : saleDetail && saleDetail.items.length > 0 ? (
                   <div className="border border-gray-200 rounded-xl overflow-hidden">
                     <table className="w-full text-sm">
@@ -989,11 +989,11 @@ export default function ReportsPage() {
                 </div>
               )}
 
-              <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-4 border border-orange-200 flex justify-between items-center">
+              <div className="bg-gradient-to-r from-brand-50 to-brand-100 rounded-xl p-4 border border-brand-200 flex justify-between items-center">
                 <span className="font-bold text-gray-800">Total</span>
-                <span className="text-xl font-bold text-orange-600">${selectedOrder.total.toLocaleString()}</span>
+                <span className="text-xl font-bold text-brand-600">${selectedOrder.total.toLocaleString()}</span>
               </div>
-              <button onClick={() => { setSelectedOrder(null); setSaleDetail(null); }} className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all cursor-pointer whitespace-nowrap">
+              <button onClick={() => { setSelectedOrder(null); setSaleDetail(null); }} className="w-full bg-gradient-to-r from-brand-500 to-brand-600 text-white py-3 rounded-xl font-semibold hover:from-brand-600 hover:to-brand-700 transition-all cursor-pointer whitespace-nowrap">
                 Cerrar
               </button>
             </div>
@@ -1005,10 +1005,10 @@ export default function ReportsPage() {
       {selectedCashSession && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-t-2xl p-4 md:p-5 flex items-center justify-between">
+            <div className="bg-gradient-to-r from-brand-500 to-brand-600 rounded-t-2xl p-4 md:p-5 flex items-center justify-between">
               <div>
                 <h2 className="text-white font-bold text-base md:text-lg">Detalle de Cierre de Caja</h2>
-                <p className="text-orange-100 text-sm">{selectedCashSession.id}</p>
+                <p className="text-brand-100 text-sm">{selectedCashSession.id}</p>
               </div>
               <button onClick={() => setSelectedCashSession(null)} className="w-8 h-8 flex items-center justify-center bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors cursor-pointer">
                 <i className="ri-close-line text-lg"></i>
@@ -1038,7 +1038,7 @@ export default function ReportsPage() {
               </div>
               <div>
                 <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2 text-sm md:text-base">
-                  <i className="ri-bank-card-line text-orange-500"></i>
+                  <i className="ri-bank-card-line text-brand-500"></i>
                   Desglose por Método de Pago
                 </h3>
                 <div className="border border-gray-200 rounded-xl overflow-hidden overflow-x-auto">
@@ -1066,10 +1066,10 @@ export default function ReportsPage() {
                         const actualAmt = selectedCashSession.actualJson[key] !== undefined ? selectedCashSession.actualJson[key] : expected;
                         const diff = actualAmt - expected;
                         return (
-                          <tr key={key} className="hover:bg-orange-50 transition-colors">
+                          <tr key={key} className="hover:bg-brand-50 transition-colors">
                             <td className="px-3 py-2.5">
                               <div className="flex items-center gap-2">
-                                <i className={`${iconMap[key] ?? 'ri-wallet-line'} text-orange-500 text-sm`}></i>
+                                <i className={`${iconMap[key] ?? 'ri-wallet-line'} text-brand-500 text-sm`}></i>
                                 <span className="text-xs text-gray-700">{labelMap[key] ?? key}</span>
                               </div>
                             </td>
@@ -1091,13 +1091,13 @@ export default function ReportsPage() {
                   </table>
                 </div>
               </div>
-              <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-4 border border-orange-200">
+              <div className="bg-gradient-to-r from-brand-50 to-brand-100 rounded-xl p-4 border border-brand-200">
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-gray-800 text-sm">Total Ventas del Turno</span>
-                  <span className="text-lg md:text-xl font-bold text-orange-600">${selectedCashSession.totalSales.toLocaleString('es-AR')}</span>
+                  <span className="text-lg md:text-xl font-bold text-brand-600">${selectedCashSession.totalSales.toLocaleString('es-AR')}</span>
                 </div>
               </div>
-              <button onClick={() => setSelectedCashSession(null)} className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all cursor-pointer whitespace-nowrap">
+              <button onClick={() => setSelectedCashSession(null)} className="w-full bg-gradient-to-r from-brand-500 to-brand-600 text-white py-3 rounded-xl font-semibold hover:from-brand-600 hover:to-brand-700 transition-all cursor-pointer whitespace-nowrap">
                 Cerrar
               </button>
             </div>

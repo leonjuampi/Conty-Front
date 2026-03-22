@@ -116,7 +116,7 @@ export default function NumberingManagement() {
           <h2 className="text-lg md:text-xl font-bold text-gray-800">Numeracion de Documentos</h2>
           <p className="text-xs md:text-sm text-gray-500 mt-1">Configurá el formato y numeración de facturas y documentos</p>
         </div>
-        <button onClick={openCreate} className="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-3 rounded-lg font-semibold text-sm transition-all whitespace-nowrap cursor-pointer min-h-[48px] w-full sm:w-auto">
+        <button onClick={openCreate} className="flex items-center justify-center gap-2 bg-brand-500 hover:bg-brand-600 text-white px-4 py-3 rounded-lg font-semibold text-sm transition-all whitespace-nowrap cursor-pointer min-h-[48px] w-full sm:w-auto">
           <i className="ri-add-line"></i>
           Nueva Regla
         </button>
@@ -138,7 +138,7 @@ export default function NumberingManagement() {
 
       {loading ? (
         <div className="flex justify-center py-10">
-          <i className="ri-loader-4-line animate-spin text-3xl text-orange-500"></i>
+          <i className="ri-loader-4-line animate-spin text-3xl text-brand-500"></i>
         </div>
       ) : rules.length === 0 ? (
         <div className="text-center py-10 text-gray-400 text-sm">No hay reglas de numeración. Crea la primera.</div>
@@ -157,10 +157,10 @@ export default function NumberingManagement() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {rules.map(r => (
-                <tr key={r.docType} className="hover:bg-orange-50/40 transition-colors">
+                <tr key={r.docType} className="hover:bg-brand-50/40 transition-colors">
                   <td className="px-4 py-3 font-medium text-gray-800">{DOC_TYPE_LABELS[r.docType] || r.docType}</td>
                   <td className="px-4 py-3 font-mono text-xs text-gray-600">{r.format}</td>
-                  <td className="px-4 py-3 font-mono text-xs text-orange-700 font-semibold">{formatPreview(r.format, r.padding)}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-brand-700 font-semibold">{formatPreview(r.format, r.padding)}</td>
                   <td className="px-4 py-3 text-gray-600 text-center">{r.nextNumber}</td>
                   <td className="px-4 py-3">
                     <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
@@ -169,7 +169,7 @@ export default function NumberingManagement() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex gap-2">
-                      <button onClick={() => openEdit(r)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-orange-100 text-orange-600 cursor-pointer">
+                      <button onClick={() => openEdit(r)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-brand-100 text-brand-600 cursor-pointer">
                         <i className="ri-edit-line"></i>
                       </button>
                       <button onClick={() => setDeleteDocType(r.docType)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-100 text-red-500 cursor-pointer">
@@ -196,36 +196,36 @@ export default function NumberingManagement() {
             <div className="p-4 md:p-6 space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Tipo de Documento *</label>
-                <select value={form.docType} onChange={e => setForm({ ...form, docType: e.target.value })} disabled={!!editing} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px] disabled:bg-gray-100">
+                <select value={form.docType} onChange={e => setForm({ ...form, docType: e.target.value })} disabled={!!editing} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px] disabled:bg-gray-100">
                   {Object.entries(DOC_TYPE_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                   <option value="custom">Personalizado...</option>
                 </select>
                 {form.docType === 'custom' && (
-                  <input type="text" value={form.customDocType} onChange={e => setForm({ ...form, customDocType: e.target.value.toUpperCase() })} placeholder="Ej: DELIVERY_ORDER" className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px] font-mono" />
+                  <input type="text" value={form.customDocType} onChange={e => setForm({ ...form, customDocType: e.target.value.toUpperCase() })} placeholder="Ej: DELIVERY_ORDER" className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px] font-mono" />
                 )}
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Formato *</label>
-                <input type="text" value={form.format} onChange={e => setForm({ ...form, format: e.target.value })} placeholder="Ej: FA-{PV}-{NUM}" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px] font-mono" />
+                <input type="text" value={form.format} onChange={e => setForm({ ...form, format: e.target.value })} placeholder="Ej: FA-{PV}-{NUM}" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px] font-mono" />
                 {form.format && (
                   <p className="text-xs text-gray-500 mt-1">
-                    Preview: <span className="font-mono font-semibold text-orange-700">{formatPreview(form.format, form.padding)}</span>
+                    Preview: <span className="font-mono font-semibold text-brand-700">{formatPreview(form.format, form.padding)}</span>
                   </p>
                 )}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Próximo número</label>
-                  <input type="number" min="1" value={form.nextNumber} onChange={e => setForm({ ...form, nextNumber: parseInt(e.target.value) || 1 })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]" />
+                  <input type="number" min="1" value={form.nextNumber} onChange={e => setForm({ ...form, nextNumber: parseInt(e.target.value) || 1 })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]" />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Padding (dígitos)</label>
-                  <input type="number" min="1" max="12" value={form.padding} onChange={e => setForm({ ...form, padding: parseInt(e.target.value) || 8 })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]" />
+                  <input type="number" min="1" max="12" value={form.padding} onChange={e => setForm({ ...form, padding: parseInt(e.target.value) || 8 })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]" />
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Política de reinicio</label>
-                <select value={form.resetPolicy} onChange={e => setForm({ ...form, resetPolicy: e.target.value as NumberingRule['resetPolicy'] })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]">
+                <select value={form.resetPolicy} onChange={e => setForm({ ...form, resetPolicy: e.target.value as NumberingRule['resetPolicy'] })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]">
                   <option value="NEVER">Nunca reiniciar</option>
                   <option value="YEARLY">Reiniciar anualmente</option>
                   <option value="MONTHLY">Reiniciar mensualmente</option>
@@ -240,7 +240,7 @@ export default function NumberingManagement() {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 p-4 md:p-6 border-t border-gray-100 bg-gray-50">
               <button onClick={() => setShowModal(false)} className="flex-1 py-3 rounded-lg border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-all text-sm cursor-pointer min-h-[48px]">Cancelar</button>
-              <button onClick={handleSave} disabled={saving} className="flex-1 py-3 rounded-lg bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white font-semibold transition-all text-sm cursor-pointer min-h-[48px]">
+              <button onClick={handleSave} disabled={saving} className="flex-1 py-3 rounded-lg bg-brand-500 hover:bg-brand-600 disabled:opacity-60 text-white font-semibold transition-all text-sm cursor-pointer min-h-[48px]">
                 {saving ? <><i className="ri-loader-4-line animate-spin mr-1"></i>Guardando...</> : (editing ? 'Guardar Cambios' : 'Crear Regla')}
               </button>
             </div>

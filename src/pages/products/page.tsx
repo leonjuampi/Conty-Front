@@ -183,7 +183,7 @@ export default function ProductsPage() {
     return (
       <AppLayout>
         <div className="flex justify-center py-16">
-          <i className="ri-loader-4-line animate-spin text-3xl text-orange-500"></i>
+          <i className="ri-loader-4-line animate-spin text-3xl text-brand-500"></i>
         </div>
       </AppLayout>
     );
@@ -199,7 +199,7 @@ export default function ProductsPage() {
           </div>
           <div className="flex flex-wrap gap-2 w-full sm:w-auto">
             <button onClick={() => setShowCategoryModal(true)}
-              className="flex items-center gap-2 px-3 py-2.5 bg-white border border-orange-400 text-orange-600 rounded-lg hover:bg-orange-50 cursor-pointer whitespace-nowrap font-medium text-sm">
+              className="flex items-center gap-2 px-3 py-2.5 bg-white border border-brand-400 text-brand-600 rounded-lg hover:bg-brand-50 cursor-pointer whitespace-nowrap font-medium text-sm">
               <i className="ri-price-tag-3-line"></i>
               <span>Categorías</span>
             </button>
@@ -215,7 +215,7 @@ export default function ProductsPage() {
               <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleImportFile} />
             </label>
             <button onClick={() => { setSelectedProduct(null); setShowForm(true); }}
-              className="flex items-center gap-2 px-3 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:shadow-lg cursor-pointer whitespace-nowrap font-medium text-sm">
+              className="flex items-center gap-2 px-3 py-2.5 bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-lg hover:shadow-lg cursor-pointer whitespace-nowrap font-medium text-sm">
               <i className="ri-add-line"></i>
               <span>Nuevo Producto</span>
             </button>
@@ -253,10 +253,10 @@ export default function ProductsPage() {
             <i className="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
             <input type="text" placeholder="Buscar productos..." value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 text-sm" />
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 text-sm" />
           </div>
           <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 text-sm cursor-pointer">
+            className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 text-sm cursor-pointer">
             <option value="all">Todas las categorías</option>
             {filterCategories.filter(c => c !== 'all').map(cat => (<option key={cat} value={cat}>{cat}</option>))}
           </select>
@@ -280,10 +280,10 @@ export default function ProductsPage() {
                 <tr key={product.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className={`w-12 h-12 flex items-center justify-center rounded-lg shrink-0 overflow-hidden ${product.isCombo ? 'bg-gradient-to-br from-purple-100 to-violet-100' : 'bg-gradient-to-br from-orange-100 to-red-100'}`}>
+                      <div className={`w-12 h-12 flex items-center justify-center rounded-lg shrink-0 overflow-hidden ${product.isCombo ? 'bg-gradient-to-br from-purple-100 to-violet-100' : 'bg-gradient-to-br from-brand-100 to-brand-100'}`}>
                         {product.image
                           ? <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
-                          : <i className={`${product.isCombo ? 'ri-gift-line text-purple-500' : 'ri-restaurant-line text-orange-500'} text-xl`}></i>}
+                          : <i className={`${product.isCombo ? 'ri-gift-line text-purple-500' : 'ri-restaurant-line text-brand-500'} text-xl`}></i>}
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
@@ -305,7 +305,7 @@ export default function ProductsPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-center gap-2">
                       <button onClick={() => handleEditProduct(product)}
-                        className="w-8 h-8 flex items-center justify-center text-orange-600 hover:bg-orange-50 rounded-lg cursor-pointer">
+                        className="w-8 h-8 flex items-center justify-center text-brand-600 hover:bg-brand-50 rounded-lg cursor-pointer">
                         <i className="ri-edit-line text-lg"></i>
                       </button>
                       <button onClick={() => handleDelete(product.id)}
@@ -325,10 +325,10 @@ export default function ProductsPage() {
       <div className="md:hidden grid grid-cols-2 gap-3">
         {filteredProducts.map((product) => (
           <div key={product.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className={`aspect-square flex items-center justify-center overflow-hidden ${product.isCombo ? 'bg-gradient-to-br from-purple-100 to-violet-100' : 'bg-gradient-to-br from-orange-100 to-red-100'}`}>
+            <div className={`aspect-square flex items-center justify-center overflow-hidden ${product.isCombo ? 'bg-gradient-to-br from-purple-100 to-violet-100' : 'bg-gradient-to-br from-brand-100 to-brand-100'}`}>
               {product.image
                 ? <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
-                : <i className={`${product.isCombo ? 'ri-gift-line text-purple-400' : 'ri-restaurant-line text-orange-500'} text-4xl`}></i>}
+                : <i className={`${product.isCombo ? 'ri-gift-line text-purple-400' : 'ri-restaurant-line text-brand-500'} text-4xl`}></i>}
             </div>
             <div className="p-3">
               <div className="flex items-center gap-1 mb-1">
@@ -341,7 +341,7 @@ export default function ProductsPage() {
               </div>
               <div className="flex items-center gap-2">
                 <button onClick={() => handleEditProduct(product)}
-                  className="flex-1 flex items-center justify-center gap-1 px-2 py-2 bg-orange-50 text-orange-600 rounded-lg hover:bg-orange-100 cursor-pointer text-xs font-medium">
+                  className="flex-1 flex items-center justify-center gap-1 px-2 py-2 bg-brand-50 text-brand-600 rounded-lg hover:bg-brand-100 cursor-pointer text-xs font-medium">
                   <i className="ri-edit-line"></i><span>Editar</span>
                 </button>
                 <button onClick={() => handleDelete(product.id)}

@@ -15,7 +15,7 @@ function getLowStockThreshold(): number {
 
 function stockStatus(qty: number, threshold: number): { label: string; cls: string } {
   if (qty === 0) return { label: 'Sin stock', cls: 'bg-red-100 text-red-700' };
-  if (threshold > 0 && qty <= threshold) return { label: 'Stock bajo', cls: 'bg-orange-100 text-orange-700' };
+  if (threshold > 0 && qty <= threshold) return { label: 'Stock bajo', cls: 'bg-brand-100 text-brand-700' };
   return { label: 'OK', cls: 'bg-green-100 text-green-700' };
 }
 
@@ -67,7 +67,7 @@ export default function StockOverviewTab({ currentUser }: Props) {
           <select
             value={selectedBranch ?? ''}
             onChange={e => setSelectedBranch(e.target.value ? Number(e.target.value) : undefined)}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
           >
             <option value="">Todas</option>
             {branches.map(b => (
@@ -87,14 +87,14 @@ export default function StockOverviewTab({ currentUser }: Props) {
       {/* KPI Cards */}
       {loading ? (
         <div className="flex justify-center py-10">
-          <i className="ri-loader-4-line animate-spin text-orange-500 text-3xl"></i>
+          <i className="ri-loader-4-line animate-spin text-brand-500 text-3xl"></i>
         </div>
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center">
-                <i className="ri-stack-line text-orange-500 text-2xl"></i>
+              <div className="w-12 h-12 rounded-xl bg-brand-100 flex items-center justify-center">
+                <i className="ri-stack-line text-brand-500 text-2xl"></i>
               </div>
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-wide">Productos en Stock</p>
@@ -154,7 +154,7 @@ export default function StockOverviewTab({ currentUser }: Props) {
                       const displayName = p.variantName ? `${p.productName} — ${p.variantName}` : p.productName;
                       const displaySku = p.variantSku || p.productSku || '—';
                       return (
-                        <tr key={p.variantId} className="hover:bg-orange-50/40 transition-colors">
+                        <tr key={p.variantId} className="hover:bg-brand-50/40 transition-colors">
                           <td className="px-4 py-3 font-medium text-gray-800">{displayName}</td>
                           <td className="px-4 py-3 text-gray-500 font-mono text-xs">{displaySku}</td>
                           <td className="px-4 py-3 text-right font-semibold text-gray-700">{p.qty}</td>

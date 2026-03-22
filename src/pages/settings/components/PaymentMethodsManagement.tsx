@@ -7,7 +7,7 @@ const KIND_COLORS: Record<string, string> = {
   DEBIT: 'bg-blue-100 text-blue-700',
   CREDIT: 'bg-purple-100 text-purple-700',
   TRANSFER: 'bg-cyan-100 text-cyan-700',
-  MIXED: 'bg-orange-100 text-orange-700',
+  MIXED: 'bg-brand-100 text-brand-700',
 };
 
 const emptyForm = { name: '', kind: 'CASH' as PaymentMethod['kind'], max_installments: 1, surcharge_pct: 0, discount_pct: 0, ticket_note: '', active: true };
@@ -96,7 +96,7 @@ export default function PaymentMethodsManagement() {
           <h2 className="text-lg md:text-xl font-bold text-gray-800">Medios de Pago</h2>
           <p className="text-xs md:text-sm text-gray-500 mt-1">Configurá los métodos de pago aceptados</p>
         </div>
-        <button onClick={openCreate} className="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-3 rounded-lg font-semibold text-sm transition-all whitespace-nowrap cursor-pointer min-h-[48px] w-full sm:w-auto">
+        <button onClick={openCreate} className="flex items-center justify-center gap-2 bg-brand-500 hover:bg-brand-600 text-white px-4 py-3 rounded-lg font-semibold text-sm transition-all whitespace-nowrap cursor-pointer min-h-[48px] w-full sm:w-auto">
           <i className="ri-add-line"></i>
           Nuevo Medio
         </button>
@@ -111,7 +111,7 @@ export default function PaymentMethodsManagement() {
 
       {loading ? (
         <div className="flex justify-center py-10">
-          <i className="ri-loader-4-line animate-spin text-3xl text-orange-500"></i>
+          <i className="ri-loader-4-line animate-spin text-3xl text-brand-500"></i>
         </div>
       ) : methods.length === 0 ? (
         <div className="text-center py-10 text-gray-400 text-sm">No hay medios de pago. Crea el primero.</div>
@@ -132,7 +132,7 @@ export default function PaymentMethodsManagement() {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {methods.map(m => (
-                  <tr key={m.id} className="hover:bg-orange-50/40 transition-colors">
+                  <tr key={m.id} className="hover:bg-brand-50/40 transition-colors">
                     <td className="px-4 py-3 font-medium text-gray-800">{m.name}</td>
                     <td className="px-4 py-3">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${KIND_COLORS[m.kind] || 'bg-gray-100 text-gray-600'}`}>
@@ -149,7 +149,7 @@ export default function PaymentMethodsManagement() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex gap-2">
-                        <button onClick={() => openEdit(m)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-orange-100 text-orange-600 cursor-pointer">
+                        <button onClick={() => openEdit(m)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-brand-100 text-brand-600 cursor-pointer">
                           <i className="ri-edit-line"></i>
                         </button>
                         <button onClick={() => setDeleteId(m.id)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-100 text-red-500 cursor-pointer">
@@ -180,7 +180,7 @@ export default function PaymentMethodsManagement() {
                   </div>
                 </div>
                 <div className="flex gap-2 mt-3 border-t border-gray-100 pt-3">
-                  <button onClick={() => openEdit(m)} className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg border border-orange-200 text-orange-600 text-xs font-semibold hover:bg-orange-50 cursor-pointer">
+                  <button onClick={() => openEdit(m)} className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg border border-brand-200 text-brand-600 text-xs font-semibold hover:bg-brand-50 cursor-pointer">
                     <i className="ri-edit-line"></i> Editar
                   </button>
                   <button onClick={() => setDeleteId(m.id)} className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg border border-red-200 text-red-500 text-xs font-semibold hover:bg-red-50 cursor-pointer">
@@ -205,38 +205,38 @@ export default function PaymentMethodsManagement() {
             <div className="p-4 md:p-6 space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Nombre *</label>
-                <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Ej: Tarjeta Visa (1 pago)" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]" />
+                <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Ej: Tarjeta Visa (1 pago)" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Tipo *</label>
-                  <select value={form.kind} onChange={e => setForm({ ...form, kind: e.target.value as PaymentMethod['kind'] })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]">
+                  <select value={form.kind} onChange={e => setForm({ ...form, kind: e.target.value as PaymentMethod['kind'] })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]">
                     {Object.entries(KIND_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Max. Cuotas</label>
-                  <input type="number" min="1" value={form.max_installments} onChange={e => setForm({ ...form, max_installments: parseInt(e.target.value) || 1 })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]" />
+                  <input type="number" min="1" value={form.max_installments} onChange={e => setForm({ ...form, max_installments: parseInt(e.target.value) || 1 })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Recargo (%)</label>
-                  <input type="number" min="0" step="0.01" value={form.surcharge_pct} onChange={e => setForm({ ...form, surcharge_pct: parseFloat(e.target.value) || 0 })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]" />
+                  <input type="number" min="0" step="0.01" value={form.surcharge_pct} onChange={e => setForm({ ...form, surcharge_pct: parseFloat(e.target.value) || 0 })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]" />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Descuento (%)</label>
-                  <input type="number" min="0" step="0.01" value={form.discount_pct} onChange={e => setForm({ ...form, discount_pct: parseFloat(e.target.value) || 0 })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]" />
+                  <input type="number" min="0" step="0.01" value={form.discount_pct} onChange={e => setForm({ ...form, discount_pct: parseFloat(e.target.value) || 0 })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]" />
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Nota en ticket</label>
-                <input type="text" value={form.ticket_note} onChange={e => setForm({ ...form, ticket_note: e.target.value })} placeholder="Ej: Presentar DNI" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]" />
+                <input type="text" value={form.ticket_note} onChange={e => setForm({ ...form, ticket_note: e.target.value })} placeholder="Ej: Presentar DNI" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]" />
               </div>
               <div className="flex items-center gap-3">
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" checked={form.active} onChange={e => setForm({ ...form, active: e.target.checked })} className="sr-only peer" />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-orange-400 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-brand-400 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-500"></div>
                 </label>
                 <span className="text-sm font-semibold text-gray-700">Activo</span>
               </div>
@@ -249,7 +249,7 @@ export default function PaymentMethodsManagement() {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 p-4 md:p-6 border-t border-gray-100 bg-gray-50">
               <button onClick={() => setShowModal(false)} className="flex-1 py-3 rounded-lg border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-all text-sm cursor-pointer min-h-[48px]">Cancelar</button>
-              <button onClick={handleSave} disabled={saving} className="flex-1 py-3 rounded-lg bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white font-semibold transition-all text-sm cursor-pointer min-h-[48px]">
+              <button onClick={handleSave} disabled={saving} className="flex-1 py-3 rounded-lg bg-brand-500 hover:bg-brand-600 disabled:opacity-60 text-white font-semibold transition-all text-sm cursor-pointer min-h-[48px]">
                 {saving ? <><i className="ri-loader-4-line animate-spin mr-1"></i>Guardando...</> : (editing ? 'Guardar Cambios' : 'Crear Medio')}
               </button>
             </div>

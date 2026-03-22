@@ -17,7 +17,7 @@ export default function CashPage() {
     return (
       <AppLayout>
         <div className="flex justify-center items-center h-64">
-          <i className="ri-loader-4-line animate-spin text-4xl text-orange-500"></i>
+          <i className="ri-loader-4-line animate-spin text-4xl text-brand-500"></i>
         </div>
       </AppLayout>
     );

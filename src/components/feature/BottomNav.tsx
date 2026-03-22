@@ -23,7 +23,7 @@ export function BottomNav() {
               onClick={() => navigate(item.path)}
               className={`flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-all cursor-pointer min-w-0 flex-1 ${
                 isActive
-                  ? 'text-orange-500'
+                  ? 'text-brand-500'
                   : 'text-gray-500'
               }`}
             >

@@ -11,7 +11,7 @@ export function TopProducts({ data }: TopProductsProps) {
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
       <div className="flex items-center justify-between mb-4 md:mb-6">
         <h2 className="text-base md:text-lg font-bold text-gray-800">Productos Más Vendidos</h2>
-        <i className="ri-fire-line text-xl md:text-2xl text-orange-500"></i>
+        <i className="ri-fire-line text-xl md:text-2xl text-brand-500"></i>
       </div>
 
       {data.length === 0 ? (
@@ -35,7 +35,7 @@ export function TopProducts({ data }: TopProductsProps) {
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
-                    className="bg-gradient-to-r from-orange-500 to-red-500 h-2 rounded-full transition-all"
+                    className="bg-gradient-to-r from-brand-500 to-brand-600 h-2 rounded-full transition-all"
                     style={{ width: `${percentage}%` }}
                   ></div>
                 </div>
