@@ -55,13 +55,8 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left panel */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-        <img
-          src="https://readdy.ai/api/search-image?query=modern%20minimalist%20retail%20store%20interior%20clean%20shelves%20soft%20natural%20lighting%20warm%20tones%20professional%20commercial%20photography%20no%20people&width=800&height=1000&seq=login-bg-02&orientation=portrait"
-          alt="Conty"
-          className="w-full h-full object-cover object-top"
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/70 via-gray-800/50 to-black/60" />
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-gray-900 via-blue-950 to-indigo-900">
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 30% 20%, #60a5fa 0%, transparent 50%), radial-gradient(circle at 70% 80%, #818cf8 0%, transparent 50%)' }} />
         <div className="absolute inset-0 flex flex-col justify-end p-12">
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-6">
