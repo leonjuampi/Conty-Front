@@ -23,7 +23,17 @@ export interface CategoryProductRow {
   profit: number;
 }
 
+export interface ReportStats {
+  totalSold: number;
+  salesCount: number;
+  avgTicket: number;
+  unitsSold: number;
+  totalCost: number;
+  grossMargin: number;
+}
+
 export interface ReportsData {
+  stats: ReportStats;
   bySeller: TopSeller[];
   topProducts: TopProduct[];
   byCategory: CategoryProductRow[];

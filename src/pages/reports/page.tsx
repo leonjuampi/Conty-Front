@@ -5,7 +5,7 @@ import { ROLE_IDS } from '../../utils/roles';
 import { listSales, getSale, addPayments, listPaymentMethods, type Sale } from '../../services/sales.service';
 import { listCustomers, type Customer } from '../../services/customers.service';
 import { listSessions, type CashSession } from '../../services/cash.service';
-import { getReports, type TopSeller, type TopProduct, type CategoryProductRow } from '../../services/reports.service';
+import { getReports, type TopSeller, type TopProduct, type CategoryProductRow, type ReportStats } from '../../services/reports.service';
 
 // ── Display types ──────────────────────────────────────────────────
 
@@ -143,7 +143,7 @@ export default function ReportsPage() {
   const [dateFrom, setDateFrom] = useState(defaultDateFrom);
   const [dateTo, setDateTo] = useState(defaultDateTo);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedReport, setSelectedReport] = useState<'clients' | 'sellers' | 'products' | 'cash' | 'ordertype' | 'history' | 'cashhistory' | 'categories'>('history');
+  const [selectedReport, setSelectedReport] = useState<'clients' | 'sellers' | 'products' | 'cash' | 'ordertype' | 'history' | 'cashhistory' | 'categories' | 'summary'>('history');
   const [selectedOrder, setSelectedOrder] = useState<DisplaySale | null>(null);
   const [saleDetail, setSaleDetail] = useState<{ items: { nameSnapshot: string; qty: number; unitPrice: number; total: number }[]; payments: { method: string; amount: number }[] } | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
@@ -163,6 +163,7 @@ export default function ReportsPage() {
   const [topSellers, setTopSellers] = useState<TopSeller[]>([]);
   const [topProducts, setTopProducts] = useState<TopProduct[]>([]);
   const [categoryReport, setCategoryReport] = useState<CategoryProductRow[]>([]);
+  const [reportStats, setReportStats] = useState<ReportStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState('');
 
@@ -184,6 +185,7 @@ export default function ReportsPage() {
         setTopSellers(res.bySeller ?? []);
         setTopProducts(res.topProducts ?? []);
         setCategoryReport(res.byCategory ?? []);
+        setReportStats(res.stats ?? null);
       }).catch(() => {}),
     ]).finally(() => setLoading(false));
   }, [dateFrom, dateTo]);
@@ -303,6 +305,7 @@ export default function ReportsPage() {
   };
 
   const allTabs = [
+    { id: 'summary', label: 'Resumen', icon: 'ri-dashboard-3-line', sellerVisible: false },
     { id: 'clients', label: 'Mejores Clientes', icon: 'ri-user-star-line', sellerVisible: false },
     { id: 'sellers', label: 'Mejores Vendedores', icon: 'ri-team-line', sellerVisible: false },
     { id: 'products', label: 'Más Vendidos', icon: 'ri-shopping-bag-line', sellerVisible: false },
@@ -405,6 +408,71 @@ export default function ReportsPage() {
 
         {/* Contenido del reporte */}
         <div className="flex-1 p-4 md:p-6 overflow-auto min-w-0">
+
+          {/* ── Resumen ── */}
+          {selectedReport === 'summary' && (
+            <div>
+              <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-1">Resumen del Período</h2>
+              <p className="text-sm text-gray-500 mb-6">Balance general de ventas, costos y ganancias</p>
+              {!reportStats ? (
+                <div className="flex flex-col items-center justify-center py-16 text-gray-400">
+                  <i className="ri-loader-4-line animate-spin text-4xl mb-3"></i>
+                  <p className="text-sm">Cargando...</p>
+                </div>
+              ) : (
+                <div className="space-y-4 max-w-md mx-auto">
+                  <div className="bg-gradient-to-br from-brand-50 to-brand-100 border border-brand-200 rounded-2xl p-6 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-11 h-11 bg-brand-500 rounded-xl flex items-center justify-center shrink-0">
+                        <i className="ri-money-dollar-circle-line text-white text-xl"></i>
+                      </div>
+                      <span className="text-base font-semibold text-gray-700">Total</span>
+                    </div>
+                    <span className="text-2xl font-bold text-brand-600">
+                      ${reportStats.totalSold.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-red-50 to-orange-50 border border-red-200 rounded-2xl p-6 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-11 h-11 bg-red-400 rounded-xl flex items-center justify-center shrink-0">
+                        <i className="ri-price-tag-3-line text-white text-xl"></i>
+                      </div>
+                      <span className="text-base font-semibold text-gray-700">Costos</span>
+                    </div>
+                    <span className="text-2xl font-bold text-red-500">
+                      ${reportStats.totalCost.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-6 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-11 h-11 bg-green-500 rounded-xl flex items-center justify-center shrink-0">
+                        <i className="ri-line-chart-line text-white text-xl"></i>
+                      </div>
+                      <span className="text-base font-semibold text-gray-700">Ganancia</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-2xl font-bold text-green-600">
+                        ${(reportStats.totalSold - reportStats.totalCost).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                      <p className="text-xs text-green-500 mt-0.5">{reportStats.grossMargin.toFixed(1)}% margen</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-gray-50 to-slate-50 border border-gray-200 rounded-2xl p-6 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-11 h-11 bg-gray-500 rounded-xl flex items-center justify-center shrink-0">
+                        <i className="ri-file-list-3-line text-white text-xl"></i>
+                      </div>
+                      <span className="text-base font-semibold text-gray-700">Facturas emitidas</span>
+                    </div>
+                    <span className="text-2xl font-bold text-gray-700">{reportStats.salesCount}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* ── Mejores Clientes ── */}
           {selectedReport === 'clients' && (
