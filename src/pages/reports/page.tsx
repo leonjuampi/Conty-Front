@@ -5,7 +5,7 @@ import { ROLE_IDS } from '../../utils/roles';
 import { listSales, getSale, addPayments, listPaymentMethods, type Sale } from '../../services/sales.service';
 import { listCustomers, type Customer } from '../../services/customers.service';
 import { listSessions, type CashSession } from '../../services/cash.service';
-import { getReports, type TopSeller, type TopProduct } from '../../services/reports.service';
+import { getReports, type TopSeller, type TopProduct, type CategoryProductRow } from '../../services/reports.service';
 
 // ── Display types ──────────────────────────────────────────────────
 
@@ -143,7 +143,7 @@ export default function ReportsPage() {
   const [dateFrom, setDateFrom] = useState(defaultDateFrom);
   const [dateTo, setDateTo] = useState(defaultDateTo);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedReport, setSelectedReport] = useState<'clients' | 'sellers' | 'products' | 'cash' | 'ordertype' | 'history' | 'cashhistory'>('history');
+  const [selectedReport, setSelectedReport] = useState<'clients' | 'sellers' | 'products' | 'cash' | 'ordertype' | 'history' | 'cashhistory' | 'categories'>('history');
   const [selectedOrder, setSelectedOrder] = useState<DisplaySale | null>(null);
   const [saleDetail, setSaleDetail] = useState<{ items: { nameSnapshot: string; qty: number; unitPrice: number; total: number }[]; payments: { method: string; amount: number }[] } | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
@@ -162,6 +162,7 @@ export default function ReportsPage() {
   const [rawSessions, setRawSessions] = useState<CashSession[]>([]);
   const [topSellers, setTopSellers] = useState<TopSeller[]>([]);
   const [topProducts, setTopProducts] = useState<TopProduct[]>([]);
+  const [categoryReport, setCategoryReport] = useState<CategoryProductRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState('');
 
@@ -182,6 +183,7 @@ export default function ReportsPage() {
       getReports({ from: toMysql(dateFrom), to: toMysql(dateTo) }).then(res => {
         setTopSellers(res.bySeller ?? []);
         setTopProducts(res.topProducts ?? []);
+        setCategoryReport(res.byCategory ?? []);
       }).catch(() => {}),
     ]).finally(() => setLoading(false));
   }, [dateFrom, dateTo]);
@@ -308,6 +310,7 @@ export default function ReportsPage() {
     { id: 'ordertype', label: 'Por Tipo de Pedido', icon: 'ri-pie-chart-line', sellerVisible: false },
     { id: 'history', label: 'Historial', icon: 'ri-file-list-line', sellerVisible: true },
     { id: 'cashhistory', label: 'Cierres de Caja', icon: 'ri-safe-line', sellerVisible: false },
+    { id: 'categories', label: 'Ventas por Categoría', icon: 'ri-folder-chart-line', sellerVisible: false },
   ];
   const tabs = isVendedor ? allTabs.filter(t => t.sellerVisible) : allTabs;
 
@@ -850,6 +853,120 @@ export default function ReportsPage() {
               )}
             </div>
           )}
+          {/* ── Ventas y Ganancias por Categoría ── */}
+          {selectedReport === 'categories' && (() => {
+            // Group flat rows by category
+            const grouped = new Map<number, { name: string; products: CategoryProductRow[] }>();
+            for (const row of categoryReport) {
+              if (!grouped.has(row.categoryId)) {
+                grouped.set(row.categoryId, { name: row.categoryName, products: [] });
+              }
+              grouped.get(row.categoryId)!.products.push(row);
+            }
+            const categories = Array.from(grouped.entries());
+            const grandTotal = categoryReport.reduce((a, r) => a + r.totalSales, 0);
+            const grandProfit = categoryReport.reduce((a, r) => a + r.profit, 0);
+
+            return (
+              <div>
+                <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-1">Ventas y Ganancias por Categoría</h2>
+                <p className="text-sm text-gray-500 mb-5">Desglose de ventas y ganancias por categoría y producto</p>
+
+                {categories.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-16 text-gray-400">
+                    <div className="w-12 h-12 flex items-center justify-center mb-3"><i className="ri-folder-chart-line text-4xl"></i></div>
+                    <p className="text-sm">No hay ventas en el período seleccionado</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {/* Grand total row */}
+                    <div className="grid grid-cols-2 gap-3 mb-2">
+                      <div className="bg-gradient-to-br from-brand-50 to-brand-100 border border-brand-200 rounded-xl p-3 md:p-4">
+                        <p className="text-xs text-gray-500 mb-1">Total Facturado</p>
+                        <p className="text-base md:text-xl font-bold text-brand-600">${grandTotal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                      </div>
+                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl p-3 md:p-4">
+                        <p className="text-xs text-gray-500 mb-1">Ganancia Total</p>
+                        <p className="text-base md:text-xl font-bold text-green-600">${grandProfit.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                      </div>
+                    </div>
+
+                    {categories.map(([catId, cat]) => {
+                      const catTotal = cat.products.reduce((a, r) => a + r.totalSales, 0);
+                      const catProfit = cat.products.reduce((a, r) => a + r.profit, 0);
+                      return (
+                        <div key={catId} className="border border-gray-200 rounded-xl overflow-hidden">
+                          {/* Category header */}
+                          <div className="bg-gradient-to-r from-brand-500 to-brand-600 px-4 py-3 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <i className="ri-folder-2-line text-white text-base"></i>
+                              <span className="text-white font-bold text-sm">{cat.name}</span>
+                              <span className="text-brand-100 text-xs">({cat.products.length} producto{cat.products.length !== 1 ? 's' : ''})</span>
+                            </div>
+                            <div className="flex items-center gap-4 text-right">
+                              <div>
+                                <p className="text-brand-100 text-xs">Ventas</p>
+                                <p className="text-white text-sm font-bold">${catTotal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                              </div>
+                              <div>
+                                <p className="text-brand-100 text-xs">Ganancia</p>
+                                <p className="text-green-200 text-sm font-bold">${catProfit.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Products table */}
+                          <div className="overflow-x-auto">
+                            <table className="w-full min-w-[480px]">
+                              <thead className="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Producto</th>
+                                  <th className="px-4 py-2 text-right text-xs font-semibold text-gray-500 uppercase">Unidades</th>
+                                  <th className="px-4 py-2 text-right text-xs font-semibold text-gray-500 uppercase">Ventas</th>
+                                  <th className="px-4 py-2 text-right text-xs font-semibold text-gray-500 uppercase">Costo</th>
+                                  <th className="px-4 py-2 text-right text-xs font-semibold text-gray-500 uppercase">Ganancia</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-gray-100">
+                                {cat.products.map(row => (
+                                  <tr key={row.productId} className="hover:bg-brand-50 transition-colors">
+                                    <td className="px-4 py-2.5 text-sm text-gray-800">{row.productName}</td>
+                                    <td className="px-4 py-2.5 text-sm text-gray-600 text-right">{row.quantity}</td>
+                                    <td className="px-4 py-2.5 text-sm font-semibold text-brand-600 text-right">${row.totalSales.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                    <td className="px-4 py-2.5 text-sm text-gray-500 text-right">${row.totalCost.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                    <td className="px-4 py-2.5 text-right">
+                                      <span className={`text-sm font-semibold ${row.profit >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                        ${row.profit.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                      </span>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                              {/* Category subtotal */}
+                              <tfoot className="bg-gray-50 border-t-2 border-gray-200">
+                                <tr>
+                                  <td className="px-4 py-2.5 text-xs font-bold text-gray-600 uppercase">Total {cat.name}</td>
+                                  <td className="px-4 py-2.5 text-xs font-bold text-gray-600 text-right">{cat.products.reduce((a, r) => a + r.quantity, 0)}</td>
+                                  <td className="px-4 py-2.5 text-sm font-bold text-brand-600 text-right">${catTotal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                  <td className="px-4 py-2.5 text-sm font-bold text-gray-500 text-right">${cat.products.reduce((a, r) => a + r.totalCost, 0).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                  <td className="px-4 py-2.5 text-right">
+                                    <span className={`text-sm font-bold ${catProfit >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                      ${catProfit.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    </span>
+                                  </td>
+                                </tr>
+                              </tfoot>
+                            </table>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
         </div>
       </div>
 

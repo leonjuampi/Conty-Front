@@ -12,9 +12,21 @@ export interface TopProduct {
   total: number;
 }
 
+export interface CategoryProductRow {
+  categoryId: number;
+  categoryName: string;
+  productId: number;
+  productName: string;
+  quantity: number;
+  totalSales: number;
+  totalCost: number;
+  profit: number;
+}
+
 export interface ReportsData {
   bySeller: TopSeller[];
   topProducts: TopProduct[];
+  byCategory: CategoryProductRow[];
 }
 
 export async function getReports(params?: {
