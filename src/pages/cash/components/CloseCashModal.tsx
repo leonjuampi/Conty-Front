@@ -166,7 +166,7 @@ export function CloseCashModal() {
 
               <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-3">
                 <div className="flex-1">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Monto Real</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">{row.key === 'CASH' ? 'Monto Real + Efectivo Inicial incluido' : 'Monto Real'}</label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">$</span>
                     <input

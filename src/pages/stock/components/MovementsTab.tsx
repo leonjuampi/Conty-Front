@@ -293,7 +293,7 @@ export default function MovementsTab({ currentUser }: Props) {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {movements.map(m => (
-                  <tr key={m.id} className="hover:bg-brand-50/40 transition-colors">
+                  <tr key={`${m.id}-${m.variantId}`} className="hover:bg-brand-50/40 transition-colors">
                     <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
                       {new Date(m.createdAt).toLocaleString('es-AR', {
                         day: '2-digit', month: '2-digit', year: 'numeric',
@@ -427,6 +427,14 @@ export default function MovementsTab({ currentUser }: Props) {
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">Agregar producto</label>
                 <div className="flex gap-2">
+                  <input
+                    type="number"
+                    min={1}
+                    value={cartQty}
+                    onChange={e => setCartQty(Math.max(1, Number(e.target.value)))}
+                    className="w-20 border border-gray-300 rounded-lg px-3 py-2 text-sm text-center focus:outline-none focus:ring-2 focus:ring-brand-400"
+                    title="Cantidad"
+                  />
                   <div className="relative flex-1">
                     <input
                       type="text"
@@ -455,14 +463,6 @@ export default function MovementsTab({ currentUser }: Props) {
                       </ul>
                     )}
                   </div>
-                  <input
-                    type="number"
-                    min={1}
-                    value={cartQty}
-                    onChange={e => setCartQty(Math.max(1, Number(e.target.value)))}
-                    className="w-20 border border-gray-300 rounded-lg px-3 py-2 text-sm text-center focus:outline-none focus:ring-2 focus:ring-brand-400"
-                    title="Cantidad"
-                  />
                 </div>
                 <p className="text-xs text-gray-400">Buscá un producto y hacé clic para agregarlo con la cantidad indicada</p>
               </div>

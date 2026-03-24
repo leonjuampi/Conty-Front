@@ -134,7 +134,7 @@ export default function ReportsPage() {
 
   const todayStr = new Date().toISOString().slice(0, 10);
   const firstOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0, 10);
-  const defaultDateFrom = `${firstOfMonth}T00:00`;
+  const defaultDateFrom = `${todayStr}T00:00`;
   const defaultDateTo = `${todayStr}T23:59`;
 
   // Convierte el valor de datetime-local ('YYYY-MM-DDTHH:mm') a formato MySQL ('YYYY-MM-DD HH:mm:00')
@@ -192,7 +192,7 @@ export default function ReportsPage() {
 
   const filteredSales = useMemo(() => rawSales.map(toDisplaySale), [rawSales]);
   const filteredSessions = useMemo(() =>
-    rawSessions.filter(s => s.status === 'CLOSED').map(toDisplaySession),
+    rawSessions.map(toDisplaySession),
     [rawSessions]
   );
 
@@ -890,8 +890,14 @@ export default function ReportsPage() {
                               <p className="text-gray-400">{new Date(session.openedAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</p>
                             </td>
                             <td className="px-3 py-2.5 text-xs text-gray-600 whitespace-nowrap">
-                              <p>{new Date(session.closedAt).toLocaleDateString('es-AR')}</p>
-                              <p className="text-gray-400">{new Date(session.closedAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</p>
+                              {session.closedAt ? (
+                                <>
+                                  <p>{new Date(session.closedAt).toLocaleDateString('es-AR')}</p>
+                                  <p className="text-gray-400">{new Date(session.closedAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</p>
+                                </>
+                              ) : (
+                                <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-semibold">En curso</span>
+                              )}
                             </td>
                             <td className="px-3 py-2.5 text-xs text-center font-semibold text-gray-700">{session.totalOrders}</td>
                             <td className="px-3 py-2.5 text-xs font-bold text-brand-600 whitespace-nowrap">${session.totalSales.toLocaleString('es-AR')}</td>
@@ -1042,10 +1048,10 @@ export default function ReportsPage() {
       {registerPaymentSale && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm">
-            <div className="bg-gradient-to-r from-amber-500 to-brand-500 rounded-t-2xl p-4 flex items-center justify-between">
+            <div className="bg-gradient-to-r from-brand-500 to-brand-600 rounded-t-2xl p-4 flex items-center justify-between">
               <div>
                 <h2 className="text-white font-bold text-base">Registrar Pago</h2>
-                <p className="text-amber-100 text-xs mt-0.5">{registerPaymentSale.id} — ${registerPaymentSale.total.toLocaleString()}</p>
+                <p className="text-brand-100 text-xs mt-0.5">{registerPaymentSale.id} — ${registerPaymentSale.total.toLocaleString()}</p>
               </div>
               <button onClick={() => setRegisterPaymentSale(null)} className="w-8 h-8 flex items-center justify-center bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors cursor-pointer">
                 <i className="ri-close-line text-lg"></i>
@@ -1055,7 +1061,7 @@ export default function ReportsPage() {
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-2">Método de pago</label>
                 <select value={paymentModalMethod} onChange={e => setPaymentModalMethod(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-400 outline-none">
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-400 outline-none">
                   {availableMethods.length > 0
                     ? availableMethods.map(m => <option key={m.id} value={m.name}>{METHOD_LABELS[m.name] ?? m.name}</option>)
                     : ['CASH', 'BANK_TRANSFER', 'CREDIT_CARD', 'MERCADO_PAGO'].map(m => <option key={m} value={m}>{METHOD_LABELS[m] ?? m}</option>)
@@ -1096,7 +1102,7 @@ export default function ReportsPage() {
                       setPaymentModalLoading(false);
                     }
                   }}
-                  className="flex-1 bg-gradient-to-r from-amber-500 to-brand-500 text-white font-bold py-2.5 rounded-xl hover:from-amber-600 hover:to-brand-600 cursor-pointer text-sm disabled:opacity-60 flex items-center justify-center gap-2">
+                  className="flex-1 bg-gradient-to-r from-brand-500 to-brand-600 text-white font-bold py-2.5 rounded-xl hover:from-brand-600 hover:to-brand-700 cursor-pointer text-sm disabled:opacity-60 flex items-center justify-center gap-2">
                   {paymentModalLoading ? <><i className="ri-loader-4-line animate-spin"></i>Guardando...</> : 'Confirmar'}
                 </button>
               </div>
@@ -1210,8 +1216,14 @@ export default function ReportsPage() {
                 </div>
                 <div className="bg-gray-50 rounded-xl p-3 md:p-4">
                   <p className="text-xs text-gray-500 mb-1">Cierre</p>
-                  <p className="font-semibold text-gray-800 text-sm">{new Date(selectedCashSession.closedAt).toLocaleDateString('es-AR')}</p>
-                  <p className="text-xs text-gray-400">{new Date(selectedCashSession.closedAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</p>
+                  {selectedCashSession.closedAt ? (
+                    <>
+                      <p className="font-semibold text-gray-800 text-sm">{new Date(selectedCashSession.closedAt).toLocaleDateString('es-AR')}</p>
+                      <p className="text-xs text-gray-400">{new Date(selectedCashSession.closedAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</p>
+                    </>
+                  ) : (
+                    <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-semibold">En curso</span>
+                  )}
                 </div>
                 <div className="col-span-2 bg-green-50 border border-green-200 rounded-xl p-3 md:p-4 flex items-center justify-between">
                   <div className="flex items-center gap-2">
