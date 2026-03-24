@@ -82,9 +82,9 @@ export function ProductSelector({ products, isLoading = false, onSelectProduct, 
           <div key={product.id} className="relative">
             <button
               onClick={() => onSelectProduct(product.id)}
-              disabled={cashBlocked}
+              disabled={cashBlocked || (!product.isCombo && product.stock === 0)}
               className={`w-full bg-white rounded-xl shadow-sm p-4 text-left border transition-all group ${
-                cashBlocked
+                cashBlocked || (!product.isCombo && product.stock === 0)
                   ? 'opacity-50 cursor-not-allowed border-gray-100'
                   : 'hover:shadow-lg hover:border-brand-400 border-gray-100 cursor-pointer'
               }`}
@@ -103,7 +103,10 @@ export function ProductSelector({ products, isLoading = false, onSelectProduct, 
               <p className="text-xs text-gray-500 mb-2">{product.category}</p>
               <div className="flex items-center justify-between">
                 <span className="text-lg font-bold text-brand-600">${product.price.toLocaleString()}</span>
-                {product.stock > 0 && <span className="text-xs text-gray-500">Stock: {product.stock}</span>}
+                {!product.isCombo && product.stock === 0
+                  ? <span className="text-xs font-semibold text-red-500">Sin stock</span>
+                  : !product.isCombo && <span className="text-xs text-gray-500">Stock: {product.stock}</span>
+                }
               </div>
             </button>
 
@@ -112,6 +115,11 @@ export function ProductSelector({ products, isLoading = false, onSelectProduct, 
                 <div className="w-8 h-8 flex items-center justify-center bg-red-100 rounded-full">
                   <i className="ri-lock-line text-red-500 text-base"></i>
                 </div>
+              </div>
+            )}
+            {!cashBlocked && !product.isCombo && product.stock === 0 && (
+              <div className="absolute inset-0 flex items-center justify-center rounded-xl pointer-events-none">
+                <span className="bg-red-100 text-red-600 text-xs font-bold px-3 py-1 rounded-full">SIN STOCK</span>
               </div>
             )}
           </div>

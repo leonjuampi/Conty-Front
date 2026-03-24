@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '../../components/feature/AppLayout';
 import { OrderPanel } from './components/OrderPanel';
@@ -27,6 +27,7 @@ export default function OrdersPage() {
   const [activeTab, setActiveTab] = useState<'products' | 'order'>('products');
   const [products, setProducts] = useState<PosProduct[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
+  const [cartError, setCartError] = useState('');
 
   const { currentUser } = useAuth();
   const { hasCashOpen } = useCash();
@@ -34,7 +35,7 @@ export default function OrdersPage() {
 
   const cashBlocked = !hasCashOpen;
 
-  useEffect(() => {
+  const loadProducts = useCallback(() => {
     setLoadingProducts(true);
     listProducts({ status: 'ACTIVE', limit: 200 })
       .then(res => {
@@ -57,13 +58,25 @@ export default function OrdersPage() {
       .finally(() => setLoadingProducts(false));
   }, []);
 
+  useEffect(() => { loadProducts(); }, [loadProducts]);
+
+  const showCartError = (msg: string) => {
+    setCartError(msg);
+    setTimeout(() => setCartError(''), 3000);
+  };
+
   const addProduct = (productId: string) => {
     if (cashBlocked) return;
     const product = products.find(p => p.id === productId);
     if (!product) return;
 
-    const existingItem = orderItems.find(item => item.productId === productId);
+    const currentQty = orderItems.find(i => i.productId === productId)?.quantity ?? 0;
+    if (!product.isCombo && product.stock > 0 && currentQty >= product.stock) {
+      showCartError(`Sin stock suficiente para ${product.name} (disponible: ${product.stock})`);
+      return;
+    }
 
+    const existingItem = orderItems.find(item => item.productId === productId);
     if (existingItem) {
       setOrderItems(orderItems.map(item =>
         item.productId === productId
@@ -85,6 +98,11 @@ export default function OrdersPage() {
     if (quantity <= 0) {
       setOrderItems(orderItems.filter(item => item.productId !== productId));
     } else {
+      const product = products.find(p => p.id === productId);
+      if (product && product.stock > 0 && quantity > product.stock) {
+        showCartError(`Sin stock suficiente para ${product.name} (disponible: ${product.stock})`);
+        return;
+      }
       setOrderItems(orderItems.map(item =>
         item.productId === productId ? { ...item, quantity } : item
       ));
@@ -138,6 +156,7 @@ export default function OrdersPage() {
     setReceiptNumber(sale.docText);
     setShowSuccessToast(true);
     setTimeout(() => setShowSuccessToast(false), 2500);
+    loadProducts();
   };
 
   const clearOrder = () => {
@@ -148,6 +167,14 @@ export default function OrdersPage() {
   return (
     <AppLayout noPadding>
       <div className="flex h-full bg-gradient-to-br from-brand-50 to-brand-100 overflow-hidden" style={{ height: 'calc(100vh - 64px)' }}>
+
+        {/* Toast de error de stock */}
+        {cartError && (
+          <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-3 bg-red-600 text-white px-6 py-4 rounded-xl shadow-2xl">
+            <i className="ri-error-warning-line text-xl"></i>
+            <p className="font-semibold text-sm">{cartError}</p>
+          </div>
+        )}
 
         {/* Toast de éxito */}
         {showSuccessToast && (
@@ -276,6 +303,7 @@ export default function OrdersPage() {
           <PaymentModal
             total={calculateTotal()}
             orderItems={orderItems}
+            products={products}
             client={selectedClient}
             receiptNumber={receiptNumber}
             onClose={() => { setShowPaymentModal(false); setOrderItems([]); setSelectedClient(null); }}
