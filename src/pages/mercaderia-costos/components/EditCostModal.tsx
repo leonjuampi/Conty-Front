@@ -209,7 +209,7 @@ export function EditCostModal({ cost, allCosts, onClose, onSaved }: Props) {
                   <select
                     value={row.item_type}
                     onChange={(e) => handleChangeRow(index, 'item_type', e.target.value)}
-                    className="w-full px-2 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-[#E8650A] bg-white cursor-pointer"
+                    className="w-full px-2 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white cursor-pointer"
                   >
                     <option value="RAW_MATERIAL">Mercadería</option>
                     <option value="ELABORATION_COST">Otro costo</option>
@@ -223,7 +223,7 @@ export function EditCostModal({ cost, allCosts, onClose, onSaved }: Props) {
                       <select
                         value={row.raw_material_id ?? ''}
                         onChange={(e) => handleChangeRow(index, 'raw_material_id', e.target.value ? Number(e.target.value) : null)}
-                        className="w-full px-2 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#E8650A] bg-white cursor-pointer"
+                        className="w-full px-2 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white cursor-pointer"
                       >
                         <option value="">— Seleccionar —</option>
                         {rawMaterials.map((rm) => (
@@ -242,7 +242,7 @@ export function EditCostModal({ cost, allCosts, onClose, onSaved }: Props) {
                     <select
                       value={row.sub_cost_id ?? ''}
                       onChange={(e) => handleChangeRow(index, 'sub_cost_id', e.target.value ? Number(e.target.value) : null)}
-                      className="w-full px-2 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#E8650A] bg-white cursor-pointer"
+                      className="w-full px-2 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white cursor-pointer"
                     >
                       <option value="">— Seleccionar —</option>
                       {otherCosts.map((c) => {
@@ -266,7 +266,7 @@ export function EditCostModal({ cost, allCosts, onClose, onSaved }: Props) {
                         value={row.formula}
                         onChange={(e) => handleChangeRow(index, 'formula', e.target.value)}
                         disabled={!row.raw_material_id}
-                        className="w-full px-2 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#E8650A] disabled:bg-gray-100 disabled:text-gray-400 font-mono"
+                        className="w-full px-2 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:bg-gray-100 disabled:text-gray-400 font-mono"
                         placeholder={row.raw_material_id ? '/ 4  ó  * 0.5  ó  vacío' : '—'}
                       />
                       {row.raw_material_id && selectedRM && (
@@ -289,7 +289,7 @@ export function EditCostModal({ cost, allCosts, onClose, onSaved }: Props) {
                   {formulaError ? (
                     <span className="text-red-500 text-xs font-medium">{formulaError}</span>
                   ) : resultado !== null ? (
-                    <span className="text-[#E8650A] font-bold text-sm">
+                    <span className="text-brand-500 font-bold text-sm">
                       ${resultado.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                     </span>
                   ) : (
@@ -313,7 +313,7 @@ export function EditCostModal({ cost, allCosts, onClose, onSaved }: Props) {
 
           <button
             onClick={handleAdd}
-            className="w-full py-2.5 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-[#E8650A] hover:text-[#E8650A] transition-colors text-sm flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full py-2.5 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-brand-500 hover:text-brand-500 transition-colors text-sm flex items-center justify-center gap-2 cursor-pointer"
           >
             <i className="ri-add-line"></i>
             Agregar ingrediente
@@ -325,7 +325,7 @@ export function EditCostModal({ cost, allCosts, onClose, onSaved }: Props) {
           {/* Total */}
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-500">Total calculado:</span>
-            <span className="font-bold text-[#E8650A] text-base">
+            <span className="font-bold text-brand-500 text-base">
               ${totalCalculado.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
           </div>
@@ -397,7 +397,7 @@ export function EditCostModal({ cost, allCosts, onClose, onSaved }: Props) {
             <button
               onClick={handleSave}
               disabled={saving}
-              className="px-4 py-2 bg-[#E8650A] text-white rounded-md hover:bg-[#d15809] transition-colors text-sm font-medium whitespace-nowrap cursor-pointer disabled:opacity-60"
+              className="px-4 py-2 bg-brand-500 text-white rounded-md hover:bg-brand-600 transition-colors text-sm font-medium whitespace-nowrap cursor-pointer disabled:opacity-60"
             >
               {saving ? <><i className="ri-loader-4-line animate-spin mr-1"></i>Guardando...</> : (cost ? 'Guardar Cambios' : 'Crear Costo')}
             </button>

@@ -20,7 +20,7 @@ export default function InventoryPage() {
             onClick={() => setActiveTab('mercaderia')}
             className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
               activeTab === 'mercaderia'
-                ? 'text-[#E8650A] border-b-2 border-[#E8650A] bg-brand-50'
+                ? 'text-brand-500 border-b-2 border-brand-500 bg-brand-50'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
@@ -33,7 +33,7 @@ export default function InventoryPage() {
             onClick={() => setActiveTab('costos')}
             className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
               activeTab === 'costos'
-                ? 'text-[#E8650A] border-b-2 border-[#E8650A] bg-brand-50'
+                ? 'text-brand-500 border-b-2 border-brand-500 bg-brand-50'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
@@ -46,7 +46,7 @@ export default function InventoryPage() {
             onClick={() => setActiveTab('totales')}
             className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
               activeTab === 'totales'
-                ? 'text-[#E8650A] border-b-2 border-[#E8650A] bg-brand-50'
+                ? 'text-brand-500 border-b-2 border-brand-500 bg-brand-50'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >

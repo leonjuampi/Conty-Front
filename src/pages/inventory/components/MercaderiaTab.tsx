@@ -105,7 +105,7 @@ export default function MercaderiaTab() {
         </div>
         <button
           onClick={openAdd}
-          className="bg-[#E8650A] text-white px-4 py-2 rounded-lg hover:bg-[#d15809] transition-colors flex items-center gap-2 whitespace-nowrap"
+          className="bg-brand-500 text-white px-4 py-2 rounded-lg hover:bg-brand-600 transition-colors flex items-center gap-2 whitespace-nowrap"
         >
           <i className="ri-add-line"></i>
           Agregar Producto
@@ -121,7 +121,7 @@ export default function MercaderiaTab() {
               placeholder="Buscar por nombre de producto..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E8650A] focus:border-transparent text-sm"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm"
             />
           </div>
         </div>
@@ -140,7 +140,7 @@ export default function MercaderiaTab() {
               {loading ? (
                 <tr>
                   <td colSpan={4} className="px-6 py-8 text-center">
-                    <i className="ri-loader-4-line animate-spin text-2xl text-[#E8650A]"></i>
+                    <i className="ri-loader-4-line animate-spin text-2xl text-brand-500"></i>
                   </td>
                 </tr>
               ) : filtered.length === 0 ? (
@@ -199,7 +199,7 @@ export default function MercaderiaTab() {
                   value={form.name}
                   onChange={e => setForm({ ...form, name: e.target.value })}
                   placeholder="Ej: ACEITE, HARINA, TOMATE..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E8650A] text-sm"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm"
                   required
                 />
               </div>
@@ -210,7 +210,7 @@ export default function MercaderiaTab() {
                   value={form.origin}
                   onChange={e => setForm({ ...form, origin: e.target.value })}
                   placeholder="Ej: FERIA, PANADERÍA, CARNICERÍA..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E8650A] text-sm"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm"
                 />
               </div>
               <div>
@@ -222,7 +222,7 @@ export default function MercaderiaTab() {
                   value={form.unitPrice}
                   onChange={e => setForm({ ...form, unitPrice: e.target.value })}
                   placeholder="Ej: 1500"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E8650A] text-sm"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm"
                   required
                 />
               </div>
@@ -231,7 +231,7 @@ export default function MercaderiaTab() {
                 <button type="button" onClick={closeModal} className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
                   Cancelar
                 </button>
-                <button type="submit" disabled={saving} className="flex-1 px-4 py-2 bg-[#E8650A] text-white rounded-lg hover:bg-[#d15809] transition-colors disabled:opacity-60 cursor-pointer">
+                <button type="submit" disabled={saving} className="flex-1 px-4 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600 transition-colors disabled:opacity-60 cursor-pointer">
                   {saving ? <><i className="ri-loader-4-line animate-spin mr-1"></i>Guardando...</> : (editItem ? 'Guardar Cambios' : 'Agregar')}
                 </button>
               </div>

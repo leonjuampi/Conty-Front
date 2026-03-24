@@ -67,12 +67,12 @@ export function TotalesTab() {
 
           {!isEditingCostos ? (
             <div className="flex items-center gap-4">
-              <span className="text-3xl font-bold text-[#E8650A]">
+              <span className="text-3xl font-bold text-brand-500">
                 ${fmt(costosLocal)}
               </span>
               <button
                 onClick={() => { setIsEditingCostos(true); setTempCostos(costosLocal.toString()); }}
-                className="text-gray-500 hover:text-[#E8650A] transition-colors w-10 h-10 flex items-center justify-center"
+                className="text-gray-500 hover:text-brand-500 transition-colors w-10 h-10 flex items-center justify-center"
                 title="Editar"
               >
                 <i className="ri-pencil-line text-xl"></i>
@@ -84,14 +84,14 @@ export function TotalesTab() {
                 type="number"
                 value={tempCostos}
                 onChange={(e) => setTempCostos(e.target.value)}
-                className="w-40 px-4 py-2 border border-gray-300 rounded-md text-lg font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#E8650A] focus:border-transparent"
+                className="w-40 px-4 py-2 border border-gray-300 rounded-md text-lg font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
                 placeholder="0"
                 autoFocus
               />
               <button
                 onClick={handleSaveCostos}
                 disabled={savingCostos}
-                className="px-4 py-2 bg-[#E8650A] text-white rounded-md hover:bg-[#d15809] transition-colors font-medium text-sm disabled:opacity-60"
+                className="px-4 py-2 bg-brand-500 text-white rounded-md hover:bg-brand-600 transition-colors font-medium text-sm disabled:opacity-60"
               >
                 {savingCostos ? <i className="ri-loader-4-line animate-spin"></i> : <i className="ri-check-line"></i>}
               </button>
@@ -123,7 +123,7 @@ export function TotalesTab() {
               {loading ? (
                 <tr>
                   <td colSpan={5} className="px-4 py-8 text-center">
-                    <i className="ri-loader-4-line animate-spin text-2xl text-[#E8650A]"></i>
+                    <i className="ri-loader-4-line animate-spin text-2xl text-brand-500"></i>
                   </td>
                 </tr>
               ) : costs.length === 0 ? (
@@ -143,9 +143,9 @@ export function TotalesTab() {
                     <tr key={cost.id} className={`border-b border-gray-100 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
                       <td className="px-4 py-3 text-sm font-semibold text-gray-900 uppercase">{cost.name}</td>
                       <td className="px-4 py-3 text-sm text-right text-gray-800">${fmt(precioCosto)}</td>
-                      <td className="px-4 py-3 text-sm text-right font-semibold text-[#E8650A]">${fmt(precioAproxVenta)}</td>
+                      <td className="px-4 py-3 text-sm text-right font-semibold text-brand-500">${fmt(precioAproxVenta)}</td>
                       <td className="px-4 py-3 text-sm text-right text-gray-800">${fmt(precioCostoFinal)}</td>
-                      <td className="px-4 py-3 text-sm text-right font-semibold text-[#E8650A]">${fmt(precioVentaFinal)}</td>
+                      <td className="px-4 py-3 text-sm text-right font-semibold text-brand-500">${fmt(precioVentaFinal)}</td>
                     </tr>
                   );
                 })

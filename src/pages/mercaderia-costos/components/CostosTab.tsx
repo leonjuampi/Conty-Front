@@ -82,7 +82,7 @@ export function CostosTab() {
         </div>
         <button
           onClick={() => { setEditTarget(null); setIsNewModal(true); }}
-          className="bg-[#E8650A] text-white px-4 py-2 rounded-lg hover:bg-[#d15809] transition-colors flex items-center gap-2 whitespace-nowrap"
+          className="bg-brand-500 text-white px-4 py-2 rounded-lg hover:bg-brand-600 transition-colors flex items-center gap-2 whitespace-nowrap"
         >
           <i className="ri-add-line"></i>
           Nuevo Costo
@@ -91,7 +91,7 @@ export function CostosTab() {
 
       {loading ? (
         <div className="flex items-center justify-center py-16">
-          <i className="ri-loader-4-line animate-spin text-3xl text-[#E8650A]"></i>
+          <i className="ri-loader-4-line animate-spin text-3xl text-brand-500"></i>
         </div>
       ) : costs.length === 0 ? (
         <div className="bg-white rounded-lg border border-gray-200 shadow-sm flex flex-col items-center justify-center py-16 text-center">
@@ -169,7 +169,7 @@ export function CostosTab() {
 
                   <div className="mt-4 pt-3 border-t-2 border-gray-300 flex items-center justify-between">
                     <span className="font-bold text-gray-900 text-sm">Total</span>
-                    <span className="font-bold text-[#E8650A] text-lg">
+                    <span className="font-bold text-brand-500 text-lg">
                       ${total.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
