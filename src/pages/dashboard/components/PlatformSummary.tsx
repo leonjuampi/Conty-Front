@@ -1,7 +1,7 @@
 interface PlatformEntry { platform: string; salesCount: number; total: number }
 
 const PLATFORM_CONFIG: Record<string, { label: string; icon: string; color: string; bg: string }> = {
-  PARTICULAR: { label: 'Particular', icon: 'ri-store-2-line',   color: 'text-orange-600', bg: 'bg-orange-100' },
+  PARTICULAR: { label: 'Particular', icon: 'ri-store-2-line',   color: 'text-brand-600', bg: 'bg-brand-100' },
   PEDIDOSYA:  { label: 'Pedidos Ya', icon: 'ri-motorbike-line', color: 'text-yellow-600', bg: 'bg-yellow-100' },
   RAPPI:      { label: 'Rappi',      icon: 'ri-e-bike-line',    color: 'text-red-600',    bg: 'bg-red-100' },
 };
@@ -20,8 +20,8 @@ export function PlatformSummary({ data = [] }: { data?: PlatformEntry[] }) {
           <h2 className="text-base md:text-lg font-bold text-gray-800">Pedidos por Plataforma</h2>
           <p className="text-xs text-gray-500 mt-0.5">Este mes</p>
         </div>
-        <div className="w-10 h-10 flex items-center justify-center bg-orange-100 rounded-xl">
-          <i className="ri-pie-chart-2-line text-xl text-orange-500"></i>
+        <div className="w-10 h-10 flex items-center justify-center bg-brand-100 rounded-xl">
+          <i className="ri-pie-chart-2-line text-xl text-brand-500"></i>
         </div>
       </div>
 

@@ -65,12 +65,12 @@ export default function SetupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-brand-50 via-white to-brand-100 flex items-center justify-center p-4">
       <div className="w-full max-w-lg">
 
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl flex items-center justify-center shadow-lg mx-auto mb-4">
+          <div className="w-16 h-16 bg-gradient-to-br from-brand-400 to-brand-600 rounded-2xl flex items-center justify-center shadow-lg mx-auto mb-4">
             <i className="ri-building-2-line text-white text-3xl"></i>
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Configurá tu organización</h1>
@@ -82,11 +82,11 @@ export default function SetupPage() {
           {STEPS.map((label, i) => (
             <div key={label} className="flex items-center gap-2 flex-1">
               <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all ${
-                i < step ? 'bg-green-500 text-white' : i === step ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-500'
+                i < step ? 'bg-green-500 text-white' : i === step ? 'bg-brand-500 text-white' : 'bg-gray-200 text-gray-500'
               }`}>
                 {i < step ? <i className="ri-check-line"></i> : i + 1}
               </div>
-              <span className={`text-xs font-medium hidden sm:block ${i === step ? 'text-orange-600' : 'text-gray-400'}`}>{label}</span>
+              <span className={`text-xs font-medium hidden sm:block ${i === step ? 'text-brand-600' : 'text-gray-400'}`}>{label}</span>
               {i < STEPS.length - 1 && <div className={`h-0.5 flex-1 ${i < step ? 'bg-green-400' : 'bg-gray-200'}`}></div>}
             </div>
           ))}
@@ -97,8 +97,8 @@ export default function SetupPage() {
 
           {step === 0 && (
             <div className="space-y-4">
-              <div className="flex items-center gap-3 p-4 bg-orange-50 border border-orange-200 rounded-xl">
-                <i className="ri-user-star-line text-orange-500 text-2xl shrink-0"></i>
+              <div className="flex items-center gap-3 p-4 bg-brand-50 border border-brand-200 rounded-xl">
+                <i className="ri-user-star-line text-brand-500 text-2xl shrink-0"></i>
                 <div>
                   <p className="font-semibold text-gray-800">Hola, {currentUser?.name}!</p>
                   <p className="text-sm text-gray-500">Tu cuenta fue creada como <span className="font-semibold text-purple-600">Owner</span>. Ahora necesitás configurar tu organización para empezar.</p>
@@ -106,20 +106,20 @@ export default function SetupPage() {
               </div>
               <div className="space-y-3 text-sm text-gray-600">
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-orange-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                    <i className="ri-store-line text-orange-500 text-xs"></i>
+                  <div className="w-6 h-6 bg-brand-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                    <i className="ri-store-line text-brand-500 text-xs"></i>
                   </div>
                   <p>Configurá los datos de tu negocio (nombre, CUIT, dirección)</p>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-orange-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                    <i className="ri-settings-line text-orange-500 text-xs"></i>
+                  <div className="w-6 h-6 bg-brand-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                    <i className="ri-settings-line text-brand-500 text-xs"></i>
                   </div>
                   <p>Elegí la moneda y zona horaria que usará el sistema</p>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-orange-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                    <i className="ri-rocket-line text-orange-500 text-xs"></i>
+                  <div className="w-6 h-6 bg-brand-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                    <i className="ri-rocket-line text-brand-500 text-xs"></i>
                   </div>
                   <p>¡Listo! Ya podés empezar a gestionar tu negocio</p>
                 </div>
@@ -137,7 +137,7 @@ export default function SetupPage() {
                   value={form.legalName}
                   onChange={e => setForm({ ...form, legalName: e.target.value })}
                   placeholder="Ej: Rotisería El Buen Sabor"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]"
                   autoFocus
                 />
               </div>
@@ -149,7 +149,7 @@ export default function SetupPage() {
                     value={form.taxId}
                     onChange={e => setForm({ ...form, taxId: e.target.value })}
                     placeholder="Ej: 20-12345678-9"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]"
                   />
                 </div>
                 <div>
@@ -157,7 +157,7 @@ export default function SetupPage() {
                   <select
                     value={form.taxCondition}
                     onChange={e => setForm({ ...form, taxCondition: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]"
                   >
                     <option value="CF">Consumidor Final</option>
                     <option value="RI">Responsable Inscripto</option>
@@ -173,7 +173,7 @@ export default function SetupPage() {
                   value={form.address}
                   onChange={e => setForm({ ...form, address: e.target.value })}
                   placeholder="Ej: Av. Corrientes 1234, CABA"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]"
                 />
               </div>
               <div>
@@ -183,7 +183,7 @@ export default function SetupPage() {
                   value={form.senderEmail}
                   onChange={e => setForm({ ...form, senderEmail: e.target.value })}
                   placeholder="Ej: ventas@minegocio.com"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]"
                 />
               </div>
             </div>
@@ -197,7 +197,7 @@ export default function SetupPage() {
                 <select
                   value={form.currency}
                   onChange={e => setForm({ ...form, currency: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]"
                 >
                   <option value="ARS">Peso Argentino (ARS)</option>
                   <option value="USD">Dolar (USD)</option>
@@ -209,7 +209,7 @@ export default function SetupPage() {
                 <select
                   value={form.timezone}
                   onChange={e => setForm({ ...form, timezone: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]"
                 >
                   <option value="America/Argentina/Buenos_Aires">Buenos Aires (GMT-3)</option>
                   <option value="America/New_York">Nueva York (GMT-5)</option>
@@ -221,7 +221,7 @@ export default function SetupPage() {
               <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-2">
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Resumen</p>
                 <div className="flex items-center gap-2 text-sm">
-                  <i className="ri-store-line text-orange-500 shrink-0"></i>
+                  <i className="ri-store-line text-brand-500 shrink-0"></i>
                   <span className="font-medium text-gray-800">{form.legalName || '—'}</span>
                 </div>
                 {form.taxId && (
@@ -269,7 +269,7 @@ export default function SetupPage() {
                 setError('');
                 setStep(s => s + 1);
               }}
-              className="flex-1 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm transition-all cursor-pointer"
+              className="flex-1 py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-sm transition-all cursor-pointer"
             >
               Continuar
               <i className="ri-arrow-right-line ml-1"></i>
@@ -278,7 +278,7 @@ export default function SetupPage() {
             <button
               onClick={handleCreate}
               disabled={saving}
-              className="flex-1 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 disabled:opacity-60 text-white font-semibold text-sm transition-all cursor-pointer"
+              className="flex-1 py-3 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 disabled:opacity-60 text-white font-semibold text-sm transition-all cursor-pointer"
             >
               {saving ? (
                 <><i className="ri-loader-4-line animate-spin mr-1"></i>Creando organización...</>

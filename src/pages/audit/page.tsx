@@ -148,7 +148,7 @@ export default function AuditPage() {
         <select
           value={filterType}
           onChange={e => setFilterType(e.target.value)}
-          className="px-3 py-2 border border-gray-200 bg-gray-50 rounded-lg text-sm cursor-pointer text-gray-700 outline-none focus:border-orange-400"
+          className="px-3 py-2 border border-gray-200 bg-gray-50 rounded-lg text-sm cursor-pointer text-gray-700 outline-none focus:border-brand-400"
         >
           <option value="">Todas las acciones</option>
           <option value="LOGIN_SUCCESS">Inicio de sesión</option>
@@ -159,7 +159,7 @@ export default function AuditPage() {
         </select>
 
         <div className="flex-1 min-w-0 md:min-w-[200px]">
-          <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus-within:border-orange-400 focus-within:ring-1 focus-within:ring-orange-200 transition-all">
+          <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus-within:border-brand-400 focus-within:ring-1 focus-within:ring-brand-200 transition-all">
             <i className="ri-search-line text-gray-400 text-sm shrink-0"></i>
             <input
               type="text"
@@ -176,7 +176,7 @@ export default function AuditPage() {
           </div>
         </div>
 
-        {loading && <i className="ri-loader-4-line animate-spin text-orange-500 text-lg ml-auto"></i>}
+        {loading && <i className="ri-loader-4-line animate-spin text-brand-500 text-lg ml-auto"></i>}
       </div>
 
       {error ? (
@@ -214,7 +214,7 @@ export default function AuditPage() {
                       </td>
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 flex items-center justify-center bg-gradient-to-r from-orange-500 to-red-500 rounded-full text-white font-bold text-xs shrink-0">
+                          <div className="w-7 h-7 flex items-center justify-center bg-gradient-to-r from-brand-500 to-brand-600 rounded-full text-white font-bold text-xs shrink-0">
                             {(log.performedBy ?? '?').charAt(0).toUpperCase()}
                           </div>
                           <span className="text-sm font-medium text-gray-800">{log.performedBy ?? 'Sistema'}</span>
@@ -236,7 +236,7 @@ export default function AuditPage() {
                       <td className="px-5 py-3">
                         <button
                           onClick={() => setSelectedLog(log)}
-                          className="flex items-center gap-1.5 text-xs text-orange-600 hover:text-orange-700 bg-orange-50 hover:bg-orange-100 border border-orange-200 px-2.5 py-1 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                          className="flex items-center gap-1.5 text-xs text-brand-600 hover:text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-200 px-2.5 py-1 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
                         >
                           <i className="ri-eye-line text-sm"></i>
                           Ver detalle
@@ -260,7 +260,7 @@ export default function AuditPage() {
               <div key={log.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <div className="w-9 h-9 flex items-center justify-center bg-gradient-to-r from-orange-500 to-red-500 rounded-full text-white font-bold text-sm shrink-0">
+                    <div className="w-9 h-9 flex items-center justify-center bg-gradient-to-r from-brand-500 to-brand-600 rounded-full text-white font-bold text-sm shrink-0">
                       {(log.performedBy ?? '?').charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0">
@@ -281,7 +281,7 @@ export default function AuditPage() {
                   ) : <span />}
                   <button
                     onClick={() => setSelectedLog(log)}
-                    className="flex items-center gap-1 text-xs text-orange-600 bg-orange-50 border border-orange-200 px-2.5 py-1 rounded-lg cursor-pointer"
+                    className="flex items-center gap-1 text-xs text-brand-600 bg-brand-50 border border-brand-200 px-2.5 py-1 rounded-lg cursor-pointer"
                   >
                     <i className="ri-eye-line text-sm"></i>
                     Ver detalle
@@ -350,7 +350,7 @@ export default function AuditPage() {
                 <div className="bg-gray-50 rounded-xl p-3">
                   <p className="text-xs text-gray-500 mb-1">Usuario</p>
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 flex items-center justify-center bg-gradient-to-r from-orange-500 to-red-500 rounded-full text-white font-bold text-xs shrink-0">
+                    <div className="w-6 h-6 flex items-center justify-center bg-gradient-to-r from-brand-500 to-brand-600 rounded-full text-white font-bold text-xs shrink-0">
                       {(selectedLog.performedBy ?? '?').charAt(0).toUpperCase()}
                     </div>
                     <p className="font-semibold text-gray-800 text-sm">{selectedLog.performedBy ?? 'Sistema'}</p>
@@ -394,7 +394,7 @@ export default function AuditPage() {
 
               <button
                 onClick={() => setSelectedLog(null)}
-                className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all cursor-pointer"
+                className="w-full bg-gradient-to-r from-brand-500 to-brand-600 text-white py-3 rounded-xl font-semibold hover:from-brand-600 hover:to-brand-700 transition-all cursor-pointer"
               >
                 Cerrar
               </button>
@@ -411,7 +411,7 @@ function getModalHeaderColor(action: string) {
     CREATE: 'bg-gradient-to-r from-green-500 to-emerald-600',
     UPDATE: 'bg-gradient-to-r from-teal-500 to-cyan-600',
     DELETE: 'bg-gradient-to-r from-red-500 to-rose-600',
-    LOGIN_SUCCESS: 'bg-gradient-to-r from-orange-500 to-red-500',
+    LOGIN_SUCCESS: 'bg-gradient-to-r from-brand-500 to-brand-600',
     LOGIN_FAIL: 'bg-gradient-to-r from-red-600 to-rose-700',
   };
   return colors[action] || 'bg-gradient-to-r from-gray-500 to-gray-600';
@@ -450,7 +450,7 @@ function getActionColor(action: string) {
     CREATE: 'text-green-700 bg-green-50',
     UPDATE: 'text-teal-700 bg-teal-50',
     DELETE: 'text-red-700 bg-red-50',
-    LOGIN_SUCCESS: 'text-orange-700 bg-orange-50',
+    LOGIN_SUCCESS: 'text-brand-700 bg-brand-50',
     LOGIN_FAIL: 'text-red-700 bg-red-100',
   };
   return colors[action] || 'text-gray-600 bg-gray-100';

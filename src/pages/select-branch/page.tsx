@@ -35,7 +35,7 @@ export default function SelectBranchPage() {
       <div className="w-full max-w-lg">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+          <div className="w-16 h-16 bg-gradient-to-br from-brand-500 to-brand-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
             <i className="ri-store-2-line text-3xl text-white"></i>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Seleccioná una sucursal</h1>
@@ -53,7 +53,7 @@ export default function SelectBranchPage() {
 
         {loading ? (
           <div className="flex justify-center py-12">
-            <i className="ri-loader-4-line animate-spin text-3xl text-orange-500"></i>
+            <i className="ri-loader-4-line animate-spin text-3xl text-brand-500"></i>
           </div>
         ) : branches.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
@@ -67,11 +67,11 @@ export default function SelectBranchPage() {
                 key={branch.id}
                 onClick={() => handleSelect(branch.id)}
                 disabled={selecting !== null}
-                className="w-full bg-white border-2 border-gray-100 hover:border-orange-300 rounded-2xl p-5 text-left transition-all hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed group"
+                className="w-full bg-white border-2 border-gray-100 hover:border-brand-400 rounded-2xl p-5 text-left transition-all hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed group"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-orange-100 to-red-100 group-hover:from-orange-500 group-hover:to-red-600 rounded-xl flex items-center justify-center transition-all flex-shrink-0">
-                    <i className="ri-store-line text-orange-500 group-hover:text-white text-xl transition-colors"></i>
+                  <div className="w-12 h-12 bg-gradient-to-br from-brand-100 to-brand-100 group-hover:from-brand-500 group-hover:to-brand-600 rounded-xl flex items-center justify-center transition-all flex-shrink-0">
+                    <i className="ri-store-line text-brand-500 group-hover:text-white text-xl transition-colors"></i>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-bold text-gray-800 text-base">{branch.name}</p>
@@ -88,9 +88,9 @@ export default function SelectBranchPage() {
                   </div>
                   <div className="flex-shrink-0">
                     {selecting === branch.id ? (
-                      <i className="ri-loader-4-line animate-spin text-orange-500 text-xl"></i>
+                      <i className="ri-loader-4-line animate-spin text-brand-500 text-xl"></i>
                     ) : (
-                      <i className="ri-arrow-right-line text-gray-300 group-hover:text-orange-500 text-xl transition-colors"></i>
+                      <i className="ri-arrow-right-line text-gray-300 group-hover:text-brand-500 text-xl transition-colors"></i>
                     )}
                   </div>
                 </div>

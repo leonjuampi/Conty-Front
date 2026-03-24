@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCash } from '../../context/CashContext';
+import { useTheme } from '../../context/ThemeContext';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -27,6 +28,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
   const { hasCashOpen, activeSession } = useCash();
+  const theme = useTheme();
 
   const menuItems = ALL_MENU_ITEMS.filter(
     item => currentUser && item.roleIds.includes(currentUser.roleId)
@@ -74,11 +76,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="p-6 border-b border-gray-700">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 flex items-center justify-center bg-gradient-to-br from-orange-400 to-red-500 rounded-xl shadow">
-                <i className="ri-store-2-line text-white text-xl"></i>
+              <div className="w-10 h-10 flex items-center justify-center bg-gradient-to-br from-brand-400 to-brand-600 rounded-xl shadow">
+                <i className={`${theme.storeIcon} text-white text-xl`}></i>
               </div>
               <div>
-                <h1 className="text-lg font-bold">Conty Pizzeria</h1>
+                <h1 className="text-lg font-bold">Conty</h1>
                 <p className="text-xs text-gray-400">Sistema de Gestión</p>
               </div>
             </div>
@@ -116,7 +118,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   onClick={() => handleNavigation(item.path)}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all cursor-pointer ${
                     location.pathname === item.path
-                      ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
+                      ? 'bg-gradient-to-r from-brand-500 to-brand-600 text-white shadow-lg'
                       : 'text-gray-300 hover:bg-gray-700 hover:text-white'
                   }`}
                 >
@@ -130,7 +132,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
         <div className="p-4 border-t border-gray-700 space-y-2">
           <div className="flex items-center gap-3 px-4 py-3 bg-gray-700/50 rounded-lg">
-            <div className="w-9 h-9 flex items-center justify-center bg-gradient-to-r from-orange-500 to-red-500 rounded-full text-white font-bold text-sm shrink-0">
+            <div className="w-9 h-9 flex items-center justify-center bg-gradient-to-r from-brand-500 to-brand-600 rounded-full text-white font-bold text-sm shrink-0">
               {nameInitial}
             </div>
             <div className="min-w-0">

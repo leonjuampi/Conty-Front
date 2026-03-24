@@ -7,6 +7,7 @@ export interface OrgItem {
   plan: 'BASIC' | 'PROFESSIONAL' | 'ENTERPRISE';
   plan_expires_at: string | null;
   max_licenses: number;
+  org_type: 'FOOD' | 'RETAIL';
   created_at: string;
   product_count: number;
   branch_count: number;
@@ -34,8 +35,14 @@ export async function listOrgs(): Promise<OrgItem[]> {
   return data.items;
 }
 
-export async function updateOrgPlan(orgId: number, plan: string, max_licenses: number, plan_expires_at: string | null) {
-  const { data } = await api.put(`/superadmin/orgs/${orgId}/plan`, { plan, max_licenses, plan_expires_at });
+export async function updateOrgPlan(
+  orgId: number,
+  plan: string,
+  max_licenses: number,
+  plan_expires_at: string | null,
+  org_type: 'FOOD' | 'RETAIL'
+) {
+  const { data } = await api.put(`/superadmin/orgs/${orgId}/plan`, { plan, max_licenses, plan_expires_at, org_type });
   return data;
 }
 

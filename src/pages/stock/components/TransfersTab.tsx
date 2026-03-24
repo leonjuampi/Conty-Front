@@ -178,7 +178,7 @@ export default function TransfersTab({ currentUser }: Props) {
       <div className="flex justify-end">
         <button
           onClick={openModal}
-          className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
+          className="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
         >
           <i className="ri-add-line"></i>
           Nueva Transferencia
@@ -196,7 +196,7 @@ export default function TransfersTab({ currentUser }: Props) {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {loading ? (
           <div className="flex justify-center py-10">
-            <i className="ri-loader-4-line animate-spin text-orange-500 text-3xl"></i>
+            <i className="ri-loader-4-line animate-spin text-brand-500 text-3xl"></i>
           </div>
         ) : transfers.length === 0 ? (
           <div className="py-12 text-center text-gray-400">
@@ -221,7 +221,7 @@ export default function TransfersTab({ currentUser }: Props) {
                   <>
                     <tr
                       key={t.id}
-                      className="hover:bg-orange-50/40 transition-colors cursor-pointer"
+                      className="hover:bg-brand-50/40 transition-colors cursor-pointer"
                       onClick={() => handleExpandRow(t)}
                     >
                       <td className="px-4 py-3 font-mono text-xs text-gray-600">{t.transferRef}</td>
@@ -253,11 +253,11 @@ export default function TransfersTab({ currentUser }: Props) {
                       </td>
                     </tr>
                     {expandedId === t.id && (
-                      <tr key={`${t.id}-detail`} className="bg-orange-50/20">
+                      <tr key={`${t.id}-detail`} className="bg-brand-50/20">
                         <td colSpan={6} className="px-6 py-4">
                           {detailLoading ? (
                             <div className="flex justify-center py-4">
-                              <i className="ri-loader-4-line animate-spin text-orange-500 text-xl"></i>
+                              <i className="ri-loader-4-line animate-spin text-brand-500 text-xl"></i>
                             </div>
                           ) : expandedDetail ? (
                             <div>
@@ -349,7 +349,7 @@ export default function TransfersTab({ currentUser }: Props) {
                   <select
                     value={originBranchId}
                     onChange={e => setOriginBranchId(Number(e.target.value))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
                   >
                     <option value="">Seleccionar</option>
                     {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
@@ -360,7 +360,7 @@ export default function TransfersTab({ currentUser }: Props) {
                   <select
                     value={destBranchId}
                     onChange={e => setDestBranchId(Number(e.target.value))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
                   >
                     <option value="">Seleccionar</option>
                     {branches.filter(b => b.id !== Number(originBranchId)).map(b => (
@@ -380,7 +380,7 @@ export default function TransfersTab({ currentUser }: Props) {
                       placeholder="Buscar producto..."
                       value={productSearch}
                       onChange={e => setProductSearch(e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
                     />
                     {productSearchLoading && (
                       <div className="absolute right-3 top-2.5">
@@ -393,7 +393,7 @@ export default function TransfersTab({ currentUser }: Props) {
                           <li
                             key={p.variantId}
                             onClick={() => handleAddItem(p)}
-                            className="px-3 py-2 hover:bg-orange-50 cursor-pointer text-sm flex justify-between"
+                            className="px-3 py-2 hover:bg-brand-50 cursor-pointer text-sm flex justify-between"
                           >
                             <span>{p.productName}{p.variantName ? ` — ${p.variantName}` : ''}</span>
                             <span className="text-gray-400 font-mono text-xs">{p.variantSku || p.productSku || ''}</span>
@@ -407,7 +407,7 @@ export default function TransfersTab({ currentUser }: Props) {
                     min={1}
                     value={itemQty}
                     onChange={e => setItemQty(Number(e.target.value))}
-                    className="w-20 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    className="w-20 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
                     placeholder="Qty"
                   />
                 </div>
@@ -460,7 +460,7 @@ export default function TransfersTab({ currentUser }: Props) {
                   placeholder="Nota..."
                   value={transferNote}
                   onChange={e => setTransferNote(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
                 />
               </div>
             </div>
@@ -475,7 +475,7 @@ export default function TransfersTab({ currentUser }: Props) {
               <button
                 onClick={handleSubmit}
                 disabled={modalLoading}
-                className="px-4 py-2 text-sm bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium flex items-center gap-2 disabled:opacity-60"
+                className="px-4 py-2 text-sm bg-brand-500 hover:bg-brand-600 text-white rounded-lg font-medium flex items-center gap-2 disabled:opacity-60"
               >
                 {modalLoading && <i className="ri-loader-4-line animate-spin"></i>}
                 Crear Transferencia

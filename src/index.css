@@ -1,3 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ── Brand theme tokens (canales RGB sin rgb()) ──────────── */
+/* Tailwind genera: rgb(var(--brand-X) / opacity)            */
+
+/* Default: RETAIL (azul/índigo) */
+:root {
+  --brand-50:  239 246 255;  /* blue-50  */
+  --brand-100: 219 234 254;  /* blue-100 */
+  --brand-200: 191 219 254;  /* blue-200 */
+  --brand-400: 96 165 250;   /* blue-400 */
+  --brand-500: 59 130 246;   /* blue-500 */
+  --brand-600: 37 99 235;    /* blue-600 */
+  --brand-700: 29 78 216;    /* blue-700 */
+}
+
+/* FOOD (naranja) */
+[data-theme="FOOD"] {
+  --brand-50:  255 247 237;  /* orange-50  */
+  --brand-100: 255 237 213;  /* orange-100 */
+  --brand-200: 254 215 170;  /* orange-200 */
+  --brand-400: 251 146 60;   /* orange-400 */
+  --brand-500: 249 115 22;   /* orange-500 */
+  --brand-600: 234 88 12;    /* orange-600 */
+  --brand-700: 194 65 12;    /* orange-700 */
+}

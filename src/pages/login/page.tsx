@@ -55,28 +55,23 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left panel */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-        <img
-          src="https://readdy.ai/api/search-image?query=warm%20cozy%20italian%20pizzeria%20interior%20with%20wood%20fired%20oven%20glowing%20orange%20flames%20rustic%20brick%20walls%20hanging%20herbs%20and%20garlic%20soft%20warm%20lighting%20inviting%20atmosphere%20rich%20textures%20no%20people%20professional%20food%20photography%20style&width=800&height=1000&seq=login-bg-01&orientation=portrait"
-          alt="Rotisería"
-          className="w-full h-full object-cover object-top"
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-orange-900/70 via-red-900/50 to-black/60" />
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-gray-900 via-blue-950 to-indigo-900">
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 30% 20%, #60a5fa 0%, transparent 50%), radial-gradient(circle at 70% 80%, #818cf8 0%, transparent 50%)' }} />
         <div className="absolute inset-0 flex flex-col justify-end p-12">
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center shadow-lg">
-                <i className="ri-store-2-line text-white text-2xl"></i>
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                <i className="ri-store-3-line text-white text-2xl"></i>
               </div>
               <div>
-                <h1 className="text-white text-2xl font-bold tracking-tight">Rotisería</h1>
-                <p className="text-orange-200 text-sm">Sistema de Gestión</p>
+                <h1 className="text-white text-2xl font-bold tracking-tight">Conty</h1>
+                <p className="text-blue-200 text-sm">Sistema de Gestión</p>
               </div>
             </div>
             <h2 className="text-white text-4xl font-bold leading-tight mb-3">
-              Gestión simple,<br />resultados deliciosos.
+              Gestión simple,<br />resultados reales.
             </h2>
-            <p className="text-orange-100/80 text-base leading-relaxed">
+            <p className="text-blue-100/80 text-base leading-relaxed">
               Administrá pedidos, productos, clientes y reportes desde un solo lugar.
             </p>
           </div>
@@ -88,11 +83,11 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="flex lg:hidden items-center gap-3 mb-10 justify-center">
-            <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center shadow-lg">
-              <i className="ri-store-2-line text-white text-2xl"></i>
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+              <i className="ri-store-3-line text-white text-2xl"></i>
             </div>
             <div>
-              <h1 className="text-gray-900 text-xl font-bold">Rotisería</h1>
+              <h1 className="text-gray-900 text-xl font-bold">Conty</h1>
               <p className="text-gray-500 text-xs">Sistema de Gestión</p>
             </div>
           </div>
@@ -117,7 +112,7 @@ export default function LoginPage() {
                   value={username}
                   onChange={e => setUsername(e.target.value)}
                   placeholder="Ingresá tu usuario"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all bg-gray-50 focus:bg-white"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent transition-all bg-gray-50 focus:bg-white"
                   required
                   autoComplete="username"
                 />
@@ -138,7 +133,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   placeholder="Ingresá tu contraseña"
-                  className="w-full pl-10 pr-11 py-3 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all bg-gray-50 focus:bg-white"
+                  className="w-full pl-10 pr-11 py-3 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent transition-all bg-gray-50 focus:bg-white"
                   required
                   autoComplete="current-password"
                 />
@@ -164,7 +159,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold py-3 rounded-xl text-sm transition-all shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
+              className="w-full bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-semibold py-3 rounded-xl text-sm transition-all shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
             >
               {loading ? (
                 <>
@@ -181,7 +176,7 @@ export default function LoginPage() {
           </form>
 
           <p className="text-center text-xs text-gray-400 mt-8">
-            © {new Date().getFullYear()} Rotisería · Sistema de Gestión Interno
+            © {new Date().getFullYear()} Conty · Sistema de Gestión
           </p>
         </div>
       </div>

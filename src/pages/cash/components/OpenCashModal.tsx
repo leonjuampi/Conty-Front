@@ -46,7 +46,7 @@ export function OpenCashModal() {
       <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 md:p-8 border border-gray-100">
         {/* Header */}
         <div className="text-center mb-6 md:mb-8">
-          <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+          <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-brand-500 to-brand-600 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
             <i className="ri-safe-line text-3xl md:text-4xl text-white"></i>
           </div>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Apertura de Caja</h1>
@@ -54,7 +54,7 @@ export function OpenCashModal() {
         </div>
 
         {/* Info */}
-        <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-4 mb-6 space-y-2">
+        <div className="bg-gradient-to-r from-brand-50 to-brand-100 rounded-xl p-4 mb-6 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-500">Vendedor</span>
             <span className="font-semibold text-gray-800 text-sm md:text-base">{currentUser?.name}</span>
@@ -81,7 +81,7 @@ export function OpenCashModal() {
               value={initialAmount}
               onChange={handleAmountChange}
               placeholder="0.00"
-              className="w-full pl-9 pr-4 py-4 md:py-5 border-2 border-gray-200 rounded-xl text-xl md:text-2xl font-bold text-gray-800 focus:outline-none focus:border-orange-500 transition-colors min-h-[56px]"
+              className="w-full pl-9 pr-4 py-4 md:py-5 border-2 border-gray-200 rounded-xl text-xl md:text-2xl font-bold text-gray-800 focus:outline-none focus:border-brand-500 transition-colors min-h-[56px]"
             />
           </div>
           {error && (
@@ -95,7 +95,7 @@ export function OpenCashModal() {
         <button
           onClick={handleOpenCash}
           disabled={loading}
-          className="w-full bg-gradient-to-r from-orange-500 to-red-600 text-white py-4 md:py-5 rounded-xl font-bold text-base md:text-lg hover:from-orange-600 hover:to-red-700 transition-all shadow-lg hover:shadow-xl whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 min-h-[56px] disabled:opacity-60 disabled:cursor-not-allowed"
+          className="w-full bg-gradient-to-r from-brand-500 to-brand-600 text-white py-4 md:py-5 rounded-xl font-bold text-base md:text-lg hover:from-brand-600 hover:to-brand-700 transition-all shadow-lg hover:shadow-xl whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 min-h-[56px] disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {loading ? (
             <><i className="ri-loader-4-line animate-spin text-xl"></i> Abriendo...</>

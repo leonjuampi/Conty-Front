@@ -69,11 +69,11 @@ export function ClientSelector({ selectedClient, onSelectClient }: ClientSelecto
       <div>
         <label className="block text-sm font-semibold text-gray-700 mb-2">Cliente</label>
         {selectedClient ? (
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+          <div className="bg-brand-50 border border-brand-200 rounded-lg p-4">
             <div className="flex items-start justify-between mb-2">
               <div>
                 <p className="font-semibold text-gray-800">
-                  <i className="ri-map-pin-line mr-1 text-orange-500"></i>
+                  <i className="ri-map-pin-line mr-1 text-brand-500"></i>
                   {selectedClient.address}
                 </p>
                 {(selectedClient.firstName || selectedClient.lastName) && (
@@ -97,7 +97,7 @@ export function ClientSelector({ selectedClient, onSelectClient }: ClientSelecto
         ) : (
           <button
             onClick={() => setShowModal(true)}
-            className="w-full border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-orange-400 hover:bg-orange-50 transition-all cursor-pointer"
+            className="w-full border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-brand-400 hover:bg-brand-50 transition-all cursor-pointer"
           >
             <i className="ri-user-add-line text-2xl text-gray-400 mb-2"></i>
             <p className="text-sm text-gray-600 font-medium">Seleccionar Cliente</p>
@@ -108,7 +108,7 @@ export function ClientSelector({ selectedClient, onSelectClient }: ClientSelecto
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
-            <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-between">
+            <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-brand-500 to-brand-600 flex items-center justify-between">
               <h2 className="text-xl font-bold text-white">Seleccionar Cliente</h2>
               <button onClick={() => { setShowModal(false); setShowNewClientForm(false); setSearchTerm(''); }} className="text-white cursor-pointer">
                 <i className="ri-close-line text-2xl"></i>
@@ -126,23 +126,23 @@ export function ClientSelector({ selectedClient, onSelectClient }: ClientSelecto
                         placeholder="Buscar por nombre, teléfono o dirección..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm"
                       />
                     </div>
                   </div>
 
-                  <button onClick={() => setShowNewClientForm(true)} className="w-full mb-4 bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-all cursor-pointer">
+                  <button onClick={() => setShowNewClientForm(true)} className="w-full mb-4 bg-brand-500 text-white py-3 rounded-lg font-semibold hover:bg-brand-600 transition-all cursor-pointer">
                     <i className="ri-user-add-line mr-2"></i>Nuevo Cliente
                   </button>
 
                   {loadingClients ? (
-                    <div className="flex justify-center py-8"><i className="ri-loader-4-line animate-spin text-2xl text-orange-500"></i></div>
+                    <div className="flex justify-center py-8"><i className="ri-loader-4-line animate-spin text-2xl text-brand-500"></i></div>
                   ) : (
                     <div className="space-y-2">
                       {clients.map(client => (
-                        <button key={client.id} onClick={() => { onSelectClient(client); setShowModal(false); }} className="w-full text-left bg-gray-50 hover:bg-orange-50 border border-gray-200 hover:border-orange-300 rounded-lg p-4 transition-all cursor-pointer">
+                        <button key={client.id} onClick={() => { onSelectClient(client); setShowModal(false); }} className="w-full text-left bg-gray-50 hover:bg-brand-50 border border-gray-200 hover:border-brand-400 rounded-lg p-4 transition-all cursor-pointer">
                           <p className="font-semibold text-gray-800 mb-1">
-                            <i className="ri-map-pin-line mr-1 text-orange-500"></i>
+                            <i className="ri-map-pin-line mr-1 text-brand-500"></i>
                             {client.address}
                           </p>
                           {(client.firstName || client.lastName) && <p className="text-sm text-gray-500"><i className="ri-user-line mr-1"></i>{client.firstName} {client.lastName}</p>}
@@ -155,27 +155,27 @@ export function ClientSelector({ selectedClient, onSelectClient }: ClientSelecto
                 </>
               ) : (
                 <div>
-                  <button onClick={() => setShowNewClientForm(false)} className="mb-4 text-orange-600 hover:text-orange-700 font-medium text-sm cursor-pointer">
+                  <button onClick={() => setShowNewClientForm(false)} className="mb-4 text-brand-600 hover:text-brand-700 font-medium text-sm cursor-pointer">
                     <i className="ri-arrow-left-line mr-1"></i>Volver
                   </button>
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Dirección <span className="text-red-500">*</span></label>
-                      <textarea value={newClient.address} onChange={(e) => setNewClient({ ...newClient, address: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 text-sm" rows={3} placeholder="Ingrese la dirección completa" />
+                      <textarea value={newClient.address} onChange={(e) => setNewClient({ ...newClient, address: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 text-sm" rows={3} placeholder="Ingrese la dirección completa" />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-                      <input type="text" value={newClient.firstName} onChange={(e) => setNewClient({ ...newClient, firstName: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 text-sm" placeholder="Nombre" />
+                      <input type="text" value={newClient.firstName} onChange={(e) => setNewClient({ ...newClient, firstName: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 text-sm" placeholder="Nombre" />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
-                      <input type="text" value={newClient.lastName} onChange={(e) => setNewClient({ ...newClient, lastName: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 text-sm" placeholder="Apellido" />
+                      <input type="text" value={newClient.lastName} onChange={(e) => setNewClient({ ...newClient, lastName: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 text-sm" placeholder="Apellido" />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
-                      <input type="tel" value={newClient.phone} onChange={(e) => setNewClient({ ...newClient, phone: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 text-sm" placeholder="11-1234-5678" />
+                      <input type="tel" value={newClient.phone} onChange={(e) => setNewClient({ ...newClient, phone: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 text-sm" placeholder="11-1234-5678" />
                     </div>
-                    <button onClick={handleCreateClient} disabled={savingClient} className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-all cursor-pointer disabled:opacity-60">
+                    <button onClick={handleCreateClient} disabled={savingClient} className="w-full bg-brand-500 text-white py-3 rounded-lg font-semibold hover:bg-brand-600 transition-all cursor-pointer disabled:opacity-60">
                       {savingClient ? <><i className="ri-loader-4-line animate-spin mr-2"></i>Guardando...</> : <><i className="ri-save-line mr-2"></i>Guardar Cliente</>}
                     </button>
                   </div>

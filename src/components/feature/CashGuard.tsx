@@ -45,7 +45,7 @@ export function CashGuard({ children }: CashGuardProps) {
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 animate-fade-in">
             {/* Ícono */}
             <div className="flex justify-center mb-5">
-              <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-brand-500 to-brand-600 rounded-full flex items-center justify-center">
                 <i className="ri-safe-line text-4xl text-white"></i>
               </div>
             </div>
@@ -59,8 +59,8 @@ export function CashGuard({ children }: CashGuardProps) {
             </p>
 
             {/* Info del usuario */}
-            <div className="bg-orange-50 rounded-xl p-4 mb-6 flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center flex-shrink-0">
+            <div className="bg-brand-50 rounded-xl p-4 mb-6 flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-brand-500 to-brand-600 rounded-full flex items-center justify-center flex-shrink-0">
                 <i className="ri-user-line text-white text-lg"></i>
               </div>
               <div>
@@ -78,7 +78,7 @@ export function CashGuard({ children }: CashGuardProps) {
             <div className="flex flex-col gap-3">
               <button
                 onClick={handleGoToCash}
-                className="w-full bg-gradient-to-r from-orange-500 to-red-600 text-white py-3 rounded-xl font-bold text-base hover:from-orange-600 hover:to-red-700 transition-all shadow-md hover:shadow-lg whitespace-nowrap cursor-pointer flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-brand-500 to-brand-600 text-white py-3 rounded-xl font-bold text-base hover:from-brand-600 hover:to-brand-700 transition-all shadow-md hover:shadow-lg whitespace-nowrap cursor-pointer flex items-center justify-center gap-2"
               >
                 <i className="ri-lock-unlock-line text-lg"></i>
                 Ir a abrir caja

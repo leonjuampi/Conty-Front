@@ -40,14 +40,14 @@ export function CategoryModal({ categories, onAdd, onDelete, onClose }: Category
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-orange-500 to-red-500 px-6 py-4 flex items-center justify-between">
+        <div className="bg-gradient-to-r from-brand-500 to-brand-600 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <i className="ri-price-tag-3-line text-white text-xl"></i>
             <h2 className="text-lg font-bold text-white">Gestionar Categorías</h2>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center text-white hover:text-orange-200 transition-colors cursor-pointer"
+            className="w-8 h-8 flex items-center justify-center text-white hover:text-brand-200 transition-colors cursor-pointer"
           >
             <i className="ri-close-line text-2xl"></i>
           </button>
@@ -66,12 +66,12 @@ export function CategoryModal({ categories, onAdd, onDelete, onClose }: Category
                 onChange={(e) => { setNewCategory(e.target.value); setError(''); }}
                 onKeyDown={handleKeyDown}
                 placeholder="Ej: Pastas, Postres especiales..."
-                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm"
                 maxLength={40}
               />
               <button
                 onClick={handleAdd}
-                className="px-4 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:shadow-md transition-all cursor-pointer whitespace-nowrap font-medium text-sm flex items-center gap-1"
+                className="px-4 py-2.5 bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-lg hover:shadow-md transition-all cursor-pointer whitespace-nowrap font-medium text-sm flex items-center gap-1"
               >
                 <i className="ri-add-line text-base"></i>
                 Agregar
@@ -99,7 +99,7 @@ export function CategoryModal({ categories, onAdd, onDelete, onClose }: Category
                     className="flex items-center justify-between px-4 py-2.5 bg-gray-50 rounded-lg border border-gray-100"
                   >
                     <div className="flex items-center gap-2">
-                      <i className="ri-price-tag-3-line text-orange-400 text-sm"></i>
+                      <i className="ri-price-tag-3-line text-brand-400 text-sm"></i>
                       <span className="text-sm font-medium text-gray-700">{cat}</span>
                       {isProtected && (
                         <span className="text-xs text-gray-400 bg-gray-200 px-2 py-0.5 rounded-full">

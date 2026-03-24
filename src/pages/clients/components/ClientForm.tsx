@@ -60,7 +60,7 @@ export function ClientForm({ client, onSave, onClose }: ClientFormProps) {
         {/* Header fijo */}
         <div className="sticky top-0 bg-white z-10 flex items-center justify-between p-4 md:p-6 border-b border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 flex items-center justify-center bg-gradient-to-br from-orange-400 to-red-500 rounded-xl">
+            <div className="w-10 h-10 flex items-center justify-center bg-gradient-to-br from-brand-400 to-brand-600 rounded-xl">
               <i className="ri-user-line text-white text-lg"></i>
             </div>
             <h2 className="text-lg md:text-xl font-bold text-gray-800">
@@ -86,7 +86,7 @@ export function ClientForm({ client, onSave, onClose }: ClientFormProps) {
                 onChange={handleChange}
                 required
                 placeholder="Juan"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]"
               />
             </div>
             <div>
@@ -98,7 +98,7 @@ export function ClientForm({ client, onSave, onClose }: ClientFormProps) {
                 onChange={handleChange}
                 required
                 placeholder="Pérez"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]"
               />
             </div>
           </div>
@@ -112,7 +112,7 @@ export function ClientForm({ client, onSave, onClose }: ClientFormProps) {
               onChange={handleChange}
               required
               placeholder="11-4567-8901"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]"
             />
           </div>
 
@@ -124,7 +124,7 @@ export function ClientForm({ client, onSave, onClose }: ClientFormProps) {
               value={form.email}
               onChange={handleChange}
               placeholder="juan@email.com"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]"
             />
           </div>
 
@@ -136,7 +136,7 @@ export function ClientForm({ client, onSave, onClose }: ClientFormProps) {
               value={form.address}
               onChange={handleChange}
               placeholder="Av. Corrientes 1234, CABA"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]"
             />
           </div>
 
@@ -149,7 +149,7 @@ export function ClientForm({ client, onSave, onClose }: ClientFormProps) {
               placeholder="Preferencias, alergias, observaciones..."
               rows={3}
               maxLength={500}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm resize-none min-h-[80px]"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm resize-none min-h-[80px]"
             />
             <p className="text-xs text-gray-400 text-right mt-1">{form.notes.length}/500</p>
           </div>
@@ -164,7 +164,7 @@ export function ClientForm({ client, onSave, onClose }: ClientFormProps) {
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg font-semibold hover:from-orange-600 hover:to-red-600 transition-all shadow-md cursor-pointer whitespace-nowrap text-sm min-h-[48px]"
+              className="flex-1 px-4 py-3 bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-lg font-semibold hover:from-brand-600 hover:to-brand-700 transition-all shadow-md cursor-pointer whitespace-nowrap text-sm min-h-[48px]"
             >
               {client ? 'Guardar Cambios' : 'Crear Cliente'}
             </button>

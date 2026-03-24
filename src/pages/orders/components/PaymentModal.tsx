@@ -211,8 +211,8 @@ export function PaymentModal({ total, orderItems, client, receiptNumber, onClose
             </div>
 
             {notes && (
-              <div className="mb-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                <p className="text-xs text-orange-700 uppercase font-semibold mb-1">Notas</p>
+              <div className="mb-4 p-3 bg-brand-50 border border-brand-200 rounded-lg">
+                <p className="text-xs text-brand-700 uppercase font-semibold mb-1">Notas</p>
                 <p className="text-sm text-gray-800 whitespace-pre-wrap">{notes}</p>
               </div>
             )}
@@ -220,7 +220,7 @@ export function PaymentModal({ total, orderItems, client, receiptNumber, onClose
             <div className="border-t-2 border-gray-300 pt-4 space-y-2">
               <div className="flex justify-between text-lg font-bold">
                 <span className="text-gray-800">TOTAL:</span>
-                <span className="text-orange-600">${total.toFixed(2)}</span>
+                <span className="text-brand-600">${total.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm pt-2 border-t border-gray-200">
                 <span className="text-gray-600">Método de pago:</span>
@@ -248,7 +248,7 @@ export function PaymentModal({ total, orderItems, client, receiptNumber, onClose
           </div>
 
           <div className="p-4 bg-gray-50 border-t border-gray-200 flex gap-3 print:hidden">
-            <button onClick={handlePrintAndFinish} className="flex-1 bg-orange-600 text-white font-bold py-3 rounded-lg hover:bg-orange-700 cursor-pointer flex items-center justify-center gap-2">
+            <button onClick={handlePrintAndFinish} className="flex-1 bg-brand-600 text-white font-bold py-3 rounded-lg hover:bg-brand-700 cursor-pointer flex items-center justify-center gap-2">
               <i className="ri-printer-line"></i>Imprimir y Finalizar
             </button>
             <button onClick={onClose} className="px-6 bg-gray-200 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-300 cursor-pointer">
@@ -263,10 +263,10 @@ export function PaymentModal({ total, orderItems, client, receiptNumber, onClose
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-0 md:p-4">
       <div className="bg-white w-full h-full md:h-auto md:rounded-xl shadow-2xl md:w-[500px] md:max-h-[90vh] overflow-y-auto flex flex-col">
-        <div className="p-6 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-orange-600 to-red-600 text-white md:rounded-t-xl">
+        <div className="p-6 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-brand-600 to-brand-700 text-white md:rounded-t-xl">
           <div>
             <h2 className="text-2xl font-bold">Finalizar Pedido</h2>
-            <p className="text-orange-100 text-sm mt-1">Total: ${total.toFixed(2)}</p>
+            <p className="text-brand-100 text-sm mt-1">Total: ${total.toFixed(2)}</p>
           </div>
           <button onClick={onClose} className="w-10 h-10 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-full cursor-pointer">
             <i className="ri-close-line text-2xl"></i>
@@ -278,10 +278,10 @@ export function PaymentModal({ total, orderItems, client, receiptNumber, onClose
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-3">Tipo de Pedido</label>
             <div className="grid grid-cols-2 gap-3">
-              <button onClick={() => setOrderType('particular')} className={`p-4 rounded-lg border-2 cursor-pointer ${orderType === 'particular' ? 'border-orange-600 bg-orange-50 text-orange-700' : 'border-gray-200 bg-white text-gray-600'}`}>
+              <button onClick={() => setOrderType('particular')} className={`p-4 rounded-lg border-2 cursor-pointer ${orderType === 'particular' ? 'border-brand-600 bg-brand-50 text-brand-700' : 'border-gray-200 bg-white text-gray-600'}`}>
                 <i className="ri-user-line text-2xl mb-2"></i><p className="font-semibold text-sm">Particular</p>
               </button>
-              <button onClick={() => setOrderType('aplicacion')} className={`p-4 rounded-lg border-2 cursor-pointer ${orderType === 'aplicacion' ? 'border-orange-600 bg-orange-50 text-orange-700' : 'border-gray-200 bg-white text-gray-600'}`}>
+              <button onClick={() => setOrderType('aplicacion')} className={`p-4 rounded-lg border-2 cursor-pointer ${orderType === 'aplicacion' ? 'border-brand-600 bg-brand-50 text-brand-700' : 'border-gray-200 bg-white text-gray-600'}`}>
                 <i className="ri-smartphone-line text-2xl mb-2"></i><p className="font-semibold text-sm">Aplicación</p>
               </button>
             </div>
@@ -331,7 +331,7 @@ export function PaymentModal({ total, orderItems, client, receiptNumber, onClose
               <label className="block text-sm font-semibold text-gray-700 mb-2">Monto Pagado</label>
               <input type="number" value={amountPaid} onChange={(e) => setAmountPaid(e.target.value)}
                 placeholder="Ingresá el monto recibido"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 text-lg" step="0.01" min={total} />
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 text-lg" step="0.01" min={total} />
               {amountPaid && parseFloat(amountPaid) >= total && (
                 <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
                   <p className="text-sm text-green-700"><span className="font-semibold">Vuelto:</span> ${change.toFixed(2)}</p>
@@ -344,7 +344,7 @@ export function PaymentModal({ total, orderItems, client, receiptNumber, onClose
             <label className="block text-sm font-semibold text-gray-700 mb-2">Notas <span className="text-gray-400 font-normal">(opcional)</span></label>
             <textarea value={notes} onChange={(e) => { if (e.target.value.length <= 300) setNotes(e.target.value); }}
               placeholder="Ej: sin cebolla, entregar en puerta..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 resize-none" rows={3} maxLength={300} />
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 resize-none" rows={3} maxLength={300} />
             <p className="text-xs text-gray-500 mt-1 text-right">{notes.length}/300</p>
           </div>
 
@@ -359,7 +359,7 @@ export function PaymentModal({ total, orderItems, client, receiptNumber, onClose
             </div>
             <div className="flex justify-between items-center pt-2 border-t border-gray-300">
               <span className="text-gray-800 font-bold">Total:</span>
-              <span className="text-orange-600 font-bold text-xl">${total.toFixed(2)}</span>
+              <span className="text-brand-600 font-bold text-xl">${total.toFixed(2)}</span>
             </div>
           </div>
 
@@ -375,7 +375,7 @@ export function PaymentModal({ total, orderItems, client, receiptNumber, onClose
             Cancelar
           </button>
           <button onClick={handleConfirmPayment} disabled={loading}
-            className="flex-1 bg-gradient-to-r from-orange-600 to-red-600 text-white font-bold py-3 md:py-4 rounded-lg hover:from-orange-700 hover:to-red-700 cursor-pointer min-h-[48px] disabled:opacity-60 flex items-center justify-center gap-2">
+            className="flex-1 bg-gradient-to-r from-brand-600 to-brand-700 text-white font-bold py-3 md:py-4 rounded-lg hover:from-brand-700 hover:to-brand-700 cursor-pointer min-h-[48px] disabled:opacity-60 flex items-center justify-center gap-2">
             {loading ? <><i className="ri-loader-4-line animate-spin"></i>Procesando...</> : paymentMethod === 'al_retirar' ? 'Confirmar pedido' : 'Confirmar Pago'}
           </button>
         </div>

@@ -147,7 +147,7 @@ export default function OrdersPage() {
 
   return (
     <AppLayout noPadding>
-      <div className="flex h-full bg-gradient-to-br from-orange-50 to-red-50 overflow-hidden" style={{ height: 'calc(100vh - 64px)' }}>
+      <div className="flex h-full bg-gradient-to-br from-brand-50 to-brand-100 overflow-hidden" style={{ height: 'calc(100vh - 64px)' }}>
 
         {/* Toast de éxito */}
         {showSuccessToast && (
@@ -191,24 +191,24 @@ export default function OrdersPage() {
           <div className="flex">
             <button
               onClick={() => setActiveTab('products')}
-              className={`flex-1 py-4 text-sm font-semibold transition-all relative cursor-pointer ${activeTab === 'products' ? 'text-orange-600' : 'text-gray-500'}`}
+              className={`flex-1 py-4 text-sm font-semibold transition-all relative cursor-pointer ${activeTab === 'products' ? 'text-brand-600' : 'text-gray-500'}`}
             >
               <i className="ri-store-line mr-2"></i>
               Productos
-              {activeTab === 'products' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-600"></div>}
+              {activeTab === 'products' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600"></div>}
             </button>
             <button
               onClick={() => setActiveTab('order')}
-              className={`flex-1 py-4 text-sm font-semibold transition-all relative cursor-pointer ${activeTab === 'order' ? 'text-orange-600' : 'text-gray-500'}`}
+              className={`flex-1 py-4 text-sm font-semibold transition-all relative cursor-pointer ${activeTab === 'order' ? 'text-brand-600' : 'text-gray-500'}`}
             >
               <i className="ri-shopping-cart-line mr-2"></i>
               Comanda
               {orderItems.length > 0 && (
-                <span className="ml-1 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-orange-600 rounded-full">
+                <span className="ml-1 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-brand-600 rounded-full">
                   {orderItems.length}
                 </span>
               )}
-              {activeTab === 'order' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-600"></div>}
+              {activeTab === 'order' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600"></div>}
             </button>
           </div>
         </div>

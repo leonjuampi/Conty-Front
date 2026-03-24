@@ -122,7 +122,7 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
     <div className="fixed inset-0 bg-black/50 flex items-start justify-center z-50 p-0 md:p-4 overflow-y-auto">
       <div className="bg-white w-full h-full md:h-auto md:rounded-2xl shadow-2xl md:max-w-2xl md:my-8 md:max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-orange-500 to-red-500 z-10 p-4 md:p-6">
+        <div className="sticky top-0 bg-gradient-to-r from-brand-500 to-brand-600 z-10 p-4 md:p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-lg md:text-xl font-bold text-white">
               {product ? 'Editar Producto' : 'Nuevo Producto'}
@@ -155,7 +155,7 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
               </label>
               <input type="text" value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 text-sm min-h-[48px]"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 text-sm min-h-[48px]"
                 placeholder={isCombo ? 'Ej: Combo Fernet + Coca' : 'Ej: Pizza Muzzarella'}
                 required />
             </div>
@@ -165,7 +165,7 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
               <label className="block text-sm font-semibold text-gray-700 mb-2">Categoría <span className="text-red-500">*</span></label>
               <select value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 text-sm min-h-[48px] cursor-pointer" required>
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 text-sm min-h-[48px] cursor-pointer" required>
                 <option value="">Seleccionar categoría</option>
                 {availableCategories.map((cat) => (<option key={cat} value={cat}>{cat}</option>))}
               </select>
@@ -177,7 +177,7 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Código de Barras</label>
                 <input type="text" value={formData.barcode}
                   onChange={(e) => setFormData({ ...formData, barcode: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 text-sm min-h-[48px]"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 text-sm min-h-[48px]"
                   placeholder="7790001234567" />
               </div>
             )}
@@ -189,7 +189,7 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                 <input type="number" value={formData.cost}
                   onChange={(e) => setFormData({ ...formData, cost: e.target.value })}
-                  className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 text-sm min-h-[48px]"
+                  className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 text-sm min-h-[48px]"
                   placeholder="1200" required min="0" step="0.01" />
               </div>
             </div>
@@ -203,7 +203,7 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                 <input type="number" value={formData.price}
                   onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                  className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 text-sm min-h-[48px]"
+                  className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 text-sm min-h-[48px]"
                   placeholder="2500" required min="0" step="0.01" />
               </div>
             </div>
@@ -214,10 +214,10 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
               <div className="flex flex-col sm:flex-row gap-2">
                 <input type="text" value={formData.image}
                   onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 text-sm min-h-[48px]"
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 text-sm min-h-[48px]"
                   placeholder="URL de la imagen" />
                 <button type="button" onClick={generateImageUrl}
-                  className="px-4 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 cursor-pointer text-sm min-h-[48px] whitespace-nowrap">
+                  className="px-4 py-3 bg-brand-500 text-white rounded-lg hover:bg-brand-600 cursor-pointer text-sm min-h-[48px] whitespace-nowrap">
                   <i className="ri-image-add-line mr-2"></i>Generar
                 </button>
               </div>
@@ -233,7 +233,7 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
               <label className="flex items-center gap-2 cursor-pointer min-h-[48px]">
                 <input type="checkbox" checked={formData.active}
                   onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
-                  className="w-5 h-5 text-orange-500 border-gray-300 rounded focus:ring-orange-500 cursor-pointer" />
+                  className="w-5 h-5 text-brand-500 border-gray-300 rounded focus:ring-brand-500 cursor-pointer" />
                 <span className="text-sm font-semibold text-gray-700">{isCombo ? 'Combo activo' : 'Producto activo'}</span>
               </label>
             </div>
@@ -309,7 +309,7 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
           {/* Botones */}
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <button type="submit"
-              className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 md:py-4 rounded-lg font-semibold hover:from-orange-600 hover:to-red-600 cursor-pointer text-sm md:text-base min-h-[52px]">
+              className="flex-1 bg-gradient-to-r from-brand-500 to-brand-600 text-white py-3 md:py-4 rounded-lg font-semibold hover:from-brand-600 hover:to-brand-700 cursor-pointer text-sm md:text-base min-h-[52px]">
               <i className="ri-save-line mr-2"></i>
               {product ? 'Guardar Cambios' : (isCombo ? 'Crear Combo' : 'Crear Producto')}
             </button>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   createElaborationCost,
   updateElaborationCost,
@@ -7,7 +7,7 @@ import {
   type ItemInput,
 } from '../../../services/elaborationCosts.service';
 import { listRawMaterials, type RawMaterial } from '../../../services/rawMaterials.service';
-import { useEffect } from 'react';
+import { listCategories, createProduct, type Category } from '../../../services/products.service';
 import { calcularTotal } from './CostosTab';
 
 interface Props {
@@ -50,15 +50,26 @@ function itemToRow(item: ElaborationCostItem): Row {
 }
 
 export function EditCostModal({ cost, allCosts, onClose, onSaved }: Props) {
+  const isNew = !cost;
+
   const [name, setName] = useState(cost?.name ?? '');
   const [rows, setRows] = useState<Row[]>(cost ? cost.items.map(itemToRow) : []);
   const [rawMaterials, setRawMaterials] = useState<RawMaterial[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
+  // Product generation (only for new costs)
+  const [generateProduct, setGenerateProduct] = useState(true);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | ''>('');
+  const [salePrice, setSalePrice] = useState('');
+
   useEffect(() => {
     listRawMaterials({ limit: 500 }).then((r) => setRawMaterials(r.items)).catch(() => {});
-  }, []);
+    if (isNew) {
+      listCategories().then((r) => setCategories(r.items)).catch(() => {});
+    }
+  }, [isNew]);
 
   // Other costs excluding the current one (to avoid self-reference)
   const otherCosts = allCosts.filter((c) => c.id !== cost?.id);
@@ -100,6 +111,10 @@ export function EditCostModal({ cost, allCosts, onClose, onSaved }: Props) {
 
   const handleSave = async () => {
     if (!name.trim()) { setError('El nombre es obligatorio'); return; }
+    if (isNew && generateProduct && !selectedCategoryId) {
+      setError('Seleccioná una categoría para el producto.');
+      return;
+    }
     setSaving(true);
     setError('');
     try {
@@ -112,7 +127,18 @@ export function EditCostModal({ cost, allCosts, onClose, onSaved }: Props) {
       if (cost) {
         await updateElaborationCost(cost.id, { name: name.trim(), items });
       } else {
-        await createElaborationCost({ name: name.trim(), items });
+        // Al crear: primero el producto (para tener su id), luego el costo
+        let productId: number | undefined;
+        if (generateProduct) {
+          const price = salePrice ? parseFloat(salePrice) : 0;
+          const { id } = await createProduct({
+            name: name.trim(),
+            categoryId: selectedCategoryId as number,
+            variants: [{ name: 'Unidad', cost: totalCalculado, price }],
+          });
+          productId = id;
+        }
+        await createElaborationCost({ name: name.trim(), items, productId });
       }
       onSaved();
       onClose();
@@ -127,7 +153,7 @@ export function EditCostModal({ cost, allCosts, onClose, onSaved }: Props) {
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-orange-500 to-red-500 px-6 py-4 flex items-center justify-between shrink-0">
+        <div className="bg-gradient-to-r from-brand-500 to-brand-600 px-6 py-4 flex items-center justify-between shrink-0">
           <div className="flex-1 mr-4">
             <input
               type="text"
@@ -295,30 +321,86 @@ export function EditCostModal({ cost, allCosts, onClose, onSaved }: Props) {
         </div>
 
         {/* Footer */}
-        <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 shrink-0">
-          {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
+        <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 shrink-0 space-y-3">
+          {/* Total */}
           <div className="flex items-center justify-between">
-            <div className="text-sm">
-              <span className="text-gray-500">Total calculado:</span>{' '}
-              <span className="font-bold text-[#E8650A] text-base">
-                ${totalCalculado.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </span>
+            <span className="text-sm text-gray-500">Total calculado:</span>
+            <span className="font-bold text-[#E8650A] text-base">
+              ${totalCalculado.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </span>
+          </div>
+
+          {/* Indicador de producto vinculado (solo al editar) */}
+          {!isNew && cost?.product_id && (
+            <div className="flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-xs px-3 py-2 rounded-lg">
+              <i className="ri-links-line text-sm"></i>
+              Al guardar se actualizará el costo del producto vinculado en el catálogo.
             </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={onClose}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors text-sm whitespace-nowrap cursor-pointer"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                className="px-4 py-2 bg-[#E8650A] text-white rounded-md hover:bg-[#d15809] transition-colors text-sm font-medium whitespace-nowrap cursor-pointer disabled:opacity-60"
-              >
-                {saving ? <><i className="ri-loader-4-line animate-spin mr-1"></i>Guardando...</> : (cost ? 'Guardar Cambios' : 'Crear Costo')}
-              </button>
+          )}
+
+          {/* Generar producto — solo para costos nuevos */}
+          {isNew && (
+            <div className="border border-brand-200 rounded-xl bg-brand-50 p-3 space-y-2.5">
+              <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={generateProduct}
+                  onChange={e => setGenerateProduct(e.target.checked)}
+                  className="w-4 h-4 accent-brand-500 cursor-pointer"
+                />
+                <span className="text-sm font-semibold text-gray-700">Generar producto en catálogo</span>
+              </label>
+              {generateProduct && (
+                <div className="grid grid-cols-2 gap-2 pl-6">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">Categoría <span className="text-red-400">*</span></label>
+                    <select
+                      value={selectedCategoryId}
+                      onChange={e => setSelectedCategoryId(e.target.value ? Number(e.target.value) : '')}
+                      className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white"
+                    >
+                      <option value="">— Seleccionar —</option>
+                      {categories.map(c => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">Precio de venta (opcional)</label>
+                    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-brand-400 bg-white">
+                      <span className="px-2 py-1.5 text-sm text-gray-400 bg-gray-50 border-r border-gray-300">$</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={salePrice}
+                        onChange={e => setSalePrice(e.target.value)}
+                        placeholder="0"
+                        className="flex-1 px-2 py-1.5 text-sm outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
+          )}
+
+          {error && <p className="text-sm text-red-600">{error}</p>}
+
+          <div className="flex items-center justify-end gap-3">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors text-sm whitespace-nowrap cursor-pointer"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="px-4 py-2 bg-[#E8650A] text-white rounded-md hover:bg-[#d15809] transition-colors text-sm font-medium whitespace-nowrap cursor-pointer disabled:opacity-60"
+            >
+              {saving ? <><i className="ri-loader-4-line animate-spin mr-1"></i>Guardando...</> : (cost ? 'Guardar Cambios' : 'Crear Costo')}
+            </button>
           </div>
         </div>
       </div>

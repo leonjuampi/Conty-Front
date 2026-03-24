@@ -16,6 +16,7 @@ export interface ElaborationCostItem {
 export interface ElaborationCost {
   id: number;
   name: string;
+  product_id: number | null;
   items: ElaborationCostItem[];
   created_at: string;
   updated_at: string;
@@ -33,7 +34,7 @@ export async function listElaborationCosts(): Promise<ElaborationCost[]> {
   return data;
 }
 
-export async function createElaborationCost(body: { name: string; items: ItemInput[] }) {
+export async function createElaborationCost(body: { name: string; items: ItemInput[]; productId?: number }) {
   const { data } = await api.post('/elaboration-costs', body);
   return data as { id: number };
 }

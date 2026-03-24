@@ -93,7 +93,7 @@ export default function ClientsPage() {
           </div>
           <button
             onClick={() => { setSelectedClient(null); setShowForm(true); }}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:shadow-lg transition-all cursor-pointer whitespace-nowrap font-medium"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-lg hover:shadow-lg transition-all cursor-pointer whitespace-nowrap font-medium"
           >
             <i className="ri-user-add-line text-lg"></i>
             <span>Nuevo Cliente</span>
@@ -106,14 +106,14 @@ export default function ClientsPage() {
             placeholder="Buscar por dirección, nombre, teléfono o email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm"
           />
         </div>
       </div>
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <i className="ri-loader-4-line animate-spin text-3xl text-orange-500"></i>
+          <i className="ri-loader-4-line animate-spin text-3xl text-brand-500"></i>
         </div>
       ) : (
         <>
@@ -134,7 +134,7 @@ export default function ClientsPage() {
                     <tr key={client.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 flex items-center justify-center bg-gradient-to-r from-orange-500 to-red-500 rounded-full text-white font-bold shrink-0">
+                          <div className="w-10 h-10 flex items-center justify-center bg-gradient-to-r from-brand-500 to-brand-600 rounded-full text-white font-bold shrink-0">
                             {(client.firstName || '?').charAt(0)}
                           </div>
                           <div>
@@ -153,7 +153,7 @@ export default function ClientsPage() {
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-center gap-2">
                           <button onClick={() => { setSelectedClient(client); setShowDetail(true); }} className="w-8 h-8 flex items-center justify-center text-teal-600 hover:bg-teal-50 rounded-lg transition-colors cursor-pointer"><i className="ri-eye-line text-lg"></i></button>
-                          <button onClick={() => { setSelectedClient(client); setShowForm(true); }} className="w-8 h-8 flex items-center justify-center text-orange-600 hover:bg-orange-50 rounded-lg transition-colors cursor-pointer"><i className="ri-edit-line text-lg"></i></button>
+                          <button onClick={() => { setSelectedClient(client); setShowForm(true); }} className="w-8 h-8 flex items-center justify-center text-brand-600 hover:bg-brand-50 rounded-lg transition-colors cursor-pointer"><i className="ri-edit-line text-lg"></i></button>
                           <button onClick={() => handleDelete(client)} className="w-8 h-8 flex items-center justify-center text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"><i className="ri-delete-bin-line text-lg"></i></button>
                         </div>
                       </td>
@@ -169,12 +169,12 @@ export default function ClientsPage() {
             {clients.map((client) => (
               <div key={client.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
                 <div className="flex items-start gap-3 mb-3">
-                  <div className="w-12 h-12 flex items-center justify-center bg-gradient-to-r from-orange-500 to-red-500 rounded-full text-white font-bold text-lg shrink-0">
+                  <div className="w-12 h-12 flex items-center justify-center bg-gradient-to-r from-brand-500 to-brand-600 rounded-full text-white font-bold text-lg shrink-0">
                     {(client.firstName || '?').charAt(0)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
-                      <i className="ri-map-pin-line text-sm text-orange-400 shrink-0"></i>
+                      <i className="ri-map-pin-line text-sm text-brand-400 shrink-0"></i>
                       <h3 className="font-bold text-gray-800 truncate">{client.address || <span className="text-gray-400 italic font-normal">Sin dirección</span>}</h3>
                     </div>
                     <p className="text-xs text-gray-500 mb-1">{client.firstName} {client.lastName}</p>
@@ -184,7 +184,7 @@ export default function ClientsPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <button onClick={() => { setSelectedClient(client); setShowDetail(true); }} className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-teal-50 text-teal-600 rounded-lg hover:bg-teal-100 transition-colors cursor-pointer text-sm font-medium"><i className="ri-eye-line"></i><span>Ver</span></button>
-                  <button onClick={() => { setSelectedClient(client); setShowForm(true); }} className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-orange-50 text-orange-600 rounded-lg hover:bg-orange-100 transition-colors cursor-pointer text-sm font-medium"><i className="ri-edit-line"></i><span>Editar</span></button>
+                  <button onClick={() => { setSelectedClient(client); setShowForm(true); }} className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-brand-50 text-brand-600 rounded-lg hover:bg-brand-100 transition-colors cursor-pointer text-sm font-medium"><i className="ri-edit-line"></i><span>Editar</span></button>
                   <button onClick={() => handleDelete(client)} className="w-10 h-10 flex items-center justify-center bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors cursor-pointer shrink-0"><i className="ri-delete-bin-line text-lg"></i></button>
                 </div>
               </div>

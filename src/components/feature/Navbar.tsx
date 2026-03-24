@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 
 interface NavbarProps {
   onMenuClick: () => void;
@@ -8,6 +9,7 @@ interface NavbarProps {
 export function Navbar({ onMenuClick }: NavbarProps) {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
+  const theme = useTheme();
 
   const handleLogout = () => {
     logout();
@@ -34,8 +36,8 @@ export function Navbar({ onMenuClick }: NavbarProps) {
 
           {/* Logo y título para mobile */}
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 flex items-center justify-center bg-gradient-to-br from-orange-400 to-red-500 rounded-lg shadow">
-              <i className="ri-store-2-line text-white text-lg"></i>
+            <div className="w-8 h-8 flex items-center justify-center bg-gradient-to-br from-brand-400 to-brand-600 rounded-lg shadow">
+              <i className={`${theme.storeIcon} text-white text-lg`}></i>
             </div>
             <h2 className="text-lg font-semibold text-gray-800">
               Sistema de Gestión

@@ -135,7 +135,7 @@ export default function UserManagement() {
             {isAdmin ? 'Crea y gestiona Owners y usuarios del sistema' : 'Administra los usuarios de tu organizacion'}
           </p>
         </div>
-        <button onClick={openCreate} className="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-3 rounded-lg font-semibold text-sm transition-all whitespace-nowrap cursor-pointer min-h-[48px] w-full sm:w-auto">
+        <button onClick={openCreate} className="flex items-center justify-center gap-2 bg-brand-500 hover:bg-brand-600 text-white px-4 py-3 rounded-lg font-semibold text-sm transition-all whitespace-nowrap cursor-pointer min-h-[48px] w-full sm:w-auto">
           <i className="ri-user-add-line"></i>
           {isAdmin ? 'Nuevo Owner / Usuario' : 'Nuevo Usuario'}
         </button>
@@ -178,7 +178,7 @@ export default function UserManagement() {
 
       {loading ? (
         <div className="flex justify-center py-10">
-          <i className="ri-loader-4-line animate-spin text-3xl text-orange-500"></i>
+          <i className="ri-loader-4-line animate-spin text-3xl text-brand-500"></i>
         </div>
       ) : users.length === 0 ? (
         <div className="text-center py-10 text-gray-400 text-sm">
@@ -200,10 +200,10 @@ export default function UserManagement() {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {users.map(user => (
-                  <tr key={user.id} className="hover:bg-orange-50/40 transition-colors">
+                  <tr key={user.id} className="hover:bg-brand-50/40 transition-colors">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 flex items-center justify-center rounded-full bg-gradient-to-br from-orange-400 to-red-400 text-white font-bold text-sm shrink-0">
+                        <div className="w-9 h-9 flex items-center justify-center rounded-full bg-gradient-to-br from-brand-400 to-brand-500 text-white font-bold text-sm shrink-0">
                           {user.name.charAt(0).toUpperCase()}
                         </div>
                         <span className="font-medium text-gray-800">{user.name}</span>
@@ -223,7 +223,7 @@ export default function UserManagement() {
                     </td>
                     {!isAdmin && (
                       <td className="px-4 py-3 text-right">
-                        <button onClick={() => openEdit(user)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-orange-100 text-orange-500 cursor-pointer" title="Editar sucursales">
+                        <button onClick={() => openEdit(user)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-brand-100 text-brand-500 cursor-pointer" title="Editar sucursales">
                           <i className="ri-edit-line text-sm"></i>
                         </button>
                       </td>
@@ -237,7 +237,7 @@ export default function UserManagement() {
             {users.map(user => (
               <div key={user.id} className="bg-white border border-gray-200 rounded-xl p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 flex items-center justify-center rounded-full bg-gradient-to-br from-orange-400 to-red-400 text-white font-bold shrink-0">
+                  <div className="w-12 h-12 flex items-center justify-center rounded-full bg-gradient-to-br from-brand-400 to-brand-500 text-white font-bold shrink-0">
                     {user.name.charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -253,7 +253,7 @@ export default function UserManagement() {
                       {STATUS_LABELS[user.status] || user.status}
                     </span>
                     {!isAdmin && (
-                      <button onClick={() => openEdit(user)} className="mt-1 text-xs text-orange-500 hover:text-orange-700 cursor-pointer flex items-center gap-1">
+                      <button onClick={() => openEdit(user)} className="mt-1 text-xs text-brand-500 hover:text-brand-700 cursor-pointer flex items-center gap-1">
                         <i className="ri-edit-line"></i> Editar
                       </button>
                     )}
@@ -293,9 +293,9 @@ export default function UserManagement() {
                           onChange={e => setEditBranchIds(ids =>
                             e.target.checked ? [...ids, b.id] : ids.filter(id => id !== b.id)
                           )}
-                          className="w-4 h-4 accent-orange-500"
+                          className="w-4 h-4 accent-brand-500"
                         />
-                        <span className="text-sm text-gray-700 group-hover:text-orange-600">{b.name}</span>
+                        <span className="text-sm text-gray-700 group-hover:text-brand-600">{b.name}</span>
                         {b.address && <span className="text-xs text-gray-400 truncate">{b.address}</span>}
                       </label>
                     ))}
@@ -313,7 +313,7 @@ export default function UserManagement() {
               <button onClick={() => setEditUser(null)} className="flex-1 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-semibold text-sm hover:bg-gray-50 cursor-pointer">
                 Cancelar
               </button>
-              <button onClick={handleEditSave} disabled={editSaving} className="flex-1 py-2.5 rounded-lg bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white font-semibold text-sm cursor-pointer">
+              <button onClick={handleEditSave} disabled={editSaving} className="flex-1 py-2.5 rounded-lg bg-brand-500 hover:bg-brand-600 disabled:opacity-60 text-white font-semibold text-sm cursor-pointer">
                 {editSaving ? <><i className="ri-loader-4-line animate-spin mr-1"></i>Guardando...</> : 'Guardar'}
               </button>
             </div>
@@ -378,20 +378,20 @@ export default function UserManagement() {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Nombre completo *</label>
-                <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Ej: Juan Perez" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]" />
+                <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Ej: Juan Perez" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]" />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email *</label>
-                <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="Ej: juan@email.com" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]" />
+                <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="Ej: juan@email.com" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]" />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Nombre de usuario *</label>
-                <input type="text" value={form.username} onChange={e => setForm({ ...form, username: e.target.value })} placeholder="Sin espacios, ej: juanperez" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]" />
+                <input type="text" value={form.username} onChange={e => setForm({ ...form, username: e.target.value })} placeholder="Sin espacios, ej: juanperez" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]" />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Contrasena * (min. 8 caracteres)</label>
                 <div className="relative">
-                  <input type={showPassword ? 'text' : 'password'} value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} placeholder="Minimo 8 caracteres" className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]" />
+                  <input type={showPassword ? 'text' : 'password'} value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} placeholder="Minimo 8 caracteres" className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]" />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer w-8 h-8 flex items-center justify-center">
                     <i className={showPassword ? 'ri-eye-off-line' : 'ri-eye-line'}></i>
                   </button>
@@ -414,9 +414,9 @@ export default function UserManagement() {
                               ? [...f.branchIds, b.id]
                               : f.branchIds.filter(id => id !== b.id),
                           }))}
-                          className="w-4 h-4 accent-orange-500"
+                          className="w-4 h-4 accent-brand-500"
                         />
-                        <span className="text-sm text-gray-700 group-hover:text-orange-600">{b.name}</span>
+                        <span className="text-sm text-gray-700 group-hover:text-brand-600">{b.name}</span>
                         {b.address && <span className="text-xs text-gray-400 truncate">{b.address}</span>}
                       </label>
                     ))}
@@ -434,7 +434,7 @@ export default function UserManagement() {
                     value={form.orgId}
                     onChange={e => setForm({ ...form, orgId: e.target.value })}
                     placeholder="Ej: 1"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm min-h-[48px]"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]"
                   />
                   <p className="text-xs text-gray-400 mt-1">ID numérico de la organización a la que pertenecerá este usuario</p>
                 </div>
@@ -451,7 +451,7 @@ export default function UserManagement() {
               <button onClick={() => setShowModal(false)} className="flex-1 py-3 rounded-lg border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-all text-sm cursor-pointer min-h-[48px]">
                 Cancelar
               </button>
-              <button onClick={handleSave} disabled={saving} className="flex-1 py-3 rounded-lg bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white font-semibold transition-all text-sm cursor-pointer min-h-[48px]">
+              <button onClick={handleSave} disabled={saving} className="flex-1 py-3 rounded-lg bg-brand-500 hover:bg-brand-600 disabled:opacity-60 text-white font-semibold transition-all text-sm cursor-pointer min-h-[48px]">
                 {saving ? <><i className="ri-loader-4-line animate-spin mr-1"></i>Creando...</> : 'Crear Usuario'}
               </button>
             </div>

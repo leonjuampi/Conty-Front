@@ -50,7 +50,7 @@ export function ClientDetailModal({ client, onClose, onEdit }: ClientDetailModal
         {/* Header fijo */}
         <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-100 bg-white sticky top-0 z-10">
           <div className="flex items-center gap-3 md:gap-4">
-            <div className="w-12 h-12 md:w-14 md:h-14 flex items-center justify-center bg-gradient-to-br from-orange-400 to-red-500 rounded-xl md:rounded-2xl shadow-md">
+            <div className="w-12 h-12 md:w-14 md:h-14 flex items-center justify-center bg-gradient-to-br from-brand-400 to-brand-600 rounded-xl md:rounded-2xl shadow-md">
               <span className="text-white text-lg md:text-xl font-bold">
                 {client.firstName[0]}{client.lastName[0]}
               </span>
@@ -66,7 +66,7 @@ export function ClientDetailModal({ client, onClose, onEdit }: ClientDetailModal
             {onEdit && (
             <button
               onClick={onEdit}
-              className="w-10 h-10 flex items-center justify-center text-orange-500 hover:bg-orange-50 rounded-lg transition-colors cursor-pointer"
+              className="w-10 h-10 flex items-center justify-center text-brand-500 hover:bg-brand-50 rounded-lg transition-colors cursor-pointer"
               title="Editar"
             >
               <i className="ri-edit-line text-lg"></i>
@@ -84,24 +84,24 @@ export function ClientDetailModal({ client, onClose, onEdit }: ClientDetailModal
         <div className="overflow-y-auto flex-1 p-4 md:p-6 space-y-4 md:space-y-6">
           {/* Info */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-            <div className="bg-orange-50 rounded-xl p-3 md:p-4">
+            <div className="bg-brand-50 rounded-xl p-3 md:p-4">
               <p className="text-xs text-gray-500 mb-1 font-medium">Teléfono</p>
               <div className="flex items-center gap-2">
-                <i className="ri-phone-line text-orange-500"></i>
+                <i className="ri-phone-line text-brand-500"></i>
                 <span className="text-sm font-semibold text-gray-800">{client.phone || '—'}</span>
               </div>
             </div>
-            <div className="bg-orange-50 rounded-xl p-3 md:p-4">
+            <div className="bg-brand-50 rounded-xl p-3 md:p-4">
               <p className="text-xs text-gray-500 mb-1 font-medium">Email</p>
               <div className="flex items-center gap-2">
-                <i className="ri-mail-line text-orange-500"></i>
+                <i className="ri-mail-line text-brand-500"></i>
                 <span className="text-sm font-semibold text-gray-800 truncate">{client.email || '—'}</span>
               </div>
             </div>
-            <div className="bg-orange-50 rounded-xl p-3 md:p-4 sm:col-span-2">
+            <div className="bg-brand-50 rounded-xl p-3 md:p-4 sm:col-span-2">
               <p className="text-xs text-gray-500 mb-1 font-medium">Dirección</p>
               <div className="flex items-center gap-2">
-                <i className="ri-map-pin-line text-orange-500"></i>
+                <i className="ri-map-pin-line text-brand-500"></i>
                 <span className="text-sm font-semibold text-gray-800">{client.address || '—'}</span>
               </div>
             </div>
@@ -117,7 +117,7 @@ export function ClientDetailModal({ client, onClose, onEdit }: ClientDetailModal
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-2 md:gap-3">
-            <div className="bg-gradient-to-br from-orange-500 to-red-500 rounded-xl p-3 md:p-4 text-white text-center">
+            <div className="bg-gradient-to-br from-brand-500 to-brand-600 rounded-xl p-3 md:p-4 text-white text-center">
               <p className="text-xl md:text-2xl font-bold">{sales.length}</p>
               <p className="text-xs opacity-80 mt-1">Pedidos totales</p>
             </div>
@@ -138,12 +138,12 @@ export function ClientDetailModal({ client, onClose, onEdit }: ClientDetailModal
           {/* Historial */}
           <div>
             <h3 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
-              <i className="ri-history-line text-orange-500"></i>
+              <i className="ri-history-line text-brand-500"></i>
               Historial de Pedidos
             </h3>
             {loadingSales ? (
               <div className="flex justify-center py-8">
-                <i className="ri-loader-4-line animate-spin text-2xl text-orange-500"></i>
+                <i className="ri-loader-4-line animate-spin text-2xl text-brand-500"></i>
               </div>
             ) : sales.length === 0 ? (
               <div className="text-center py-8 text-gray-400">
@@ -153,7 +153,7 @@ export function ClientDetailModal({ client, onClose, onEdit }: ClientDetailModal
             ) : (
               <div className="space-y-3">
                 {sales.map(sale => (
-                  <div key={sale.id} className="border border-gray-200 rounded-xl p-3 md:p-4 hover:border-orange-200 hover:bg-orange-50/30 transition-all">
+                  <div key={sale.id} className="border border-gray-200 rounded-xl p-3 md:p-4 hover:border-brand-200 hover:bg-brand-50/30 transition-all">
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-bold text-gray-800">{sale.doc_number || `#${sale.id}`}</span>
@@ -161,7 +161,7 @@ export function ClientDetailModal({ client, onClose, onEdit }: ClientDetailModal
                           {sale.status}
                         </span>
                       </div>
-                      <span className="text-sm font-bold text-orange-600">
+                      <span className="text-sm font-bold text-brand-600">
                         ${Number(sale.total_amount).toLocaleString('es-AR')}
                       </span>
                     </div>

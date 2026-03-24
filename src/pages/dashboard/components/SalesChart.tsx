@@ -46,7 +46,7 @@ export function SalesChart({ data }: SalesChartProps) {
                       {item.total >= 1000 ? `$${(item.total / 1000).toFixed(1)}k` : `$${item.total}`}
                     </span>
                     <div
-                      className="w-full bg-gradient-to-t from-orange-500 to-red-500 rounded-t-lg transition-all hover:opacity-80 cursor-pointer"
+                      className="w-full bg-gradient-to-t from-brand-500 to-brand-600 rounded-t-lg transition-all hover:opacity-80 cursor-pointer"
                       style={{ height: `${barHeight}px` }}
                     ></div>
                     <span className="text-xs font-medium text-gray-600">{dayLabel}</span>

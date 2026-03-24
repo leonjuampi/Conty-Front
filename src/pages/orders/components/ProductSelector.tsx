@@ -35,7 +35,7 @@ export function ProductSelector({ products, isLoading = false, onSelectProduct, 
   if (isLoading) {
     return (
       <div className="flex justify-center py-12">
-        <i className="ri-loader-4-line animate-spin text-3xl text-orange-500"></i>
+        <i className="ri-loader-4-line animate-spin text-3xl text-brand-500"></i>
       </div>
     );
   }
@@ -52,7 +52,7 @@ export function ProductSelector({ products, isLoading = false, onSelectProduct, 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             disabled={cashBlocked}
-            className={`w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm ${cashBlocked ? 'opacity-50 cursor-not-allowed bg-gray-100' : ''}`}
+            className={`w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm ${cashBlocked ? 'opacity-50 cursor-not-allowed bg-gray-100' : ''}`}
           />
         </div>
 
@@ -66,8 +66,8 @@ export function ProductSelector({ products, isLoading = false, onSelectProduct, 
                 cashBlocked
                   ? 'opacity-50 cursor-not-allowed bg-gray-100 text-gray-400 border border-gray-200'
                   : selectedCategory === category
-                    ? 'bg-orange-500 text-white shadow-md cursor-pointer'
-                    : 'bg-white text-gray-700 hover:bg-orange-50 border border-gray-200 cursor-pointer'
+                    ? 'bg-brand-500 text-white shadow-md cursor-pointer'
+                    : 'bg-white text-gray-700 hover:bg-brand-50 border border-gray-200 cursor-pointer'
               }`}
             >
               {category}
@@ -86,7 +86,7 @@ export function ProductSelector({ products, isLoading = false, onSelectProduct, 
               className={`w-full bg-white rounded-xl shadow-sm p-4 text-left border transition-all group ${
                 cashBlocked
                   ? 'opacity-50 cursor-not-allowed border-gray-100'
-                  : 'hover:shadow-lg hover:border-orange-300 border-gray-100 cursor-pointer'
+                  : 'hover:shadow-lg hover:border-brand-400 border-gray-100 cursor-pointer'
               }`}
             >
               <div className={`aspect-square w-full h-32 mb-3 rounded-lg overflow-hidden flex items-center justify-center ${product.isCombo ? 'bg-purple-50' : 'bg-gray-100'}`}>
@@ -102,7 +102,7 @@ export function ProductSelector({ products, isLoading = false, onSelectProduct, 
               </div>
               <p className="text-xs text-gray-500 mb-2">{product.category}</p>
               <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-orange-600">${product.price.toLocaleString()}</span>
+                <span className="text-lg font-bold text-brand-600">${product.price.toLocaleString()}</span>
                 {product.stock > 0 && <span className="text-xs text-gray-500">Stock: {product.stock}</span>}
               </div>
             </button>

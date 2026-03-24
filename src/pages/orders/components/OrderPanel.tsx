@@ -32,10 +32,10 @@ export function OrderPanel({
       <div className="p-4 border-b border-gray-200 bg-gray-50">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold text-gray-700">
-            <i className="ri-shopping-cart-line mr-2 text-orange-500"></i>
+            <i className="ri-shopping-cart-line mr-2 text-brand-500"></i>
             Productos del Pedido
           </h2>
-          <span className="text-xs bg-orange-100 text-orange-700 font-semibold px-2 py-1 rounded-full">
+          <span className="text-xs bg-brand-100 text-brand-700 font-semibold px-2 py-1 rounded-full">
             {orderItems.length} ítem{orderItems.length !== 1 ? 's' : ''}
           </span>
         </div>
@@ -57,7 +57,7 @@ export function OrderPanel({
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-800 text-sm">{item.productName}</h3>
-                    <p className="text-orange-600 font-bold text-sm">${item.price.toLocaleString()}</p>
+                    <p className="text-brand-600 font-bold text-sm">${item.price.toLocaleString()}</p>
                   </div>
                   <button
                     onClick={() => onRemoveItem(item.productId)}
@@ -99,7 +99,7 @@ export function OrderPanel({
           </div>
           <div className="flex justify-between items-center pt-2 border-t border-gray-300">
             <span className="text-base font-bold text-gray-800">Total</span>
-            <span className="text-xl font-bold text-orange-600">${total.toLocaleString()}</span>
+            <span className="text-xl font-bold text-brand-600">${total.toLocaleString()}</span>
           </div>
         </div>
 
@@ -115,7 +115,7 @@ export function OrderPanel({
           <button
             onClick={onFinishOrder}
             disabled={orderItems.length === 0 || !selectedClient || cashBlocked}
-            className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 rounded-lg font-semibold hover:from-orange-600 hover:to-red-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md whitespace-nowrap cursor-pointer text-sm"
+            className="w-full bg-gradient-to-r from-brand-500 to-brand-600 text-white py-3 rounded-lg font-semibold hover:from-brand-600 hover:to-brand-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md whitespace-nowrap cursor-pointer text-sm"
           >
             <i className={`${cashBlocked ? 'ri-lock-line' : 'ri-check-line'} mr-2`}></i>
             {cashBlocked ? 'Caja cerrada' : 'Finalizar Pedido'}

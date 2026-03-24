@@ -10,6 +10,7 @@ export interface Organization {
   logoUrl: string | null;
   currency: string | null;
   senderEmail: string | null;
+  orgType: 'FOOD' | 'RETAIL' | null;
 }
 
 export async function getOrganization(id: number): Promise<Organization> {

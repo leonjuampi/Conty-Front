@@ -33,12 +33,18 @@ interface EditPlanModalProps {
   onSaved: () => void;
 }
 
+const ORG_TYPE_LABELS: Record<string, string> = {
+  FOOD: 'Comida / Restaurante',
+  RETAIL: 'Retail / Tienda',
+};
+
 function EditPlanModal({ org, onClose, onSaved }: EditPlanModalProps) {
   const [plan, setPlan] = useState(org.plan);
   const [maxLicenses, setMaxLicenses] = useState(org.max_licenses);
   const [expiresAt, setExpiresAt] = useState(
     org.plan_expires_at ? org.plan_expires_at.slice(0, 10) : ''
   );
+  const [orgType, setOrgType] = useState<'FOOD' | 'RETAIL'>(org.org_type ?? 'RETAIL');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -53,7 +59,7 @@ function EditPlanModal({ org, onClose, onSaved }: EditPlanModalProps) {
     setError('');
     setSaving(true);
     try {
-      await updateOrgPlan(org.id, plan, maxLicenses, expiresAt || null);
+      await updateOrgPlan(org.id, plan, maxLicenses, expiresAt || null, orgType);
       onSaved();
       onClose();
     } catch (e: unknown) {
@@ -87,12 +93,27 @@ function EditPlanModal({ org, onClose, onSaved }: EditPlanModalProps) {
                 if (c !== null && maxLicenses > c) setMaxLicenses(c);
                 if (c === 1) setMaxLicenses(1);
               }}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
             >
               <option value="BASIC">Básico</option>
               <option value="PROFESSIONAL">Profesional</option>
               <option value="ENTERPRISE">Empresarial</option>
             </select>
+          </div>
+
+          {/* Tipo de negocio */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de negocio</label>
+            <select
+              value={orgType}
+              onChange={e => setOrgType(e.target.value as 'FOOD' | 'RETAIL')}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+              {Object.entries(ORG_TYPE_LABELS).map(([val, label]) => (
+                <option key={val} value={val}>{label}</option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-400 mt-1">Define la estética del sistema para esta organización.</p>
           </div>
 
           {/* Licencias */}
@@ -109,7 +130,7 @@ function EditPlanModal({ org, onClose, onSaved }: EditPlanModalProps) {
               value={maxLicenses}
               onChange={e => setMaxLicenses(Number(e.target.value))}
               disabled={plan === 'ENTERPRISE'}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 disabled:bg-gray-50 disabled:text-gray-400"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 disabled:bg-gray-50 disabled:text-gray-400"
             />
             {plan === 'ENTERPRISE' && (
               <p className="text-xs text-gray-400 mt-1">El plan Empresarial tiene licencias ilimitadas.</p>
@@ -123,7 +144,7 @@ function EditPlanModal({ org, onClose, onSaved }: EditPlanModalProps) {
               type="date"
               value={expiresAt}
               onChange={e => setExpiresAt(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
             />
             <p className="text-xs text-gray-400 mt-1">Dejá en blanco si no tiene vencimiento.</p>
           </div>
@@ -143,7 +164,7 @@ function EditPlanModal({ org, onClose, onSaved }: EditPlanModalProps) {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="px-5 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold rounded-xl disabled:opacity-60 cursor-pointer"
+            className="px-5 py-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold rounded-xl disabled:opacity-60 cursor-pointer"
           >
             {saving ? 'Guardando...' : 'Guardar'}
           </button>
@@ -319,7 +340,7 @@ export default function SuperAdminPage() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Buscar..."
-                className="pl-8 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 w-52"
+                className="pl-8 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 w-52"
               />
             </div>
           </div>
@@ -337,6 +358,7 @@ export default function SuperAdminPage() {
                   <tr className="border-b border-gray-100 bg-gray-50">
                     <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Organización</th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Plan</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Tipo</th>
                     <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Productos</th>
                     <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Sucursales</th>
                     <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Dispositivos</th>
@@ -358,6 +380,11 @@ export default function SuperAdminPage() {
                           {PLAN_LABELS[org.plan]}
                         </span>
                       </td>
+                      <td className="px-4 py-3.5">
+                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${org.org_type === 'FOOD' ? 'bg-brand-100 text-brand-700' : 'bg-blue-100 text-blue-700'}`}>
+                          {org.org_type === 'FOOD' ? 'Comida' : 'Retail'}
+                        </span>
+                      </td>
                       <td className="px-4 py-3.5 text-center">
                         <span className="text-gray-700">{org.product_count}</span>
                         <span className="text-gray-400">/{limitLabel(org.limits.max_products)}</span>
@@ -369,7 +396,7 @@ export default function SuperAdminPage() {
                       <td className="px-4 py-3.5 text-center">
                         <button
                           onClick={() => setDevicesOrg(org)}
-                          className="inline-flex items-center gap-1.5 text-gray-700 hover:text-orange-600 transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1.5 text-gray-700 hover:text-brand-600 transition-colors cursor-pointer"
                         >
                           <i className="ri-device-line text-sm"></i>
                           <span>{org.active_devices}/{org.max_licenses}</span>
@@ -396,7 +423,7 @@ export default function SuperAdminPage() {
                           <button
                             onClick={() => setEditOrg(org)}
                             title="Editar plan"
-                            className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors cursor-pointer"
                           >
                             <i className="ri-edit-line text-base"></i>
                           </button>

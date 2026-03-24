@@ -39,7 +39,7 @@ function diffColor(diff: number | null) {
   if (diff === null) return 'text-gray-400';
   if (diff === 0) return 'text-green-600';
   if (diff < 0) return 'text-red-600';
-  return 'text-orange-600';
+  return 'text-brand-600';
 }
 
 export default function InventoryTab({ currentUser }: Props) {
@@ -196,7 +196,7 @@ export default function InventoryTab({ currentUser }: Props) {
       <div className="flex justify-end">
         <button
           onClick={openModal}
-          className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
+          className="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
         >
           <i className="ri-add-line"></i>
           Nuevo Conteo
@@ -214,7 +214,7 @@ export default function InventoryTab({ currentUser }: Props) {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {loading ? (
           <div className="flex justify-center py-10">
-            <i className="ri-loader-4-line animate-spin text-orange-500 text-3xl"></i>
+            <i className="ri-loader-4-line animate-spin text-brand-500 text-3xl"></i>
           </div>
         ) : sessions.length === 0 ? (
           <div className="py-12 text-center text-gray-400">
@@ -237,7 +237,7 @@ export default function InventoryTab({ currentUser }: Props) {
               <tbody className="divide-y divide-gray-100">
                 {sessions.map(s => (
                   <>
-                    <tr key={s.id} className="hover:bg-orange-50/40 transition-colors">
+                    <tr key={s.id} className="hover:bg-brand-50/40 transition-colors">
                       <td className="px-4 py-3 font-mono text-xs text-gray-500">#{s.id}</td>
                       <td className="px-4 py-3 font-medium text-gray-800">{s.branchName}</td>
                       <td className="px-4 py-3 text-center">
@@ -252,18 +252,18 @@ export default function InventoryTab({ currentUser }: Props) {
                       <td className="px-4 py-3 text-center">
                         <button
                           onClick={() => handleExpandSession(s)}
-                          className="text-xs px-3 py-1 border border-orange-300 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+                          className="text-xs px-3 py-1 border border-brand-400 text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
                         >
                           {expandedId === s.id ? 'Cerrar' : 'Ver'}
                         </button>
                       </td>
                     </tr>
                     {expandedId === s.id && (
-                      <tr key={`${s.id}-detail`} className="bg-orange-50/20">
+                      <tr key={`${s.id}-detail`} className="bg-brand-50/20">
                         <td colSpan={6} className="px-6 py-4">
                           {detailLoading ? (
                             <div className="flex justify-center py-4">
-                              <i className="ri-loader-4-line animate-spin text-orange-500 text-xl"></i>
+                              <i className="ri-loader-4-line animate-spin text-brand-500 text-xl"></i>
                             </div>
                           ) : (
                             <>
@@ -306,7 +306,7 @@ export default function InventoryTab({ currentUser }: Props) {
                                                       [item.variantId]: e.target.value,
                                                     }))}
                                                     onBlur={e => handleCountBlur(s.id, item.variantId, e.target.value)}
-                                                    className="w-20 border border-gray-300 rounded px-2 py-1 text-sm text-right focus:outline-none focus:ring-2 focus:ring-orange-400"
+                                                    className="w-20 border border-gray-300 rounded px-2 py-1 text-sm text-right focus:outline-none focus:ring-2 focus:ring-brand-400"
                                                     placeholder="—"
                                                   />
                                                 ) : (
@@ -383,7 +383,7 @@ export default function InventoryTab({ currentUser }: Props) {
                 <select
                   value={newBranchId}
                   onChange={e => setNewBranchId(Number(e.target.value))}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
                 >
                   <option value="">Seleccionar sucursal</option>
                   {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
@@ -395,7 +395,7 @@ export default function InventoryTab({ currentUser }: Props) {
                   type="checkbox"
                   checked={onlyDifferences}
                   onChange={e => setOnlyDifferences(e.target.checked)}
-                  className="w-4 h-4 accent-orange-500"
+                  className="w-4 h-4 accent-brand-500"
                 />
                 <span className="text-sm text-gray-700">Solo mostrar diferencias</span>
               </label>
@@ -411,7 +411,7 @@ export default function InventoryTab({ currentUser }: Props) {
               <button
                 onClick={handleCreateSession}
                 disabled={modalLoading}
-                className="px-4 py-2 text-sm bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium flex items-center gap-2 disabled:opacity-60"
+                className="px-4 py-2 text-sm bg-brand-500 hover:bg-brand-600 text-white rounded-lg font-medium flex items-center gap-2 disabled:opacity-60"
               >
                 {modalLoading && <i className="ri-loader-4-line animate-spin"></i>}
                 Iniciar Conteo
