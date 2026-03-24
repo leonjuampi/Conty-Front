@@ -1,13 +1,16 @@
 import { useState } from 'react';
+import type { PosProduct } from './ProductSelector';
 
 interface PaymentModalProps {
   total: number;
   orderItems: Array<{
     productId: string;
+    variantId: number;
     productName: string;
     quantity: number;
     price: number;
   }>;
+  products: PosProduct[];
   client: { firstName: string; lastName: string; phone?: string; address?: string } | null;
   receiptNumber: string;
   onClose: () => void;
@@ -21,7 +24,7 @@ const PAYMENT_METHOD_MAP: Record<string, string> = {
   mercadopago: 'MERCADO_PAGO',
 };
 
-export function PaymentModal({ total, orderItems, client, receiptNumber, onClose, onComplete }: PaymentModalProps) {
+export function PaymentModal({ total, orderItems, products, client, receiptNumber, onClose, onComplete }: PaymentModalProps) {
   const [paymentMethod, setPaymentMethod] = useState<'efectivo' | 'tarjeta' | 'transferencia' | 'mercadopago' | 'al_retirar'>('efectivo');
   const [orderType, setOrderType] = useState<'particular' | 'aplicacion'>('particular');
   const [appPlatform, setAppPlatform] = useState<'pedidosya' | 'rappi'>('pedidosya');
@@ -39,7 +42,7 @@ export function PaymentModal({ total, orderItems, client, receiptNumber, onClose
 
   const handleConfirmPayment = async () => {
     if (paymentMethod === 'efectivo' && (!amountPaid || parseFloat(amountPaid) < total)) {
-      alert('El monto pagado debe ser mayor o igual al total');
+      setError('El monto pagado debe ser mayor o igual al total');
       return;
     }
     setError('');
@@ -54,8 +57,20 @@ export function PaymentModal({ total, orderItems, client, receiptNumber, onClose
       });
       setShowReceipt(true);
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      setError(msg || 'Error al procesar el pago');
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || '';
+      if (msg.includes('INSUFFICIENT_STOCK')) {
+        const varIdMatch = msg.match(/Variante ID (\d+)/);
+        const varId = varIdMatch ? parseInt(varIdMatch[1]) : null;
+        // Buscar primero en orderItems, luego en todos los productos (cubre componentes de combos)
+        const fromOrder = orderItems.find(i => i.variantId === varId);
+        const fromProducts = products.find(p => p.variantId === varId);
+        const name = fromOrder?.productName ?? fromProducts?.name ?? `variante #${varId}`;
+        const avail = msg.match(/tiene (\d+) unidades/)?.[1];
+        const needed = msg.match(/se necesitan (\d+)/)?.[1];
+        setError(`Stock insuficiente para "${name}". Disponible: ${avail ?? '?'}, solicitado: ${needed ?? '?'}`);
+      } else {
+        setError(msg || 'Error al procesar el pago');
+      }
     } finally {
       setLoading(false);
     }
@@ -273,6 +288,16 @@ export function PaymentModal({ total, orderItems, client, receiptNumber, onClose
           </button>
         </div>
 
+        {error && (
+          <div className="flex items-center gap-3 bg-red-600 text-white px-6 py-4 shadow-md">
+            <i className="ri-error-warning-line text-xl shrink-0"></i>
+            <p className="font-semibold text-sm">{error}</p>
+            <button onClick={() => setError('')} className="ml-auto shrink-0 opacity-70 hover:opacity-100 cursor-pointer">
+              <i className="ri-close-line text-lg"></i>
+            </button>
+          </div>
+        )}
+
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Tipo de pedido */}
           <div>
@@ -303,14 +328,14 @@ export function PaymentModal({ total, orderItems, client, receiptNumber, onClose
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-3">Método de Pago</label>
             <div className="grid grid-cols-2 gap-3">
-              {[
-                { key: 'efectivo', label: 'Efectivo', icon: 'ri-money-dollar-circle-line', color: 'green' },
-                { key: 'tarjeta', label: 'Tarjeta', icon: 'ri-bank-card-line', color: 'orange' },
-                { key: 'transferencia', label: 'Transferencia', icon: 'ri-exchange-line', color: 'teal' },
-                { key: 'mercadopago', label: 'Mercado Pago', icon: 'ri-smartphone-line', color: 'sky' },
-              ].map(m => (
-                <button key={m.key} onClick={() => setPaymentMethod(m.key as typeof paymentMethod)}
-                  className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${paymentMethod === m.key ? `border-${m.color}-600 bg-${m.color}-50 text-${m.color}-700` : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'}`}>
+              {([
+                { key: 'efectivo',      label: 'Efectivo',      icon: 'ri-money-dollar-circle-line', selected: 'border-green-600 bg-green-50 text-green-700' },
+                { key: 'tarjeta',       label: 'Tarjeta',       icon: 'ri-bank-card-line',           selected: 'border-orange-600 bg-orange-50 text-orange-700' },
+                { key: 'transferencia', label: 'Transferencia', icon: 'ri-exchange-line',            selected: 'border-teal-600 bg-teal-50 text-teal-700' },
+                { key: 'mercadopago',   label: 'Mercado Pago',  icon: 'ri-smartphone-line',          selected: 'border-sky-600 bg-sky-50 text-sky-700' },
+              ] as const).map(m => (
+                <button key={m.key} onClick={() => setPaymentMethod(m.key)}
+                  className={`p-4 rounded-lg border-2 cursor-pointer transition-all flex flex-col items-center ${paymentMethod === m.key ? m.selected : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'}`}>
                   <i className={`${m.icon} text-2xl mb-2`}></i>
                   <p className="font-semibold text-xs">{m.label}</p>
                 </button>
@@ -363,11 +388,6 @@ export function PaymentModal({ total, orderItems, client, receiptNumber, onClose
             </div>
           </div>
 
-          {error && (
-            <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl">
-              <i className="ri-error-warning-line"></i>{error}
-            </div>
-          )}
         </div>
 
         <div className="p-6 bg-gray-50 border-t border-gray-200 flex gap-3 md:rounded-b-xl">
