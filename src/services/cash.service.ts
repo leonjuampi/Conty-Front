@@ -1,5 +1,14 @@
 import { api } from './api';
 
+export interface CashMovement {
+  id: number;
+  sessionId: number;
+  type: 'INGRESO' | 'RETIRO';
+  amount: number;
+  description: string | null;
+  createdAt: string;
+}
+
 export interface CashSession {
   id: number;
   orgId: number;
@@ -15,6 +24,7 @@ export interface CashSession {
   totalsPerMethod: Record<string, number>;
   totalSales: number;
   totalOrders: number;
+  movements?: CashMovement[];
 }
 
 export async function getActiveSession(): Promise<CashSession | null> {
@@ -33,6 +43,21 @@ export async function closeSession(
   note?: string
 ): Promise<{ ok: boolean; totalsPerMethod: Record<string, number>; totalSales: number }> {
   const { data } = await api.post(`/cash/${sessionId}/close`, { actualJson, note });
+  return data;
+}
+
+export async function listCashMovements(sessionId: number): Promise<CashMovement[]> {
+  const { data } = await api.get<{ items: CashMovement[] }>(`/cash/${sessionId}/movements`);
+  return data.items;
+}
+
+export async function createCashMovement(
+  sessionId: number,
+  type: 'INGRESO' | 'RETIRO',
+  amount: number,
+  description?: string
+): Promise<{ id: number }> {
+  const { data } = await api.post(`/cash/${sessionId}/movements`, { type, amount, description });
   return data;
 }
 
