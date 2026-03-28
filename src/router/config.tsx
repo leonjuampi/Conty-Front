@@ -20,6 +20,8 @@ const SelectBranchPage = lazy(() => import('../pages/select-branch/page'));
 const SetupPage = lazy(() => import('../pages/setup/page'));
 const StockPage = lazy(() => import('../pages/stock/page'));
 const SuperAdminPage = lazy(() => import('../pages/superadmin/page'));
+const ForgotPasswordPage = lazy(() => import('../pages/forgot-password/page'));
+const ResetPasswordPage = lazy(() => import('../pages/reset-password/page'));
 
 const routes: RouteObject[] = [
   {
@@ -115,6 +117,14 @@ const routes: RouteObject[] = [
   {
     path: '/login',
     element: <LoginPage />,
+  },
+  {
+    path: '/forgot-password',
+    element: <ForgotPasswordPage />,
+  },
+  {
+    path: '/reset-password',
+    element: <ResetPasswordPage />,
   },
   {
     path: '*',
