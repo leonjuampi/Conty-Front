@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCash } from '../../context/CashContext';
 import { useTheme } from '../../context/ThemeContext';
+import { ChangePasswordModal } from './ChangePasswordModal';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -29,6 +31,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { currentUser, logout } = useAuth();
   const { hasCashOpen, activeSession } = useCash();
   const theme = useTheme();
+  const [showChangePassword, setShowChangePassword] = useState(false);
 
   const menuItems = ALL_MENU_ITEMS.filter(
     item => currentUser && item.roleIds.includes(currentUser.roleId)
@@ -143,12 +146,20 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             </div>
           </div>
           <button
+            onClick={() => setShowChangePassword(true)}
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-300 hover:bg-gray-600/50 hover:text-white transition-all cursor-pointer whitespace-nowrap text-sm"
+          >
+            <i className="ri-lock-password-line text-lg"></i>
+            <span className="font-medium">Cambiar contraseña</span>
+          </button>
+          <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-300 hover:bg-red-500/20 hover:text-red-400 transition-all cursor-pointer whitespace-nowrap text-sm"
           >
             <i className="ri-logout-box-r-line text-lg"></i>
             <span className="font-medium">Cerrar sesión</span>
           </button>
+          {showChangePassword && <ChangePasswordModal onClose={() => setShowChangePassword(false)} />}
         </div>
       </div>
     </>

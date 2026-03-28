@@ -28,3 +28,20 @@ export async function refreshToken(): Promise<LoginResponse> {
   const { data } = await api.post<LoginResponse>('/auth/refresh');
   return data;
 }
+
+export async function forgotPassword(email: string): Promise<void> {
+  await api.post('/auth/forgot-password', { email });
+}
+
+export async function checkResetToken(token: string): Promise<{ valid: boolean; email: string; username: string }> {
+  const { data } = await api.get('/auth/check-reset-token', { params: { token } });
+  return data;
+}
+
+export async function resetPassword(token: string, password: string): Promise<void> {
+  await api.post('/auth/reset-password', { token, password });
+}
+
+export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
+  await api.post('/auth/change-password', { currentPassword, newPassword });
+}
