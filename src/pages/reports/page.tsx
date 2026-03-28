@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { ROLE_IDS } from '../../utils/roles';
 import { listSales, getSale, addPayments, listPaymentMethods, type Sale } from '../../services/sales.service';
 import { listCustomers, type Customer } from '../../services/customers.service';
-import { listSessions, type CashSession } from '../../services/cash.service';
+import { listSessions, listCashMovements, type CashSession, type CashMovement } from '../../services/cash.service';
 import { getReports, type TopSeller, type TopProduct, type CategoryProductRow, type ReportStats } from '../../services/reports.service';
 
 // ── Display types ──────────────────────────────────────────────────
@@ -154,6 +154,8 @@ export default function ReportsPage() {
   const [paymentModalError, setPaymentModalError] = useState('');
   const [availableMethods, setAvailableMethods] = useState<{ id: number; name: string }[]>([]);
   const [selectedCashSession, setSelectedCashSession] = useState<DisplaySession | null>(null);
+  const [selectedSessionMovements, setSelectedSessionMovements] = useState<CashMovement[]>([]);
+  const [loadingMovements, setLoadingMovements] = useState(false);
   const [typeDetailFilter, setTypeDetailFilter] = useState<'Particular' | 'Pedidos Ya' | 'Rappi'>('Particular');
 
   // API data
@@ -914,7 +916,15 @@ export default function ReportsPage() {
                               )}
                             </td>
                             <td className="px-3 py-2.5">
-                              <button onClick={() => setSelectedCashSession(session)} className="w-7 h-7 flex items-center justify-center bg-brand-100 hover:bg-brand-200 text-brand-600 rounded-lg transition-colors cursor-pointer">
+                              <button onClick={() => {
+                                setSelectedCashSession(session);
+                                setSelectedSessionMovements([]);
+                                setLoadingMovements(true);
+                                listCashMovements(session.id)
+                                  .then(setSelectedSessionMovements)
+                                  .catch(() => setSelectedSessionMovements([]))
+                                  .finally(() => setLoadingMovements(false));
+                              }} className="w-7 h-7 flex items-center justify-center bg-brand-100 hover:bg-brand-200 text-brand-600 rounded-lg transition-colors cursor-pointer">
                                 <i className="ri-eye-line text-sm"></i>
                               </button>
                             </td>
@@ -1233,6 +1243,60 @@ export default function ReportsPage() {
                   <p className="font-bold text-green-700 text-sm">${selectedCashSession.initialCash.toLocaleString('es-AR')}</p>
                 </div>
               </div>
+              {/* Movimientos de caja */}
+              <div>
+                <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2 text-sm md:text-base">
+                  <i className="ri-swap-line text-brand-500"></i>
+                  Movimientos de Caja
+                </h3>
+                {loadingMovements ? (
+                  <div className="flex justify-center py-4">
+                    <i className="ri-loader-4-line animate-spin text-xl text-brand-500"></i>
+                  </div>
+                ) : selectedSessionMovements.length === 0 ? (
+                  <p className="text-xs text-gray-400 italic px-1">Sin movimientos registrados en este turno.</p>
+                ) : (
+                  <div className="border border-gray-200 rounded-xl overflow-hidden">
+                    <div className="divide-y divide-gray-100">
+                      {selectedSessionMovements.map(m => (
+                        <div key={m.id} className="flex items-center justify-between px-3 py-2.5">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${m.type === 'INGRESO' ? 'bg-green-100' : 'bg-red-100'}`}>
+                              <i className={`text-xs ${m.type === 'INGRESO' ? 'ri-arrow-down-line text-green-600' : 'ri-arrow-up-line text-red-600'}`}></i>
+                            </div>
+                            <div>
+                              <p className={`text-xs font-semibold ${m.type === 'INGRESO' ? 'text-green-700' : 'text-red-700'}`}>
+                                {m.type === 'INGRESO' ? 'Ingreso' : 'Retiro'}
+                              </p>
+                              {m.description && <p className="text-xs text-gray-400">{m.description}</p>}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className={`text-xs font-bold ${m.type === 'INGRESO' ? 'text-green-700' : 'text-red-700'}`}>
+                              {m.type === 'INGRESO' ? '+' : '-'}${m.amount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+                            </p>
+                            <p className="text-xs text-gray-400">
+                              {new Date(m.createdAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex items-center justify-between px-3 py-2 bg-gray-50 border-t border-gray-200">
+                      <span className="text-xs font-semibold text-gray-600">Neto movimientos</span>
+                      {(() => {
+                        const net = selectedSessionMovements.reduce((s, m) => m.type === 'INGRESO' ? s + m.amount : s - m.amount, 0);
+                        return (
+                          <span className={`text-xs font-bold ${net >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+                            {net >= 0 ? '+' : ''}${net.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+                          </span>
+                        );
+                      })()}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <div>
                 <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2 text-sm md:text-base">
                   <i className="ri-bank-card-line text-brand-500"></i>
@@ -1259,7 +1323,8 @@ export default function ReportsPage() {
                           BANK_TRANSFER: 'ri-bank-line', MERCADO_PAGO: 'ri-smartphone-line',
                         };
                         const salesAmt = selectedCashSession.totalsJson[key] ?? 0;
-                        const expected = key === 'CASH' ? selectedCashSession.initialCash + salesAmt : salesAmt;
+                        const netMov = selectedSessionMovements.reduce((s, m) => m.type === 'INGRESO' ? s + m.amount : s - m.amount, 0);
+                        const expected = key === 'CASH' ? selectedCashSession.initialCash + salesAmt + netMov : salesAmt;
                         const actualAmt = selectedCashSession.actualJson[key] !== undefined ? selectedCashSession.actualJson[key] : expected;
                         const diff = actualAmt - expected;
                         return (
