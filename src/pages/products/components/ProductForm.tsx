@@ -120,7 +120,7 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-start justify-center z-50 p-0 md:p-4 overflow-y-auto">
-      <div className="bg-white w-full h-full md:h-auto md:rounded-2xl shadow-2xl md:max-w-2xl md:my-8 md:max-h-[90vh] overflow-y-auto">
+      <div className="bg-white w-full h-full md:h-auto md:rounded-2xl shadow-2xl md:max-w-2xl md:my-8 md:max-h-[90vh] overflow-y-auto safe-top">
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-brand-500 to-brand-600 z-10 p-4 md:p-6">
           <div className="flex items-center justify-between">

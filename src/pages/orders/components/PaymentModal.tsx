@@ -277,7 +277,7 @@ export function PaymentModal({ total, orderItems, products, client, receiptNumbe
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-0 md:p-4">
-      <div className="bg-white w-full h-full md:h-auto md:rounded-xl shadow-2xl md:w-[500px] md:max-h-[90vh] overflow-y-auto flex flex-col">
+      <div className="bg-white w-full h-full md:h-auto md:rounded-xl shadow-2xl md:w-[500px] md:max-h-[90vh] overflow-y-auto flex flex-col safe-top">
         <div className="p-6 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-brand-600 to-brand-700 text-white md:rounded-t-xl">
           <div>
             <h2 className="text-2xl font-bold">Finalizar Pedido</h2>

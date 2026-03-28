@@ -46,7 +46,7 @@ export function ClientDetailModal({ client, onClose, onEdit }: ClientDetailModal
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-0 md:p-4">
-      <div className="bg-white w-full h-full md:h-auto md:rounded-2xl shadow-2xl md:max-w-2xl md:max-h-[90vh] flex flex-col overflow-hidden">
+      <div className="bg-white w-full h-full md:h-auto md:rounded-2xl shadow-2xl md:max-w-2xl md:max-h-[90vh] flex flex-col overflow-hidden safe-top">
         {/* Header fijo */}
         <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-100 bg-white sticky top-0 z-10">
           <div className="flex items-center gap-3 md:gap-4">
