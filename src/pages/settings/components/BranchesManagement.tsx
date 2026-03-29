@@ -193,7 +193,7 @@ export default function BranchesManagement() {
       {/* Modal crear/editar */}
       {showModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-0 md:p-4">
-          <div className="bg-white w-full h-full md:h-auto md:rounded-2xl shadow-2xl md:max-w-lg overflow-y-auto">
+          <div className="bg-white w-full h-full md:h-auto md:rounded-2xl shadow-2xl md:max-w-lg overflow-y-auto safe-top">
             <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-100 sticky top-0 bg-white z-10">
               <h3 className="text-lg font-bold text-gray-800">{editing ? 'Editar Sucursal' : 'Nueva Sucursal'}</h3>
               <button onClick={() => setShowModal(false)} className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 cursor-pointer">

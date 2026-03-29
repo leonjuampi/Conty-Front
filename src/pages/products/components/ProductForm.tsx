@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { listProducts } from '../../../services/products.service';
 import type { ComboItem } from '../../../services/products.service';
+import { getElaborationSettings } from '../../../services/elaborationCosts.service';
 
 interface ProductFormProps {
   product: any;
@@ -28,6 +29,11 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
   const [comboSearch, setComboSearch] = useState('');
   const [comboResults, setComboResults] = useState<{ variantId: number; variantName: string; productName: string; price: number; cost: number }[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [costosLocal, setCostosLocal] = useState(0);
+
+  useEffect(() => {
+    getElaborationSettings().then(s => setCostosLocal(s.monthly_local_cost)).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (product) {
@@ -120,7 +126,7 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-start justify-center z-50 p-0 md:p-4 overflow-y-auto">
-      <div className="bg-white w-full h-full md:h-auto md:rounded-2xl shadow-2xl md:max-w-2xl md:my-8 md:max-h-[90vh] overflow-y-auto">
+      <div className="bg-white w-full h-full md:h-auto md:rounded-2xl shadow-2xl md:max-w-2xl md:my-8 md:max-h-[90vh] overflow-y-auto safe-top">
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-brand-500 to-brand-600 z-10 p-4 md:p-6">
           <div className="flex items-center justify-between">
@@ -192,6 +198,14 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
                   className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 text-sm min-h-[48px]"
                   placeholder="1200" required min="0" step="0.01" />
               </div>
+              {costosLocal > 0 && (
+                <div className="mt-1.5 flex items-center justify-between px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg">
+                  <span className="text-xs text-gray-500">Costo Final (+ gastos del local)</span>
+                  <span className="text-xs font-semibold text-gray-800">
+                    ${(parseFloat(formData.cost || '0') + costosLocal).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Precio */}

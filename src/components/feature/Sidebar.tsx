@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCash } from '../../context/CashContext';
-import { useTheme } from '../../context/ThemeContext';
 import { ChangePasswordModal } from './ChangePasswordModal';
 
 interface SidebarProps {
@@ -30,7 +29,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
   const { hasCashOpen, activeSession } = useCash();
-  const theme = useTheme();
   const [showChangePassword, setShowChangePassword] = useState(false);
 
   const menuItems = ALL_MENU_ITEMS.filter(
@@ -79,13 +77,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="p-6 border-b border-gray-700">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 flex items-center justify-center bg-gradient-to-br from-brand-400 to-brand-600 rounded-xl shadow">
-                <i className={`${theme.storeIcon} text-white text-xl`}></i>
-              </div>
-              <div>
-                <h1 className="text-lg font-bold">Conty</h1>
-                <p className="text-xs text-gray-400">Sistema de Gestión</p>
-              </div>
+              <img src="/LOGO-BYN-COMPLETO.png" alt="Conty" className="h-10 brightness-0 invert" />
             </div>
             <button
               onClick={onClose}
