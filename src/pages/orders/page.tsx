@@ -191,7 +191,7 @@ export default function OrdersPage() {
 
         {/* Banner de caja cerrada */}
         {cashBlocked && (
-          <div className="fixed top-0 md:top-0 left-0 md:left-64 right-0 z-[35] bg-red-600 text-white px-6 py-3 flex items-center justify-between shadow-lg safe-top">
+          <div className="fixed top-0 left-0 md:left-64 right-0 z-40 bg-red-600 text-white px-6 py-3 flex items-center justify-between shadow-lg safe-top">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 flex items-center justify-center">
                 <i className="ri-lock-line text-xl"></i>
@@ -214,8 +214,8 @@ export default function OrdersPage() {
         )}
 
         {/* Tabs Mobile */}
-        <div className="md:hidden fixed left-0 right-0 z-30 bg-white border-b border-gray-200 shadow-sm" style={{ top: `calc(60px + env(safe-area-inset-top, 0px) + ${cashBlocked ? '60px' : '0px'})` }}>
-          <div className="flex">
+        <div className="md:hidden fixed top-0 left-0 right-0 z-30 bg-white border-b border-gray-200 shadow-sm safe-top" style={{ marginTop: cashBlocked ? '60px' : undefined }}>
+          <div className="flex items-center">
             <button
               onClick={() => setActiveTab('products')}
               className={`flex-1 py-4 text-sm font-semibold transition-all relative cursor-pointer ${activeTab === 'products' ? 'text-brand-600' : 'text-gray-500'}`}
@@ -241,7 +241,7 @@ export default function OrdersPage() {
         </div>
 
         {/* Vista Mobile - Tab Productos */}
-        <div className={`md:hidden w-full overflow-y-auto ${activeTab === 'products' ? 'block' : 'hidden'}`} style={{ paddingTop: cashBlocked ? '70px' : '50px', paddingBottom: '20px' }}>
+        <div className={`md:hidden w-full overflow-y-auto ${activeTab === 'products' ? 'block' : 'hidden'}`} style={{ paddingTop: cashBlocked ? '120px' : '60px', paddingBottom: '20px' }}>
           <div className="p-4">
             <div className="mb-4">
               <h1 className="text-2xl font-bold text-gray-800 mb-1">Panel de Pedidos</h1>
@@ -252,7 +252,7 @@ export default function OrdersPage() {
         </div>
 
         {/* Vista Mobile - Tab Comanda */}
-        <div className={`md:hidden w-full overflow-y-auto ${activeTab === 'order' ? 'block' : 'hidden'}`} style={{ paddingTop: cashBlocked ? '70px' : '50px' }}>
+        <div className={`md:hidden w-full overflow-y-auto ${activeTab === 'order' ? 'block' : 'hidden'}`} style={{ paddingTop: cashBlocked ? '120px' : '60px' }}>
           <div className="p-4 pb-6">
             <ClientSelector selectedClient={selectedClient} onSelectClient={setSelectedClient} />
           </div>
