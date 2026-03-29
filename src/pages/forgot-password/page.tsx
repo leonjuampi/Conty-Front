@@ -25,14 +25,8 @@ export default function ForgotPasswordPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-6">
       <div className="w-full max-w-md">
-        <div className="flex items-center gap-3 mb-8 justify-center">
-          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-            <i className="ri-store-3-line text-white text-2xl"></i>
-          </div>
-          <div>
-            <h1 className="text-gray-900 text-xl font-bold">Conty</h1>
-            <p className="text-gray-500 text-xs">Sistema de Gestión</p>
-          </div>
+        <div className="flex justify-center mb-8">
+          <img src="/LOGO-COLOR-COMPLETO.png" alt="Conty" className="h-14" />
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">

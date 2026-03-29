@@ -66,7 +66,7 @@ export default function ClientsPage() {
   useEffect(() => { fetchClients(); }, [fetchClients]);
 
   const handleSave = async (data: { firstName: string; lastName: string; phone?: string; email?: string; address?: string; notes?: string }) => {
-    const name = `${data.firstName} ${data.lastName}`.trim();
+    const name = `${data.firstName} ${data.lastName}`.trim() || 'Sin nombre';
     if (selectedClient) {
       await updateCustomer(selectedClient._apiId, { name, phone: data.phone, email: data.email, address: data.address, notes: data.notes });
     } else {

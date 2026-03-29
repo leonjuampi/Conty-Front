@@ -50,7 +50,7 @@ export function ClientForm({ client, onSave, onClose }: ClientFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.firstName.trim() || !form.lastName.trim() || !form.phone.trim()) return;
+    if (!form.address.trim()) return;
     onSave(form);
   };
 
@@ -78,25 +78,23 @@ export function ClientForm({ client, onSave, onClose }: ClientFormProps) {
         <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Nombre *</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Nombre</label>
               <input
                 type="text"
                 name="firstName"
                 value={form.firstName}
                 onChange={handleChange}
-                required
                 placeholder="Juan"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Apellido *</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Apellido</label>
               <input
                 type="text"
                 name="lastName"
                 value={form.lastName}
                 onChange={handleChange}
-                required
                 placeholder="Pérez"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]"
               />
@@ -104,13 +102,12 @@ export function ClientForm({ client, onSave, onClose }: ClientFormProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Teléfono *</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Teléfono</label>
             <input
               type="text"
               name="phone"
               value={form.phone}
               onChange={handleChange}
-              required
               placeholder="11-4567-8901"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]"
             />
@@ -129,12 +126,13 @@ export function ClientForm({ client, onSave, onClose }: ClientFormProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Dirección</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Dirección <span className="text-red-500">*</span></label>
             <input
               type="text"
               name="address"
               value={form.address}
               onChange={handleChange}
+              required
               placeholder="Av. Corrientes 1234, CABA"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]"
             />

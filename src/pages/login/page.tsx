@@ -59,14 +59,8 @@ export default function LoginPage() {
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 30% 20%, #60a5fa 0%, transparent 50%), radial-gradient(circle at 70% 80%, #818cf8 0%, transparent 50%)' }} />
         <div className="absolute inset-0 flex flex-col justify-end p-12">
           <div className="mb-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                <i className="ri-store-3-line text-white text-2xl"></i>
-              </div>
-              <div>
-                <h1 className="text-white text-2xl font-bold tracking-tight">Conty</h1>
-                <p className="text-blue-200 text-sm">Sistema de Gestión</p>
-              </div>
+            <div className="mb-6">
+              <img src="/LOGO-BYN-COMPLETO.png" alt="Conty" className="h-14 brightness-0 invert" />
             </div>
             <h2 className="text-white text-4xl font-bold leading-tight mb-3">
               Gestión simple,<br />resultados reales.
@@ -82,14 +76,8 @@ export default function LoginPage() {
       <div className="flex-1 flex items-center justify-center bg-white px-6 py-12">
         <div className="w-full max-w-md">
           {/* Mobile logo */}
-          <div className="flex lg:hidden items-center gap-3 mb-10 justify-center">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-              <i className="ri-store-3-line text-white text-2xl"></i>
-            </div>
-            <div>
-              <h1 className="text-gray-900 text-xl font-bold">Conty</h1>
-              <p className="text-gray-500 text-xs">Sistema de Gestión</p>
-            </div>
+          <div className="flex lg:hidden justify-center mb-10">
+            <img src="/LOGO-COLOR-COMPLETO.png" alt="Conty" className="h-14" />
           </div>
 
           <div className="mb-8">
