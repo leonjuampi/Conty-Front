@@ -60,7 +60,7 @@ export default function LoginPage() {
         <div className="absolute inset-0 flex flex-col justify-end p-12">
           <div className="mb-8">
             <div className="mb-6">
-              <img src="/LOGO-BYN-COMPLETO.png" alt="Conty" className="h-14 brightness-0 invert" />
+              <img src="/LOGO-BYN-COMPLETO.png" alt="Conty" className="h-20 brightness-0 invert" />
             </div>
             <h2 className="text-white text-4xl font-bold leading-tight mb-3">
               Gestión simple,<br />resultados reales.
@@ -77,7 +77,7 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="flex lg:hidden justify-center mb-10">
-            <img src="/LOGO-COLOR-COMPLETO.png" alt="Conty" className="h-14" />
+            <img src="/LOGO-COLOR-COMPLETO.png" alt="Conty" className="h-20" />
           </div>
 
           <div className="mb-8">

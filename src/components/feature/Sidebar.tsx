@@ -77,7 +77,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="p-6 border-b border-gray-700">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <img src="/LOGO-BYN-COMPLETO.png" alt="Conty" className="h-10 brightness-0 invert" />
+              <img src="/LOGO-BYN-COMPLETO.png" alt="Conty" className="h-14 brightness-0 invert" />
             </div>
             <button
               onClick={onClose}
