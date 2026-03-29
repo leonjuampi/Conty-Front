@@ -1,24 +1,8 @@
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-
 interface NavbarProps {
   onMenuClick: () => void;
 }
 
 export function Navbar({ onMenuClick }: NavbarProps) {
-  const { currentUser, logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login', { replace: true });
-  };
-
-  const roleLabel: Record<string, string> = {
-    admin: 'Administrador',
-    vendedor: 'Vendedor',
-    cajero: 'Cajero'
-  };
 
   return (
     <div className="md:hidden bg-white border-b border-gray-200 px-4 py-4 shadow-sm safe-top">
