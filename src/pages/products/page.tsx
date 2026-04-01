@@ -13,6 +13,7 @@ import {
   deleteCategory,
   downloadProductTemplate,
   importProducts,
+  uploadProductImage,
   type Category,
 } from '../../services/products.service';
 
@@ -117,10 +118,17 @@ export default function ProductsPage() {
       }],
     };
     try {
+      let productId: number;
       if (selectedProduct) {
         await updateProduct(selectedProduct.id, payload as any);
+        productId = selectedProduct.id;
       } else {
-        await createProduct(payload as any);
+        const res = await createProduct(payload as any);
+        productId = res.id;
+      }
+      // Subir imagen si el usuario eligió un archivo
+      if (data.imageFile) {
+        await uploadProductImage(productId, data.imageFile);
       }
       const filterCatId = categories.find(c => c.name === categoryFilter)?.id;
       await fetchProducts(currentPage, searchTerm || undefined, filterCatId);

@@ -137,6 +137,15 @@ export async function downloadProductTemplate(): Promise<void> {
   URL.revokeObjectURL(url);
 }
 
+export async function uploadProductImage(id: number, file: File): Promise<{ imageUrl: string }> {
+  const form = new FormData();
+  form.append('image', file);
+  const { data } = await api.post(`/products/${id}/image`, form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return data;
+}
+
 export async function importProducts(file: File): Promise<{ successCount: number; errorCount: number; errors: { row: number; message: string }[] }> {
   const form = new FormData();
   form.append('file', file);
