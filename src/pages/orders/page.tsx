@@ -24,6 +24,7 @@ export default function OrdersPage() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [receiptNumber, setReceiptNumber] = useState<string>('');
+  const [lastSaleId, setLastSaleId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<'products' | 'order'>('products');
   const [products, setProducts] = useState<PosProduct[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
@@ -133,13 +134,13 @@ export default function OrdersPage() {
     setShowPaymentModal(true);
   };
 
-  const handlePaymentComplete = async (data: { paymentMethod: string; amountPaid: number; notes: string; deliveryPlatform: string | null; pendingPayment: boolean }) => {
+  const handlePaymentComplete = async (data: { paymentMethod: string; amountPaid: number; notes: string; deliveryPlatform: string | null; pendingPayment: boolean; docType: string }) => {
     if (!currentUser?.branchId) throw new Error('Sin sucursal activa');
 
     const sale = await createSale({
       branchId: currentUser.branchId,
       posCode: '0001',
-      docType: 'TICKET',
+      docType: data.docType,
       customerId: selectedClient?.id ?? null,
       items: orderItems.map(item => ({
         variantId: item.variantId,
@@ -151,9 +152,16 @@ export default function OrdersPage() {
         : [{ method: data.paymentMethod, amount: calculateTotal(), note: data.notes || undefined }],
       note: data.pendingPayment ? (data.notes || undefined) : undefined,
       deliveryPlatform: data.deliveryPlatform,
+      // Campos fiscales ARCA
+      clientTaxCond: selectedClient?.taxCondition ?? null,
+      docTipoReceptor: selectedClient?.taxId ? 80 : 99,
+      docNroReceptor: selectedClient?.taxId
+        ? parseInt(String(selectedClient.taxId).replace(/\D/g, ''), 10)
+        : 0,
     });
 
     setReceiptNumber(sale.docText);
+    setLastSaleId(sale.id);
     setShowSuccessToast(true);
     setTimeout(() => setShowSuccessToast(false), 2500);
     loadProducts();
@@ -306,6 +314,7 @@ export default function OrdersPage() {
             products={products}
             client={selectedClient}
             receiptNumber={receiptNumber}
+            saleId={lastSaleId}
             onClose={() => { setShowPaymentModal(false); setOrderItems([]); setSelectedClient(null); }}
             onComplete={handlePaymentComplete}
           />
