@@ -42,14 +42,23 @@ export default function ProductsPage() {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [importLoading, setImportLoading] = useState(false);
   const [importResult, setImportResult] = useState<{ successCount: number; errorCount: number; errors: { row: number; message: string }[] } | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const pageSize = 100;
+  const totalPages = Math.max(1, Math.ceil(totalProducts / pageSize));
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const categoryNames = categories.map(c => c.name);
   const filterCategories = ['all', ...categoryNames];
 
-  const fetchProducts = useCallback(async () => {
+  const fetchProducts = useCallback(async (page = 1, search?: string, catId?: number) => {
     try {
-      const res = await listProducts({ limit: 200 });
+      const params: Parameters<typeof listProducts>[0] = { page, pageSize };
+      if (search) params.search = search;
+      if (catId) params.categoryId = catId;
+      const res = await listProducts(params);
+      setTotalProducts(res.total ?? 0);
+      setCurrentPage(res.page ?? page);
       setProducts(res.items.map(p => ({
         id: p.id,
         name: p.name,
@@ -78,12 +87,17 @@ export default function ProductsPage() {
     Promise.all([fetchProducts(), fetchCategories()]).finally(() => setLoading(false));
   }, [fetchProducts, fetchCategories]);
 
-  const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter === 'all' || product.category === categoryFilter;
-    return matchesSearch && matchesCategory;
-  });
+  // Re-fetch con debounce cuando cambian búsqueda o categoría
+  const searchTimeout = useRef<ReturnType<typeof setTimeout>>();
+  useEffect(() => {
+    clearTimeout(searchTimeout.current);
+    searchTimeout.current = setTimeout(() => {
+      const catId = categories.find(c => c.name === categoryFilter)?.id;
+      setLoading(true);
+      fetchProducts(1, searchTerm || undefined, catId).finally(() => setLoading(false));
+    }, 300);
+    return () => clearTimeout(searchTimeout.current);
+  }, [searchTerm, categoryFilter, categories, fetchProducts]);
 
   const handleSave = async (data: any) => {
     const catId = categories.find(c => c.name === data.category)?.id;
@@ -108,7 +122,8 @@ export default function ProductsPage() {
       } else {
         await createProduct(payload as any);
       }
-      await fetchProducts();
+      const filterCatId = categories.find(c => c.name === categoryFilter)?.id;
+      await fetchProducts(currentPage, searchTerm || undefined, filterCatId);
       setShowForm(false);
       setSelectedProduct(null);
     } catch {
@@ -169,7 +184,10 @@ export default function ProductsPage() {
     try {
       const result = await importProducts(file);
       setImportResult(result);
-      if (result.successCount > 0) await fetchProducts();
+      if (result.successCount > 0) {
+        const catId = categories.find(c => c.name === categoryFilter)?.id;
+        await fetchProducts(currentPage, searchTerm || undefined, catId);
+      }
     } catch (err: any) {
       const msg = err?.response?.data?.message || 'Error al importar el archivo';
       alert(msg);
@@ -276,7 +294,7 @@ export default function ProductsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredProducts.map((product) => (
+              {products.map((product) => (
                 <tr key={product.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -323,7 +341,7 @@ export default function ProductsPage() {
 
       {/* Vista de tarjetas en mobile */}
       <div className="md:hidden grid grid-cols-2 gap-3">
-        {filteredProducts.map((product) => (
+        {products.map((product) => (
           <div key={product.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div className={`aspect-square flex items-center justify-center overflow-hidden ${product.isCombo ? 'bg-gradient-to-br from-purple-100 to-violet-100' : 'bg-gradient-to-br from-brand-100 to-brand-100'}`}>
               {product.image
@@ -354,10 +372,44 @@ export default function ProductsPage() {
         ))}
       </div>
 
-      {filteredProducts.length === 0 && !loading && (
+      {products.length === 0 && !loading && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
           <i className="ri-search-line text-6xl text-gray-300 mb-4"></i>
           <p className="text-gray-600">No se encontraron productos</p>
+        </div>
+      )}
+
+      {/* Paginación */}
+      {totalPages > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-6 bg-white rounded-xl shadow-sm border border-gray-200 px-6 py-4">
+          <p className="text-sm text-gray-600">
+            Mostrando página <span className="font-semibold text-gray-800">{currentPage}</span> de <span className="font-semibold text-gray-800">{totalPages}</span>
+            <span className="text-gray-400 ml-2">({totalProducts} productos en total)</span>
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                const catId = categories.find(c => c.name === categoryFilter)?.id;
+                setLoading(true);
+                fetchProducts(currentPage - 1, searchTerm || undefined, catId).finally(() => setLoading(false));
+              }}
+              disabled={currentPage <= 1}
+              className="flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer">
+              <i className="ri-arrow-left-s-line"></i>
+              Anterior
+            </button>
+            <button
+              onClick={() => {
+                const catId = categories.find(c => c.name === categoryFilter)?.id;
+                setLoading(true);
+                fetchProducts(currentPage + 1, searchTerm || undefined, catId).finally(() => setLoading(false));
+              }}
+              disabled={currentPage >= totalPages}
+              className="flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer">
+              Siguiente
+              <i className="ri-arrow-right-s-line"></i>
+            </button>
+          </div>
         </div>
       )}
 
