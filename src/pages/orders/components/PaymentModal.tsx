@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { PosProduct } from './ProductSelector';
+import { downloadInvoicePdf } from '../../../services/arca.service';
 
 interface PaymentModalProps {
   total: number;
@@ -13,8 +14,9 @@ interface PaymentModalProps {
   products: PosProduct[];
   client: { firstName: string; lastName: string; phone?: string; address?: string } | null;
   receiptNumber: string;
+  saleId?: number | null;
   onClose: () => void;
-  onComplete: (data: { paymentMethod: string; amountPaid: number; notes: string; deliveryPlatform: string | null; pendingPayment: boolean }) => Promise<void>;
+  onComplete: (data: { paymentMethod: string; amountPaid: number; notes: string; deliveryPlatform: string | null; pendingPayment: boolean; docType: string }) => Promise<void>;
 }
 
 const PAYMENT_METHOD_MAP: Record<string, string> = {
@@ -24,8 +26,9 @@ const PAYMENT_METHOD_MAP: Record<string, string> = {
   mercadopago: 'MERCADO_PAGO',
 };
 
-export function PaymentModal({ total, orderItems, products, client, receiptNumber, onClose, onComplete }: PaymentModalProps) {
+export function PaymentModal({ total, orderItems, products, client, receiptNumber, saleId, onClose, onComplete }: PaymentModalProps) {
   const [paymentMethod, setPaymentMethod] = useState<'efectivo' | 'tarjeta' | 'transferencia' | 'mercadopago' | 'al_retirar'>('efectivo');
+  const [docType, setDocType] = useState<string>('TICKET');
   const [orderType, setOrderType] = useState<'particular' | 'aplicacion'>('particular');
   const [appPlatform, setAppPlatform] = useState<'pedidosya' | 'rappi'>('pedidosya');
   const [amountPaid, setAmountPaid] = useState<string>('');
@@ -54,6 +57,7 @@ export function PaymentModal({ total, orderItems, products, client, receiptNumbe
         notes,
         deliveryPlatform: orderType === 'aplicacion' ? appPlatform.toUpperCase() : null,
         pendingPayment: paymentMethod === 'al_retirar',
+        docType,
       });
       setShowReceipt(true);
     } catch (err: unknown) {
@@ -262,13 +266,24 @@ export function PaymentModal({ total, orderItems, products, client, receiptNumbe
             </div>
           </div>
 
-          <div className="p-4 bg-gray-50 border-t border-gray-200 flex gap-3 print:hidden">
-            <button onClick={handlePrintAndFinish} className="flex-1 bg-brand-600 text-white font-bold py-3 rounded-lg hover:bg-brand-700 cursor-pointer flex items-center justify-center gap-2">
-              <i className="ri-printer-line"></i>Imprimir y Finalizar
-            </button>
-            <button onClick={onClose} className="px-6 bg-gray-200 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-300 cursor-pointer">
-              Cerrar
-            </button>
+          <div className="p-4 bg-gray-50 border-t border-gray-200 flex flex-col gap-2 print:hidden">
+            <div className="flex gap-3">
+              <button onClick={handlePrintAndFinish} className="flex-1 bg-brand-600 text-white font-bold py-3 rounded-lg hover:bg-brand-700 cursor-pointer flex items-center justify-center gap-2">
+                <i className="ri-printer-line"></i>Imprimir y Finalizar
+              </button>
+              <button onClick={onClose} className="px-6 bg-gray-200 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-300 cursor-pointer">
+                Cerrar
+              </button>
+            </div>
+            {saleId && docType !== 'TICKET' && (
+              <button
+                onClick={() => downloadInvoicePdf(saleId)}
+                className="flex items-center justify-center gap-2 w-full py-2.5 border border-brand-300 text-brand-700 rounded-lg hover:bg-brand-50 text-sm font-medium transition-all cursor-pointer"
+              >
+                <i className="ri-file-pdf-line"></i>
+                Descargar PDF del comprobante
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -299,6 +314,40 @@ export function PaymentModal({ total, orderItems, products, client, receiptNumbe
         )}
 
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          {/* Tipo de comprobante */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-3">
+              Tipo de Comprobante
+            </label>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {([
+                { value: 'TICKET', label: 'Ticket' },
+                { value: 'INVOICE_A', label: 'Factura A' },
+                { value: 'INVOICE_B', label: 'Factura B' },
+                { value: 'INVOICE_C', label: 'Factura C' },
+              ] as const).map(opt => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setDocType(opt.value)}
+                  className={`py-2.5 px-2 rounded-lg border-2 text-xs font-semibold cursor-pointer transition-all ${
+                    docType === opt.value
+                      ? 'border-brand-600 bg-brand-50 text-brand-700'
+                      : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            {docType !== 'TICKET' && (
+              <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-2">
+                <i className="ri-information-line mr-1"></i>
+                Se solicitará el CAE a ARCA automáticamente. Asegurate de tener configurado el punto de venta.
+              </p>
+            )}
+          </div>
+
           {/* Tipo de pedido */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-3">Tipo de Pedido</label>

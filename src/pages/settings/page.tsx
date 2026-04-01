@@ -6,6 +6,7 @@ import BranchesManagement from './components/BranchesManagement';
 import PaymentMethodsManagement from './components/PaymentMethodsManagement';
 import PriceListsManagement from './components/PriceListsManagement';
 import NumberingManagement from './components/NumberingManagement';
+import ArcaConfig from './components/ArcaConfig';
 import { useCashAlertLimit } from '../../hooks/useCashAlertLimit';
 import { useAuth } from '../../context/AuthContext';
 import { getOrganization, updateOrganization } from '../../services/organization.service';
@@ -106,6 +107,7 @@ export default function SettingsPage() {
               { id: 'pricelists', label: 'Listas de Precio', icon: 'ri-price-tag-3-line' },
               { id: 'numbering', label: 'Numeracion', icon: 'ri-hashtag' },
               { id: 'users', label: 'Usuarios', icon: 'ri-team-line' },
+              { id: 'arca', label: 'ARCA', icon: 'ri-government-line' },
             ].map(tab => (
               <button
                 key={tab.id}
@@ -406,6 +408,7 @@ export default function SettingsPage() {
             {activeTab === 'pricelists' && <PriceListsManagement />}
             {activeTab === 'numbering' && <NumberingManagement />}
             {activeTab === 'users' && <UserManagement />}
+            {activeTab === 'arca' && <ArcaConfig />}
           </div>
 
           {(activeTab === 'general' || activeTab === 'business') && (

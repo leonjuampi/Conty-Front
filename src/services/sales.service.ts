@@ -23,6 +23,11 @@ export interface CreateSalePayload {
   payments: SalePayment[];
   note?: string;
   deliveryPlatform?: string | null;
+  // Campos fiscales ARCA (opcionales)
+  concepto?: number;
+  clientTaxCond?: string | null;
+  docTipoReceptor?: number;
+  docNroReceptor?: number;
 }
 
 export interface Sale {
