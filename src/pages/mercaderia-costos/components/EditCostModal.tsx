@@ -58,18 +58,19 @@ export function EditCostModal({ cost, allCosts, onClose, onSaved }: Props) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
-  // Product generation (only for new costs)
-  const [generateProduct, setGenerateProduct] = useState(true);
+  // Product generation (for new costs or existing costs without a linked product)
+  const canGenerateProduct = isNew || !cost?.product_id;
+  const [generateProduct, setGenerateProduct] = useState(isNew);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | ''>('');
   const [salePrice, setSalePrice] = useState('');
 
   useEffect(() => {
     listRawMaterials({ limit: 500 }).then((r) => setRawMaterials(r.items)).catch(() => {});
-    if (isNew) {
+    if (canGenerateProduct) {
       listCategories().then((r) => setCategories(r.items)).catch(() => {});
     }
-  }, [isNew]);
+  }, [canGenerateProduct]);
 
   // Other costs excluding the current one (to avoid self-reference)
   const otherCosts = allCosts.filter((c) => c.id !== cost?.id);
@@ -111,7 +112,7 @@ export function EditCostModal({ cost, allCosts, onClose, onSaved }: Props) {
 
   const handleSave = async () => {
     if (!name.trim()) { setError('El nombre es obligatorio'); return; }
-    if (isNew && generateProduct && !selectedCategoryId) {
+    if (generateProduct && canGenerateProduct && !selectedCategoryId) {
       setError('Seleccioná una categoría para el producto.');
       return;
     }
@@ -124,20 +125,22 @@ export function EditCostModal({ cost, allCosts, onClose, onSaved }: Props) {
         sub_cost_id: r.sub_cost_id,
         formula: r.formula,
       }));
+
+      // Crear producto si se pidió y el costo no tiene uno vinculado
+      let productId: number | undefined;
+      if (generateProduct && canGenerateProduct) {
+        const price = salePrice ? parseFloat(salePrice) : 0;
+        const { id } = await createProduct({
+          name: name.trim(),
+          categoryId: selectedCategoryId as number,
+          variants: [{ name: 'Unidad', cost: totalCalculado, price }],
+        });
+        productId = id;
+      }
+
       if (cost) {
-        await updateElaborationCost(cost.id, { name: name.trim(), items });
+        await updateElaborationCost(cost.id, { name: name.trim(), items, productId });
       } else {
-        // Al crear: primero el producto (para tener su id), luego el costo
-        let productId: number | undefined;
-        if (generateProduct) {
-          const price = salePrice ? parseFloat(salePrice) : 0;
-          const { id } = await createProduct({
-            name: name.trim(),
-            categoryId: selectedCategoryId as number,
-            variants: [{ name: 'Unidad', cost: totalCalculado, price }],
-          });
-          productId = id;
-        }
         await createElaborationCost({ name: name.trim(), items, productId });
       }
       onSaved();
@@ -337,9 +340,15 @@ export function EditCostModal({ cost, allCosts, onClose, onSaved }: Props) {
               Al guardar se actualizará el costo del producto vinculado en el catálogo.
             </div>
           )}
+          {!isNew && !cost?.product_id && (
+            <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-700 text-xs px-3 py-2 rounded-lg">
+              <i className="ri-alert-line text-sm"></i>
+              Este costo no tiene un producto vinculado. Activá la opción de abajo para generarlo.
+            </div>
+          )}
 
-          {/* Generar producto — solo para costos nuevos */}
-          {isNew && (
+          {/* Generar producto — para costos nuevos o existentes sin producto vinculado */}
+          {canGenerateProduct && (
             <div className="border border-brand-200 rounded-xl bg-brand-50 p-3 space-y-2.5">
               <label className="flex items-center gap-2.5 cursor-pointer select-none">
                 <input

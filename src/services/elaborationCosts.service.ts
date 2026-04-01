@@ -39,7 +39,7 @@ export async function createElaborationCost(body: { name: string; items: ItemInp
   return data as { id: number };
 }
 
-export async function updateElaborationCost(id: number, body: { name?: string; items?: ItemInput[] }) {
+export async function updateElaborationCost(id: number, body: { name?: string; items?: ItemInput[]; productId?: number }) {
   const { data } = await api.put(`/elaboration-costs/${id}`, body);
   return data;
 }
