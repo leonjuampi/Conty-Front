@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { AppLayout } from '../../components/feature/AppLayout';
 import { useAuth } from '../../context/AuthContext';
 import { ROLE_IDS } from '../../utils/roles';
-import { listSales, getSale, addPayments, listPaymentMethods, type Sale } from '../../services/sales.service';
+import { listSales, getSale, addPayments, cancelSale, listPaymentMethods, type Sale } from '../../services/sales.service';
 import { listCustomers, type Customer } from '../../services/customers.service';
 import { listSessions, listCashMovements, type CashSession, type CashMovement } from '../../services/cash.service';
 import { getReports, type TopSeller, type TopProduct, type CategoryProductRow, type ReportStats } from '../../services/reports.service';
@@ -147,6 +147,9 @@ export default function ReportsPage() {
   const [selectedOrder, setSelectedOrder] = useState<DisplaySale | null>(null);
   const [saleDetail, setSaleDetail] = useState<{ items: { nameSnapshot: string; qty: number; unitPrice: number; total: number }[]; payments: { method: string; amount: number }[] } | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [cancelReason, setCancelReason] = useState('');
+  const [cancelLoading, setCancelLoading] = useState(false);
   const [registerPaymentSale, setRegisterPaymentSale] = useState<DisplaySale | null>(null);
   const [paymentModalMethod, setPaymentModalMethod] = useState('CASH');
   const [paymentModalAmount, setPaymentModalAmount] = useState('');
@@ -1194,7 +1197,63 @@ export default function ReportsPage() {
                 <span className="font-bold text-gray-800">Total</span>
                 <span className="text-xl font-bold text-brand-600">${selectedOrder.total.toLocaleString()}</span>
               </div>
-              <button onClick={() => { setSelectedOrder(null); setSaleDetail(null); }} className="w-full bg-gradient-to-r from-brand-500 to-brand-600 text-white py-3 rounded-xl font-semibold hover:from-brand-600 hover:to-brand-700 transition-all cursor-pointer whitespace-nowrap">
+
+              {/* Anular pedido */}
+              {selectedOrder.status !== 'CANCELLED' && !showCancelConfirm && (
+                <button
+                  onClick={() => setShowCancelConfirm(true)}
+                  className="w-full flex items-center justify-center gap-2 border border-red-300 text-red-600 py-2.5 rounded-xl font-semibold hover:bg-red-50 transition-all cursor-pointer text-sm"
+                >
+                  <i className="ri-close-circle-line"></i>
+                  Anular pedido
+                </button>
+              )}
+
+              {showCancelConfirm && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4 space-y-3">
+                  <p className="text-sm font-semibold text-red-800">¿Estás seguro de anular este pedido?</p>
+                  <p className="text-xs text-red-600">Se restaurará el stock y se generará una nota de crédito si corresponde.</p>
+                  <input
+                    type="text"
+                    value={cancelReason}
+                    onChange={e => setCancelReason(e.target.value)}
+                    placeholder="Motivo de anulación (opcional)"
+                    className="w-full px-3 py-2 border border-red-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-300 bg-white"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => { setShowCancelConfirm(false); setCancelReason(''); }}
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors text-sm cursor-pointer"
+                    >
+                      No, volver
+                    </button>
+                    <button
+                      onClick={async () => {
+                        setCancelLoading(true);
+                        try {
+                          await cancelSale(selectedOrder.saleId, cancelReason || undefined);
+                          setSelectedOrder(null);
+                          setSaleDetail(null);
+                          setShowCancelConfirm(false);
+                          setCancelReason('');
+                          listSales({ from: toMysql(dateFrom), to: toMysql(dateTo), limit: 500 }).then(res => setRawSales(res.items)).catch(() => {});
+                        } catch {
+                          // error silenciado, el backend ya valida
+                        } finally {
+                          setCancelLoading(false);
+                        }
+                      }}
+                      disabled={cancelLoading}
+                      className="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg text-sm transition-all disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      {cancelLoading ? <i className="ri-loader-4-line animate-spin"></i> : <i className="ri-close-circle-line"></i>}
+                      Sí, anular
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <button onClick={() => { setSelectedOrder(null); setSaleDetail(null); setShowCancelConfirm(false); setCancelReason(''); }} className="w-full bg-gradient-to-r from-brand-500 to-brand-600 text-white py-3 rounded-xl font-semibold hover:from-brand-600 hover:to-brand-700 transition-all cursor-pointer whitespace-nowrap">
                 Cerrar
               </button>
             </div>
