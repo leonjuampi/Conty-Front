@@ -277,11 +277,11 @@ export function PaymentModal({ total, orderItems, products, client, receiptNumbe
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-0 md:p-4">
-      <div className="bg-white w-full h-full md:h-auto md:rounded-xl shadow-2xl md:w-[500px] md:max-h-[90vh] overflow-y-auto flex flex-col safe-top">
-        <div className="p-6 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-brand-600 to-brand-700 text-white md:rounded-t-xl">
+      <div className="bg-white w-full h-full md:h-auto md:rounded-xl shadow-2xl md:w-[820px] md:max-h-[90vh] overflow-y-auto flex flex-col safe-top">
+        <div className="p-5 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-brand-600 to-brand-700 text-white md:rounded-t-xl">
           <div>
-            <h2 className="text-2xl font-bold">Finalizar Pedido</h2>
-            <p className="text-brand-100 text-sm mt-1">Total: ${total.toFixed(2)}</p>
+            <h2 className="text-xl font-bold">Finalizar Pedido</h2>
+            <p className="text-brand-100 text-sm mt-0.5">Total: ${total.toFixed(2)}</p>
           </div>
           <button onClick={onClose} className="w-10 h-10 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-full cursor-pointer">
             <i className="ri-close-line text-2xl"></i>
@@ -289,7 +289,7 @@ export function PaymentModal({ total, orderItems, products, client, receiptNumbe
         </div>
 
         {error && (
-          <div className="flex items-center gap-3 bg-red-600 text-white px-6 py-4 shadow-md">
+          <div className="flex items-center gap-3 bg-red-600 text-white px-6 py-3 shadow-md">
             <i className="ri-error-warning-line text-xl shrink-0"></i>
             <p className="font-semibold text-sm">{error}</p>
             <button onClick={() => setError('')} className="ml-auto shrink-0 opacity-70 hover:opacity-100 cursor-pointer">
@@ -298,104 +298,111 @@ export function PaymentModal({ total, orderItems, products, client, receiptNumbe
           </div>
         )}
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          {/* Tipo de pedido */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">Tipo de Pedido</label>
-            <div className="grid grid-cols-2 gap-3">
-              <button onClick={() => setOrderType('particular')} className={`p-4 rounded-lg border-2 cursor-pointer ${orderType === 'particular' ? 'border-brand-600 bg-brand-50 text-brand-700' : 'border-gray-200 bg-white text-gray-600'}`}>
-                <i className="ri-user-line text-2xl mb-2"></i><p className="font-semibold text-sm">Particular</p>
-              </button>
-              <button onClick={() => setOrderType('aplicacion')} className={`p-4 rounded-lg border-2 cursor-pointer ${orderType === 'aplicacion' ? 'border-brand-600 bg-brand-50 text-brand-700' : 'border-gray-200 bg-white text-gray-600'}`}>
-                <i className="ri-smartphone-line text-2xl mb-2"></i><p className="font-semibold text-sm">Aplicación</p>
-              </button>
-            </div>
-            {orderType === 'aplicacion' && (
-              <div className="mt-3 grid grid-cols-2 gap-3">
-                <button onClick={() => setAppPlatform('pedidosya')} className={`p-3 rounded-lg border-2 cursor-pointer flex items-center gap-3 ${appPlatform === 'pedidosya' ? 'border-yellow-500 bg-yellow-50 text-yellow-700' : 'border-gray-200 bg-white text-gray-600'}`}>
-                  <div className="w-8 h-8 flex items-center justify-center bg-yellow-400 rounded-full flex-shrink-0"><i className="ri-motorbike-line text-white text-sm"></i></div>
-                  <span className="font-semibold text-sm">Pedidos Ya</span>
-                </button>
-                <button onClick={() => setAppPlatform('rappi')} className={`p-3 rounded-lg border-2 cursor-pointer flex items-center gap-3 ${appPlatform === 'rappi' ? 'border-red-500 bg-red-50 text-red-700' : 'border-gray-200 bg-white text-gray-600'}`}>
-                  <div className="w-8 h-8 flex items-center justify-center bg-red-500 rounded-full flex-shrink-0"><i className="ri-bike-line text-white text-sm"></i></div>
-                  <span className="font-semibold text-sm">Rappi</span>
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Método de pago */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">Método de Pago</label>
-            <div className="grid grid-cols-2 gap-3">
-              {([
-                { key: 'efectivo',      label: 'Efectivo',      icon: 'ri-money-dollar-circle-line', selected: 'border-green-600 bg-green-50 text-green-700' },
-                { key: 'tarjeta',       label: 'Tarjeta',       icon: 'ri-bank-card-line',           selected: 'border-orange-600 bg-orange-50 text-orange-700' },
-                { key: 'transferencia', label: 'Transferencia', icon: 'ri-exchange-line',            selected: 'border-teal-600 bg-teal-50 text-teal-700' },
-                { key: 'mercadopago',   label: 'Mercado Pago',  icon: 'ri-smartphone-line',          selected: 'border-sky-600 bg-sky-50 text-sky-700' },
-              ] as const).map(m => (
-                <button key={m.key} onClick={() => setPaymentMethod(m.key)}
-                  className={`p-4 rounded-lg border-2 cursor-pointer transition-all flex flex-col items-center ${paymentMethod === m.key ? m.selected : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'}`}>
-                  <i className={`${m.icon} text-2xl mb-2`}></i>
-                  <p className="font-semibold text-xs">{m.label}</p>
-                </button>
-              ))}
-              <button onClick={() => setPaymentMethod('al_retirar')}
-                className={`col-span-2 p-3 rounded-lg border-2 cursor-pointer transition-all flex items-center justify-center gap-3 ${paymentMethod === 'al_retirar' ? 'border-amber-500 bg-amber-50 text-amber-700' : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'}`}>
-                <i className="ri-time-line text-xl"></i>
-                <div className="text-left">
-                  <p className="font-semibold text-sm">Pago al retirar</p>
-                  <p className="text-xs opacity-70">Registrá el pago cuando venga a buscar el pedido</p>
+        <div className="flex-1 overflow-y-auto p-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* Columna izquierda: Tipo + Método de pago */}
+            <div className="space-y-5">
+              {/* Tipo de pedido */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Tipo de Pedido</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button onClick={() => setOrderType('particular')} className={`p-3 rounded-lg border-2 cursor-pointer ${orderType === 'particular' ? 'border-brand-600 bg-brand-50 text-brand-700' : 'border-gray-200 bg-white text-gray-600'}`}>
+                    <i className="ri-user-line text-xl mb-1"></i><p className="font-semibold text-sm">Particular</p>
+                  </button>
+                  <button onClick={() => setOrderType('aplicacion')} className={`p-3 rounded-lg border-2 cursor-pointer ${orderType === 'aplicacion' ? 'border-brand-600 bg-brand-50 text-brand-700' : 'border-gray-200 bg-white text-gray-600'}`}>
+                    <i className="ri-smartphone-line text-xl mb-1"></i><p className="font-semibold text-sm">Aplicación</p>
+                  </button>
                 </div>
-              </button>
-            </div>
-          </div>
+                {orderType === 'aplicacion' && (
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    <button onClick={() => setAppPlatform('pedidosya')} className={`p-2.5 rounded-lg border-2 cursor-pointer flex items-center gap-2 ${appPlatform === 'pedidosya' ? 'border-yellow-500 bg-yellow-50 text-yellow-700' : 'border-gray-200 bg-white text-gray-600'}`}>
+                      <div className="w-7 h-7 flex items-center justify-center bg-yellow-400 rounded-full flex-shrink-0"><i className="ri-motorbike-line text-white text-xs"></i></div>
+                      <span className="font-semibold text-sm">Pedidos Ya</span>
+                    </button>
+                    <button onClick={() => setAppPlatform('rappi')} className={`p-2.5 rounded-lg border-2 cursor-pointer flex items-center gap-2 ${appPlatform === 'rappi' ? 'border-red-500 bg-red-50 text-red-700' : 'border-gray-200 bg-white text-gray-600'}`}>
+                      <div className="w-7 h-7 flex items-center justify-center bg-red-500 rounded-full flex-shrink-0"><i className="ri-bike-line text-white text-xs"></i></div>
+                      <span className="font-semibold text-sm">Rappi</span>
+                    </button>
+                  </div>
+                )}
+              </div>
 
-          {paymentMethod === 'efectivo' && (
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Monto Pagado</label>
-              <input type="number" value={amountPaid} onChange={(e) => setAmountPaid(e.target.value)}
-                placeholder="Ingresá el monto recibido"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 text-lg" step="0.01" min={total} />
-              {amountPaid && parseFloat(amountPaid) >= total && (
-                <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-sm text-green-700"><span className="font-semibold">Vuelto:</span> ${change.toFixed(2)}</p>
+              {/* Método de pago */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Método de Pago</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {([
+                    { key: 'efectivo',      label: 'Efectivo',      icon: 'ri-money-dollar-circle-line', selected: 'border-green-600 bg-green-50 text-green-700' },
+                    { key: 'tarjeta',       label: 'Tarjeta',       icon: 'ri-bank-card-line',           selected: 'border-orange-600 bg-orange-50 text-orange-700' },
+                    { key: 'transferencia', label: 'Transferencia', icon: 'ri-exchange-line',            selected: 'border-teal-600 bg-teal-50 text-teal-700' },
+                    { key: 'mercadopago',   label: 'Mercado Pago',  icon: 'ri-smartphone-line',          selected: 'border-sky-600 bg-sky-50 text-sky-700' },
+                  ] as const).map(m => (
+                    <button key={m.key} onClick={() => setPaymentMethod(m.key)}
+                      className={`p-3 rounded-lg border-2 cursor-pointer transition-all flex flex-col items-center ${paymentMethod === m.key ? m.selected : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'}`}>
+                      <i className={`${m.icon} text-xl mb-1`}></i>
+                      <p className="font-semibold text-xs">{m.label}</p>
+                    </button>
+                  ))}
+                  <button onClick={() => setPaymentMethod('al_retirar')}
+                    className={`col-span-2 p-2.5 rounded-lg border-2 cursor-pointer transition-all flex items-center justify-center gap-2 ${paymentMethod === 'al_retirar' ? 'border-amber-500 bg-amber-50 text-amber-700' : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'}`}>
+                    <i className="ri-time-line text-lg"></i>
+                    <div className="text-left">
+                      <p className="font-semibold text-sm">Pago al retirar</p>
+                      <p className="text-xs opacity-70">Registrá el pago cuando venga a buscar el pedido</p>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Columna derecha: Efectivo + Notas + Resumen */}
+            <div className="space-y-4">
+              {paymentMethod === 'efectivo' && (
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Monto Pagado</label>
+                  <input type="number" value={amountPaid} onChange={(e) => setAmountPaid(e.target.value)}
+                    placeholder="Ingresá el monto recibido"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 text-lg" step="0.01" min={total} />
+                  {amountPaid && parseFloat(amountPaid) >= total && (
+                    <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+                      <p className="text-sm text-green-700"><span className="font-semibold">Vuelto:</span> ${change.toFixed(2)}</p>
+                    </div>
+                  )}
                 </div>
               )}
-            </div>
-          )}
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Notas <span className="text-gray-400 font-normal">(opcional)</span></label>
-            <textarea value={notes} onChange={(e) => { if (e.target.value.length <= 300) setNotes(e.target.value); }}
-              placeholder="Ej: sin cebolla, entregar en puerta..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 resize-none" rows={3} maxLength={300} />
-            <p className="text-xs text-gray-500 mt-1 text-right">{notes.length}/300</p>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Notas <span className="text-gray-400 font-normal">(opcional)</span></label>
+                <textarea value={notes} onChange={(e) => { if (e.target.value.length <= 300) setNotes(e.target.value); }}
+                  placeholder="Ej: sin cebolla, entregar en puerta..."
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 resize-none" rows={2} maxLength={300} />
+                <p className="text-xs text-gray-500 mt-1 text-right">{notes.length}/300</p>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-600 text-sm">Cliente:</span>
+                  <span className="font-semibold text-gray-800">{clientName}</span>
+                </div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-600 text-sm">Productos:</span>
+                  <span className="font-semibold text-gray-800">{orderItems.length} items</span>
+                </div>
+                <div className="flex justify-between items-center pt-2 border-t border-gray-300">
+                  <span className="text-gray-800 font-bold">Total:</span>
+                  <span className="text-brand-600 font-bold text-xl">${total.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
           </div>
-
-          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-gray-600 text-sm">Cliente:</span>
-              <span className="font-semibold text-gray-800">{clientName}</span>
-            </div>
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-gray-600 text-sm">Productos:</span>
-              <span className="font-semibold text-gray-800">{orderItems.length} items</span>
-            </div>
-            <div className="flex justify-between items-center pt-2 border-t border-gray-300">
-              <span className="text-gray-800 font-bold">Total:</span>
-              <span className="text-brand-600 font-bold text-xl">${total.toFixed(2)}</span>
-            </div>
-          </div>
-
         </div>
 
-        <div className="p-6 bg-gray-50 border-t border-gray-200 flex gap-3 md:rounded-b-xl">
-          <button onClick={onClose} className="flex-1 bg-gray-200 text-gray-700 font-semibold py-3 md:py-4 rounded-lg hover:bg-gray-300 cursor-pointer min-h-[48px]">
+        <div className="p-4 bg-gray-50 border-t border-gray-200 flex gap-3 md:rounded-b-xl">
+          <button onClick={onClose} className="flex-1 bg-gray-200 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-300 cursor-pointer min-h-[48px]">
             Cancelar
           </button>
           <button onClick={handleConfirmPayment} disabled={loading}
-            className="flex-1 bg-gradient-to-r from-brand-600 to-brand-700 text-white font-bold py-3 md:py-4 rounded-lg hover:from-brand-700 hover:to-brand-700 cursor-pointer min-h-[48px] disabled:opacity-60 flex items-center justify-center gap-2">
+            className="flex-1 bg-gradient-to-r from-brand-600 to-brand-700 text-white font-bold py-3 rounded-lg hover:from-brand-700 hover:to-brand-700 cursor-pointer min-h-[48px] disabled:opacity-60 flex items-center justify-center gap-2">
             {loading ? <><i className="ri-loader-4-line animate-spin"></i>Procesando...</> : paymentMethod === 'al_retirar' ? 'Confirmar pedido' : 'Confirmar Pago'}
           </button>
         </div>
