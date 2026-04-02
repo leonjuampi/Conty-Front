@@ -37,8 +37,12 @@ export default function OrdersPage() {
 
   const loadProducts = useCallback(() => {
     setLoadingProducts(true);
-    listProducts({ status: 'ACTIVE', limit: 200 })
-      .then(res => {
+    const fetchAll = async () => {
+      let all: PosProduct[] = [];
+      let page = 1;
+      const pageSize = 100;
+      while (true) {
+        const res = await listProducts({ status: 'ACTIVE', page, pageSize });
         const mapped: PosProduct[] = res.items
           .filter(p => p.variants && p.variants.length > 0)
           .map(p => ({
@@ -52,8 +56,14 @@ export default function OrdersPage() {
             active: p.status === 'ACTIVE',
             isCombo: p.isCombo ?? false,
           }));
-        setProducts(mapped);
-      })
+        all = [...all, ...mapped];
+        if (res.items.length < pageSize) break;
+        page++;
+      }
+      return all;
+    };
+    fetchAll()
+      .then(setProducts)
       .catch(() => {})
       .finally(() => setLoadingProducts(false));
   }, []);

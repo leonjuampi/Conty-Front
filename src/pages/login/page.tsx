@@ -41,6 +41,13 @@ export default function LoginPage() {
         navigate('/dashboard', { replace: true });
       }
     } catch (err: unknown) {
+      // MFA requerido → redirigir a pantalla de verificación
+      const mfaErr = err as Error & { mfaToken?: string };
+      if (mfaErr.message === 'MFA_REQUIRED' && mfaErr.mfaToken) {
+        navigate('/mfa-verify', { state: { mfaToken: mfaErr.mfaToken }, replace: true });
+        return;
+      }
+
       const data = (err as { response?: { data?: { error?: string; message?: string; active?: number; max?: number } } })?.response?.data;
       if (data?.error === 'DEVICE_LIMIT_REACHED') {
         setError(`Este negocio ya alcanzó el límite de dispositivos habilitados (${data.active}/${data.max}). Contactá al administrador para liberar una licencia.`);

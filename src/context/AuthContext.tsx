@@ -63,6 +63,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const deviceId = getOrCreateDeviceId();
     const deviceLabel = `${navigator.platform} – ${navigator.userAgent.split(' ').slice(-1)[0]}`;
     const resp = await apiLogin(username, password, deviceId, deviceLabel);
+
+    // Si el backend requiere MFA, lanzar error especial para que el login page lo maneje
+    if (resp.requiresMFA && resp.mfaToken) {
+      const err = new Error('MFA_REQUIRED') as Error & { mfaToken: string };
+      err.mfaToken = resp.mfaToken;
+      throw err;
+    }
+
     localStorage.setItem(TOKEN_STORAGE_KEY, resp.token);
     setToken(resp.token);
     setCurrentUser({
