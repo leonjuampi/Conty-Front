@@ -22,6 +22,44 @@ function formatDate(iso: string | null) {
   return new Date(iso).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
+function formatDateTime(iso: string | null) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleString('es-AR', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  });
+}
+
+function parseUserAgent(ua: string | null): { browser: string; os: string; device: string } {
+  if (!ua) return { browser: 'Desconocido', os: 'Desconocido', device: 'desktop' };
+
+  let browser = 'Otro';
+  if (ua.includes('Edg/')) browser = 'Edge';
+  else if (ua.includes('OPR/') || ua.includes('Opera')) browser = 'Opera';
+  else if (ua.includes('Chrome/') && !ua.includes('Edg/')) browser = 'Chrome';
+  else if (ua.includes('Safari/') && !ua.includes('Chrome/')) browser = 'Safari';
+  else if (ua.includes('Firefox/')) browser = 'Firefox';
+
+  let os = 'Otro';
+  if (ua.includes('Windows')) os = 'Windows';
+  else if (ua.includes('Mac OS')) os = 'macOS';
+  else if (ua.includes('Android')) os = 'Android';
+  else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
+  else if (ua.includes('Linux')) os = 'Linux';
+
+  const isMobile = /Mobile|Android|iPhone|iPad/i.test(ua);
+  const isTablet = /iPad|Tablet/i.test(ua);
+  const device = isTablet ? 'tablet' : isMobile ? 'mobile' : 'desktop';
+
+  return { browser, os, device };
+}
+
+function deviceIcon(device: string) {
+  if (device === 'mobile') return 'ri-smartphone-line';
+  if (device === 'tablet') return 'ri-tablet-line';
+  return 'ri-computer-line';
+}
+
 function limitLabel(value: number | null) {
   return value === null ? '∞' : String(value);
 }
@@ -208,8 +246,8 @@ function DevicesModal({ org, onClose }: DevicesModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6">
-        <div className="flex items-center justify-between mb-5">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[85vh] flex flex-col">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 shrink-0">
           <div>
             <h2 className="text-lg font-bold text-gray-900">Dispositivos — {org.name}</h2>
             <p className="text-sm text-gray-500 mt-0.5">
@@ -221,50 +259,78 @@ function DevicesModal({ org, onClose }: DevicesModalProps) {
           </button>
         </div>
 
-        {loading ? (
-          <div className="flex justify-center py-10">
-            <i className="ri-loader-4-line animate-spin text-2xl text-gray-400"></i>
-          </div>
-        ) : devices.length === 0 ? (
-          <div className="text-center py-10 text-gray-400 text-sm">No hay dispositivos registrados.</div>
-        ) : (
-          <div className="divide-y divide-gray-100">
-            {devices.map(d => (
-              <div key={d.id} className="flex items-center justify-between py-3 gap-4">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${d.is_active ? 'bg-green-100' : 'bg-gray-100'}`}>
-                    <i className={`ri-device-line text-sm ${d.is_active ? 'text-green-600' : 'text-gray-400'}`}></i>
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-gray-800 truncate">
-                      {d.device_label || d.device_id}
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      Último acceso: {formatDate(d.last_seen)}
-                      {d.registered_by_name && ` · Registrado por ${d.registered_by_name}`}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 flex-shrink-0">
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${d.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                    {d.is_active ? 'Activo' : 'Revocado'}
-                  </span>
-                  {d.is_active === 1 && (
-                    <button
-                      onClick={() => handleRevoke(d.id)}
-                      disabled={revoking === d.id}
-                      className="text-xs text-red-500 hover:text-red-700 font-medium cursor-pointer disabled:opacity-50"
-                    >
-                      {revoking === d.id ? 'Revocando...' : 'Revocar'}
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        <div className="flex-1 overflow-y-auto px-6">
+          {loading ? (
+            <div className="flex justify-center py-10">
+              <i className="ri-loader-4-line animate-spin text-2xl text-gray-400"></i>
+            </div>
+          ) : devices.length === 0 ? (
+            <div className="text-center py-10 text-gray-400 text-sm">No hay dispositivos registrados.</div>
+          ) : (
+            <table className="w-full text-sm">
+              <thead className="sticky top-0 bg-white">
+                <tr className="border-b border-gray-100">
+                  <th className="text-left py-3 pr-4 text-xs font-semibold text-gray-500 uppercase">Dispositivo</th>
+                  <th className="text-left py-3 pr-4 text-xs font-semibold text-gray-500 uppercase">IP</th>
+                  <th className="text-left py-3 pr-4 text-xs font-semibold text-gray-500 uppercase">Último acceso</th>
+                  <th className="text-left py-3 pr-4 text-xs font-semibold text-gray-500 uppercase">Usuario</th>
+                  <th className="text-center py-3 pr-4 text-xs font-semibold text-gray-500 uppercase">Estado</th>
+                  <th className="py-3 w-20"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {devices.map(d => {
+                  const parsed = parseUserAgent(d.user_agent);
+                  const hasInfo = !!d.user_agent;
+                  return (
+                    <tr key={d.id} className="hover:bg-gray-50/60">
+                      <td className="py-3 pr-4">
+                        <div className="flex items-center gap-2.5">
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${d.is_active ? 'bg-green-100' : 'bg-gray-100'}`}>
+                            <i className={`${hasInfo ? deviceIcon(parsed.device) : 'ri-device-line'} text-base ${d.is_active ? 'text-green-600' : 'text-gray-400'}`}></i>
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-gray-800">
+                              {hasInfo ? `${parsed.browser} · ${parsed.os}` : (d.device_label || 'Sin info')}
+                            </p>
+                            <p className="text-xs text-gray-300 truncate max-w-[180px]">{d.device_id}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-3 pr-4">
+                        <span className="text-xs text-gray-600 font-mono">{d.ip_address || '—'}</span>
+                      </td>
+                      <td className="py-3 pr-4">
+                        <span className="text-xs text-gray-600">{formatDateTime(d.last_seen)}</span>
+                      </td>
+                      <td className="py-3 pr-4">
+                        <span className="text-xs text-gray-600">{d.registered_by_name || '—'}</span>
+                      </td>
+                      <td className="py-3 pr-4 text-center">
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${d.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                          {d.is_active ? 'Activo' : 'Revocado'}
+                        </span>
+                      </td>
+                      <td className="py-3 text-right">
+                        {d.is_active === 1 && (
+                          <button
+                            onClick={() => handleRevoke(d.id)}
+                            disabled={revoking === d.id}
+                            className="text-xs text-red-500 hover:text-red-700 font-medium cursor-pointer disabled:opacity-50 px-2 py-1 hover:bg-red-50 rounded-lg transition-colors"
+                          >
+                            {revoking === d.id ? '...' : 'Revocar'}
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+        </div>
 
-        <div className="flex justify-end mt-5">
+        <div className="flex justify-end px-6 py-4 border-t border-gray-100 shrink-0">
           <button onClick={onClose} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 cursor-pointer">
             Cerrar
           </button>

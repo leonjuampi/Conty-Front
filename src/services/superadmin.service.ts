@@ -23,6 +23,8 @@ export interface DeviceItem {
   id: number;
   device_id: string;
   device_label: string | null;
+  ip_address: string | null;
+  user_agent: string | null;
   last_seen: string;
   created_at: string;
   is_active: number;
