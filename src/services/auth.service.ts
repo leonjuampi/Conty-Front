@@ -12,6 +12,8 @@ export interface LoginResponse {
     branchId: number | null;
     branchIds: number[];
   };
+  requiresMFA?: boolean;
+  mfaToken?: string;
 }
 
 export async function login(username: string, password: string, deviceId?: string, deviceLabel?: string): Promise<LoginResponse> {

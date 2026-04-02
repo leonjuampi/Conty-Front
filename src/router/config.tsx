@@ -22,6 +22,7 @@ const StockPage = lazy(() => import('../pages/stock/page'));
 const SuperAdminPage = lazy(() => import('../pages/superadmin/page'));
 const ForgotPasswordPage = lazy(() => import('../pages/forgot-password/page'));
 const ResetPasswordPage = lazy(() => import('../pages/reset-password/page'));
+const MfaVerifyPage = lazy(() => import('../pages/mfa-verify/page'));
 
 const routes: RouteObject[] = [
   {
@@ -125,6 +126,10 @@ const routes: RouteObject[] = [
   {
     path: '/reset-password',
     element: <ResetPasswordPage />,
+  },
+  {
+    path: '/mfa-verify',
+    element: <MfaVerifyPage />,
   },
   {
     path: '*',
