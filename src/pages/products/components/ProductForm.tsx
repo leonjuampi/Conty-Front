@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { listProducts } from '../../../services/products.service';
 import type { ComboItem } from '../../../services/products.service';
 import { getElaborationSettings } from '../../../services/elaborationCosts.service';
@@ -24,6 +24,8 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
     image: '',
     active: true,
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
   const [isCombo, setIsCombo] = useState(false);
   const [comboItems, setComboItems] = useState<ComboItem[]>([]);
   const [comboSearch, setComboSearch] = useState('');
@@ -110,18 +112,13 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
     }
     onSave({
       ...formData,
+      image: imageFile ? '' : formData.image,
+      imageFile: imageFile || undefined,
       cost: parseFloat(formData.cost),
       price: parseFloat(formData.price),
       isCombo,
       comboItems: isCombo ? comboItems : [],
     });
-  };
-
-  const generateImageUrl = () => {
-    if (!formData.name) return;
-    const prompt = `delicious ${formData.name} food photography on clean white background with soft lighting professional product shot appetizing presentation high quality commercial style simple minimal`;
-    const url = `https://readdy.ai/api/search-image?query=${encodeURIComponent(prompt)}&width=400&height=400&seq=prod${Date.now()}&orientation=squarish`;
-    setFormData({ ...formData, image: url });
   };
 
   return (
@@ -227,12 +224,19 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
               <label className="block text-sm font-semibold text-gray-700 mb-2">Imagen del Producto</label>
               <div className="flex flex-col sm:flex-row gap-2">
                 <input type="text" value={formData.image}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                  onChange={(e) => { setFormData({ ...formData, image: e.target.value }); setImageFile(null); }}
                   className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 text-sm min-h-[48px]"
                   placeholder="URL de la imagen" />
-                <button type="button" onClick={generateImageUrl}
-                  className="px-4 py-3 bg-brand-500 text-white rounded-lg hover:bg-brand-600 cursor-pointer text-sm min-h-[48px] whitespace-nowrap">
-                  <i className="ri-image-add-line mr-2"></i>Generar
+                <input ref={imageInputRef} type="file" accept="image/jpeg,image/png,image/gif,image/webp" className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    setImageFile(file);
+                    setFormData({ ...formData, image: URL.createObjectURL(file) });
+                  }} />
+                <button type="button" onClick={() => imageInputRef.current?.click()}
+                  className="px-4 py-3 bg-teal-500 text-white rounded-lg hover:bg-teal-600 cursor-pointer text-sm min-h-[48px] whitespace-nowrap">
+                  <i className="ri-upload-2-line mr-2"></i>Subir
                 </button>
               </div>
               {formData.image && (
