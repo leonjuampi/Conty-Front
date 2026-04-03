@@ -151,11 +151,49 @@ export default function AuditPage() {
           className="px-3 py-2 border border-gray-200 bg-gray-50 rounded-lg text-sm cursor-pointer text-gray-700 outline-none focus:border-brand-400"
         >
           <option value="">Todas las acciones</option>
-          <option value="LOGIN_SUCCESS">Inicio de sesión</option>
-          <option value="LOGIN_FAIL">Intento fallido</option>
-          <option value="CREATE">Crear</option>
-          <option value="UPDATE">Actualizar</option>
-          <option value="DELETE">Eliminar</option>
+          <optgroup label="Sesión">
+            <option value="LOGIN_SUCCESS">Inicio de sesión</option>
+            <option value="LOGIN_FAIL">Intento fallido</option>
+            <option value="LOGIN_MFA_REQUIRED">MFA requerido</option>
+          </optgroup>
+          <optgroup label="CRUD">
+            <option value="CREATE">Crear</option>
+            <option value="UPDATE">Actualizar</option>
+            <option value="DELETE">Eliminar</option>
+          </optgroup>
+          <optgroup label="Ventas">
+            <option value="CANCEL_SALE">Anular venta</option>
+            <option value="CONVERT_QUOTE">Convertir presupuesto</option>
+          </optgroup>
+          <optgroup label="Caja">
+            <option value="OPEN_CASH">Apertura de caja</option>
+            <option value="CLOSE_CASH">Cierre de caja</option>
+            <option value="CASH_INGRESO">Ingreso de efectivo</option>
+            <option value="CASH_RETIRO">Retiro de efectivo</option>
+          </optgroup>
+          <optgroup label="Stock">
+            <option value="TRANSFER_OUT">Transferencia saliente</option>
+            <option value="RECEIVE_TRANSFER">Transferencia recibida</option>
+            <option value="APPROVE_INVENTORY">Aprobar inventario</option>
+          </optgroup>
+          <optgroup label="Usuarios">
+            <option value="INVITE_USER">Invitar usuario</option>
+            <option value="SET_PASSWORD">Setear contraseña</option>
+            <option value="RESET_PASSWORD">Reset contraseña</option>
+            <option value="FORCE_RESET_PASSWORD">Reset forzado</option>
+            <option value="ACTIVATE_USER">Activar usuario</option>
+            <option value="DEACTIVATE_USER">Desactivar usuario</option>
+            <option value="UNLOCK_USER">Desbloquear usuario</option>
+            <option value="MFA_ENABLED">MFA activado</option>
+            <option value="MFA_DISABLED">MFA desactivado</option>
+          </optgroup>
+          <optgroup label="Importaciones">
+            <option value="IMPORT_PRODUCTS">Importar productos</option>
+            <option value="IMPORT_CUSTOMERS">Importar clientes</option>
+          </optgroup>
+          <optgroup label="Organización">
+            <option value="CREATE_ORG">Crear organización</option>
+          </optgroup>
         </select>
 
         <div className="flex-1 min-w-0 md:min-w-[200px]">
@@ -413,6 +451,15 @@ function getModalHeaderColor(action: string) {
     DELETE: 'bg-gradient-to-r from-red-500 to-rose-600',
     LOGIN_SUCCESS: 'bg-gradient-to-r from-brand-500 to-brand-600',
     LOGIN_FAIL: 'bg-gradient-to-r from-red-600 to-rose-700',
+    CANCEL_SALE: 'bg-gradient-to-r from-red-500 to-rose-600',
+    OPEN_CASH: 'bg-gradient-to-r from-green-500 to-emerald-600',
+    CLOSE_CASH: 'bg-gradient-to-r from-gray-500 to-gray-600',
+    CASH_INGRESO: 'bg-gradient-to-r from-green-500 to-emerald-600',
+    CASH_RETIRO: 'bg-gradient-to-r from-orange-500 to-amber-600',
+    ACTIVATE_USER: 'bg-gradient-to-r from-green-500 to-emerald-600',
+    DEACTIVATE_USER: 'bg-gradient-to-r from-red-500 to-rose-600',
+    MFA_ENABLED: 'bg-gradient-to-r from-green-500 to-emerald-600',
+    MFA_DISABLED: 'bg-gradient-to-r from-red-500 to-rose-600',
   };
   return colors[action] || 'bg-gradient-to-r from-gray-500 to-gray-600';
 }
@@ -425,11 +472,18 @@ function getEntityLabel(entity: string): string {
     BRANCH: 'Sucursal',
     USER: 'Usuario',
     CASH_SESSION: 'Sesión de caja',
+    CASH_MOVEMENT: 'Movimiento de caja',
     PAYMENT_METHOD: 'Método de pago',
     CATEGORY: 'Categoría',
+    SUBCATEGORY: 'Subcategoría',
     STOCK: 'Stock',
     RAW_MATERIAL: 'Mercadería',
     ELABORATION_COST: 'Costo de elaboración',
+    QUOTE: 'Presupuesto',
+    ORGANIZATION: 'Organización',
+    PRICE_LIST: 'Lista de precios',
+    NUMBERING: 'Numeración',
+    INVENTORY_SESSION: 'Sesión de inventario',
   };
   return labels[entity] ?? entity;
 }
@@ -441,6 +495,28 @@ function getActionIcon(action: string) {
     DELETE: 'ri-delete-bin-line',
     LOGIN_SUCCESS: 'ri-login-box-line',
     LOGIN_FAIL: 'ri-error-warning-line',
+    LOGIN_MFA_REQUIRED: 'ri-shield-keyhole-line',
+    CANCEL_SALE: 'ri-close-circle-line',
+    CONVERT_QUOTE: 'ri-exchange-line',
+    OPEN_CASH: 'ri-safe-2-line',
+    CLOSE_CASH: 'ri-safe-2-fill',
+    CASH_INGRESO: 'ri-arrow-down-circle-line',
+    CASH_RETIRO: 'ri-arrow-up-circle-line',
+    TRANSFER_OUT: 'ri-truck-line',
+    RECEIVE_TRANSFER: 'ri-inbox-archive-line',
+    APPROVE_INVENTORY: 'ri-checkbox-circle-line',
+    INVITE_USER: 'ri-mail-send-line',
+    SET_PASSWORD: 'ri-lock-password-line',
+    RESET_PASSWORD: 'ri-lock-unlock-line',
+    FORCE_RESET_PASSWORD: 'ri-mail-send-line',
+    ACTIVATE_USER: 'ri-user-follow-line',
+    DEACTIVATE_USER: 'ri-user-unfollow-line',
+    UNLOCK_USER: 'ri-lock-unlock-line',
+    MFA_ENABLED: 'ri-shield-check-line',
+    MFA_DISABLED: 'ri-shield-line',
+    IMPORT_PRODUCTS: 'ri-upload-2-line',
+    IMPORT_CUSTOMERS: 'ri-upload-2-line',
+    CREATE_ORG: 'ri-building-line',
   };
   return icons[action] || 'ri-file-list-line';
 }
@@ -452,6 +528,28 @@ function getActionColor(action: string) {
     DELETE: 'text-red-700 bg-red-50',
     LOGIN_SUCCESS: 'text-brand-700 bg-brand-50',
     LOGIN_FAIL: 'text-red-700 bg-red-100',
+    LOGIN_MFA_REQUIRED: 'text-amber-700 bg-amber-50',
+    CANCEL_SALE: 'text-red-700 bg-red-50',
+    CONVERT_QUOTE: 'text-blue-700 bg-blue-50',
+    OPEN_CASH: 'text-green-700 bg-green-50',
+    CLOSE_CASH: 'text-gray-700 bg-gray-100',
+    CASH_INGRESO: 'text-green-700 bg-green-50',
+    CASH_RETIRO: 'text-orange-700 bg-orange-50',
+    TRANSFER_OUT: 'text-blue-700 bg-blue-50',
+    RECEIVE_TRANSFER: 'text-blue-700 bg-blue-50',
+    APPROVE_INVENTORY: 'text-green-700 bg-green-50',
+    INVITE_USER: 'text-blue-700 bg-blue-50',
+    SET_PASSWORD: 'text-amber-700 bg-amber-50',
+    RESET_PASSWORD: 'text-amber-700 bg-amber-50',
+    FORCE_RESET_PASSWORD: 'text-amber-700 bg-amber-50',
+    ACTIVATE_USER: 'text-green-700 bg-green-50',
+    DEACTIVATE_USER: 'text-red-700 bg-red-50',
+    UNLOCK_USER: 'text-amber-700 bg-amber-50',
+    MFA_ENABLED: 'text-green-700 bg-green-50',
+    MFA_DISABLED: 'text-red-700 bg-red-50',
+    IMPORT_PRODUCTS: 'text-purple-700 bg-purple-50',
+    IMPORT_CUSTOMERS: 'text-purple-700 bg-purple-50',
+    CREATE_ORG: 'text-brand-700 bg-brand-50',
   };
   return colors[action] || 'text-gray-600 bg-gray-100';
 }
@@ -463,6 +561,28 @@ function getActionLabel(action: string) {
     DELETE: 'Eliminar',
     LOGIN_SUCCESS: 'Inicio de sesión',
     LOGIN_FAIL: 'Intento fallido',
+    LOGIN_MFA_REQUIRED: 'MFA requerido',
+    CANCEL_SALE: 'Anular venta',
+    CONVERT_QUOTE: 'Convertir presupuesto',
+    OPEN_CASH: 'Apertura de caja',
+    CLOSE_CASH: 'Cierre de caja',
+    CASH_INGRESO: 'Ingreso de efectivo',
+    CASH_RETIRO: 'Retiro de efectivo',
+    TRANSFER_OUT: 'Transferencia saliente',
+    RECEIVE_TRANSFER: 'Transferencia recibida',
+    APPROVE_INVENTORY: 'Aprobar inventario',
+    INVITE_USER: 'Invitar usuario',
+    SET_PASSWORD: 'Setear contraseña',
+    RESET_PASSWORD: 'Reset contraseña',
+    FORCE_RESET_PASSWORD: 'Reset forzado',
+    ACTIVATE_USER: 'Activar usuario',
+    DEACTIVATE_USER: 'Desactivar usuario',
+    UNLOCK_USER: 'Desbloquear usuario',
+    MFA_ENABLED: 'MFA activado',
+    MFA_DISABLED: 'MFA desactivado',
+    IMPORT_PRODUCTS: 'Importar productos',
+    IMPORT_CUSTOMERS: 'Importar clientes',
+    CREATE_ORG: 'Crear organización',
   };
   return labels[action] || action;
 }
