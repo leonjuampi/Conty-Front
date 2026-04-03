@@ -12,6 +12,7 @@ export interface OrgItem {
   product_count: number;
   branch_count: number;
   active_devices: number;
+  user_count: number;
   limits: {
     max_products: number | null;
     max_branches: number | null;
@@ -55,5 +56,53 @@ export async function listDevices(orgId: number): Promise<DeviceItem[]> {
 
 export async function revokeDevice(orgId: number, deviceId: number) {
   const { data } = await api.delete(`/superadmin/orgs/${orgId}/devices/${deviceId}`);
+  return data;
+}
+
+export interface UserItem {
+  id: number;
+  name: string;
+  email: string | null;
+  username: string;
+  roleId: number;
+  status: string;
+  createdAt: string;
+  lastLoginAt: string | null;
+  failedAttempts: number;
+  lockoutUntil: string | null;
+}
+
+export async function listOrgUsers(orgId: number): Promise<UserItem[]> {
+  const { data } = await api.get<{ items: UserItem[] }>(`/superadmin/orgs/${orgId}/users`);
+  return data.items;
+}
+
+export async function forceResetPassword(userId: number): Promise<void> {
+  await api.post(`/superadmin/users/${userId}/force-reset-password`);
+}
+
+export async function setUserPassword(userId: number, password: string): Promise<void> {
+  await api.post(`/superadmin/users/${userId}/set-password`, { password });
+}
+
+export async function toggleUserStatus(userId: number, status: 'ACTIVE' | 'DISABLED'): Promise<void> {
+  await api.post(`/superadmin/users/${userId}/toggle-status`, { status });
+}
+
+export async function unlockUser(userId: number): Promise<void> {
+  await api.post(`/superadmin/users/${userId}/unlock`);
+}
+
+export interface CreateOrgPayload {
+  name: string;
+  legal_name?: string;
+  plan?: string;
+  max_licenses?: number;
+  plan_expires_at?: string | null;
+  org_type?: 'FOOD' | 'RETAIL';
+}
+
+export async function createOrg(payload: CreateOrgPayload): Promise<{ ok: boolean; id: number }> {
+  const { data } = await api.post<{ ok: boolean; id: number }>('/superadmin/orgs', payload);
   return data;
 }
