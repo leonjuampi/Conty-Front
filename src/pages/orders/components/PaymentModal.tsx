@@ -115,23 +115,23 @@ export function PaymentModal({ total, orderItems, products, client, receiptNumbe
   * { box-sizing: border-box; }
   body {
     font-family: 'Courier New', Courier, monospace;
-    font-size: 9pt;
+    font-size: 11pt;
     width: 72mm;
     margin: 0;
     color: #000;
   }
   .center { text-align: center; }
   .bold   { font-weight: bold; }
-  .sep    { border: none; border-top: 1px dashed #000; margin: 5px 0; }
+  .sep    { border: none; border-top: 1px dashed #000; margin: 6px 0; }
   table   { width: 100%; border-collapse: collapse; }
-  td      { vertical-align: top; font-size: 8.5pt; }
-  .total-row { font-size: 11pt; font-weight: bold; }
+  td      { vertical-align: top; font-size: 10pt; padding: 3px 0; }
+  .total-row { font-size: 13pt; font-weight: bold; }
 </style>
 </head>
 <body>
-  <div class="center bold" style="font-size:13pt;letter-spacing:1px">COMANDA</div>
-  <div class="center" style="font-size:8pt">${receiptNumber}</div>
-  <div class="center" style="font-size:8pt">${new Date().toLocaleString('es-AR')}</div>
+  <div class="center bold" style="font-size:15pt;letter-spacing:1px">COMANDA</div>
+  <div class="center" style="font-size:10pt">${receiptNumber}</div>
+  <div class="center" style="font-size:10pt">${new Date().toLocaleString('es-AR')}</div>
   <hr class="sep"/>
 
   <div><b>Cliente:</b> ${clientName}</div>
@@ -161,7 +161,7 @@ export function PaymentModal({ total, orderItems, products, client, receiptNumbe
   <div style="display:flex;justify-content:space-between"><span>Pago:</span><span>${paymentLabel[paymentMethod] || paymentMethod}</span></div>
   ${cashBlock}
   <hr class="sep"/>
-  <div class="center" style="margin-top:6px;font-size:8pt">¡Gracias por su compra!</div>
+  <div class="center" style="margin-top:6px;font-size:10pt">¡Gracias por su compra!</div>
 </body>
 </html>`;
 
