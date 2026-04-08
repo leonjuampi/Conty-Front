@@ -137,13 +137,22 @@ export default function ReportsPage() {
   const { currentUser } = useAuth();
   const isVendedor = currentUser?.roleId === ROLE_IDS.VENDEDOR;
 
-  const todayStr = new Date().toISOString().slice(0, 10);
-  const firstOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0, 10);
+  const localDateStr = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+  const todayStr = localDateStr(new Date());
+  const firstOfMonth = localDateStr(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
   const defaultDateFrom = `${todayStr}T00:00`;
   const defaultDateTo = `${todayStr}T23:59`;
 
-  // Convierte el valor de datetime-local ('YYYY-MM-DDTHH:mm') a formato MySQL ('YYYY-MM-DD HH:mm:00')
-  const toMysql = (dt: string) => dt.replace('T', ' ') + ':00';
+  // Convierte el valor de datetime-local ('YYYY-MM-DDTHH:mm') a UTC para comparar con la DB (que guarda en UTC)
+  const toMysql = (dt: string) => {
+    const d = new Date(dt); // el browser interpreta datetime-local como hora local
+    return d.toISOString().slice(0, 19).replace('T', ' ');
+  };
 
   const [dateFrom, setDateFrom] = useState(defaultDateFrom);
   const [dateTo, setDateTo] = useState(defaultDateTo);
