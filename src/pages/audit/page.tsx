@@ -169,7 +169,8 @@ export default function AuditPage() {
             <option value="OPEN_CASH">Apertura de caja</option>
             <option value="CLOSE_CASH">Cierre de caja</option>
             <option value="CASH_INGRESO">Ingreso de efectivo</option>
-            <option value="CASH_RETIRO">Retiro de efectivo</option>
+            <option value="CASH_RETIRO_GASTO">Retiro gasto</option>
+            <option value="CASH_RETIRO_OWNER">Extracción</option>
           </optgroup>
           <optgroup label="Stock">
             <option value="TRANSFER_OUT">Transferencia saliente</option>
@@ -455,7 +456,8 @@ function getModalHeaderColor(action: string) {
     OPEN_CASH: 'bg-gradient-to-r from-green-500 to-emerald-600',
     CLOSE_CASH: 'bg-gradient-to-r from-gray-500 to-gray-600',
     CASH_INGRESO: 'bg-gradient-to-r from-green-500 to-emerald-600',
-    CASH_RETIRO: 'bg-gradient-to-r from-orange-500 to-amber-600',
+    CASH_RETIRO_GASTO: 'bg-gradient-to-r from-orange-500 to-amber-600',
+    CASH_RETIRO_OWNER: 'bg-gradient-to-r from-purple-500 to-purple-600',
     ACTIVATE_USER: 'bg-gradient-to-r from-green-500 to-emerald-600',
     DEACTIVATE_USER: 'bg-gradient-to-r from-red-500 to-rose-600',
     MFA_ENABLED: 'bg-gradient-to-r from-green-500 to-emerald-600',
@@ -501,7 +503,8 @@ function getActionIcon(action: string) {
     OPEN_CASH: 'ri-safe-2-line',
     CLOSE_CASH: 'ri-safe-2-fill',
     CASH_INGRESO: 'ri-arrow-down-circle-line',
-    CASH_RETIRO: 'ri-arrow-up-circle-line',
+    CASH_RETIRO_GASTO: 'ri-arrow-up-circle-line',
+    CASH_RETIRO_OWNER: 'ri-user-line',
     TRANSFER_OUT: 'ri-truck-line',
     RECEIVE_TRANSFER: 'ri-inbox-archive-line',
     APPROVE_INVENTORY: 'ri-checkbox-circle-line',
@@ -534,7 +537,8 @@ function getActionColor(action: string) {
     OPEN_CASH: 'text-green-700 bg-green-50',
     CLOSE_CASH: 'text-gray-700 bg-gray-100',
     CASH_INGRESO: 'text-green-700 bg-green-50',
-    CASH_RETIRO: 'text-orange-700 bg-orange-50',
+    CASH_RETIRO_GASTO: 'text-orange-700 bg-orange-50',
+    CASH_RETIRO_OWNER: 'text-purple-700 bg-purple-50',
     TRANSFER_OUT: 'text-blue-700 bg-blue-50',
     RECEIVE_TRANSFER: 'text-blue-700 bg-blue-50',
     APPROVE_INVENTORY: 'text-green-700 bg-green-50',
@@ -567,7 +571,8 @@ function getActionLabel(action: string) {
     OPEN_CASH: 'Apertura de caja',
     CLOSE_CASH: 'Cierre de caja',
     CASH_INGRESO: 'Ingreso de efectivo',
-    CASH_RETIRO: 'Retiro de efectivo',
+    CASH_RETIRO_GASTO: 'Retiro gasto',
+    CASH_RETIRO_OWNER: 'Extracción',
     TRANSFER_OUT: 'Transferencia saliente',
     RECEIVE_TRANSFER: 'Transferencia recibida',
     APPROVE_INVENTORY: 'Aprobar inventario',

@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useCash } from '../../../context/CashContext';
-import { createCashMovement, type CashMovement } from '../../../services/cash.service';
+import { createCashMovement, deleteCashMovement, type CashMovement } from '../../../services/cash.service';
 
 interface PaymentRow {
   key: string;
@@ -18,11 +18,13 @@ export function CloseCashModal() {
   // Movements
   const [movements, setMovements] = useState<CashMovement[]>(activeSession?.movements ?? []);
   const [showMovementForm, setShowMovementForm] = useState(false);
-  const [movType, setMovType] = useState<'INGRESO' | 'RETIRO'>('RETIRO');
+  const [movType, setMovType] = useState<'INGRESO' | 'RETIRO_GASTO' | 'RETIRO_OWNER'>('RETIRO_GASTO');
   const [movAmount, setMovAmount] = useState('');
   const [movDesc, setMovDesc] = useState('');
   const [savingMov, setSavingMov] = useState(false);
   const [movError, setMovError] = useState('');
+  const [deletingMovId, setDeletingMovId] = useState<number | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
 
   useEffect(() => {
     setMovements(activeSession?.movements ?? []);
@@ -32,6 +34,27 @@ export function CloseCashModal() {
     (sum, m) => (m.type === 'INGRESO' ? sum + m.amount : sum - m.amount),
     0
   );
+
+  const movementLabel = (type: CashMovement['type']) => {
+    if (type === 'INGRESO') return 'Ingreso';
+    if (type === 'RETIRO_OWNER') return 'Extracción';
+    return 'Retiro gasto';
+  };
+  const movementIcon = (type: CashMovement['type']) => {
+    if (type === 'INGRESO') return 'ri-arrow-down-line text-green-600';
+    if (type === 'RETIRO_OWNER') return 'ri-user-line text-purple-600';
+    return 'ri-arrow-up-line text-red-600';
+  };
+  const movementBg = (type: CashMovement['type']) => {
+    if (type === 'INGRESO') return 'bg-green-100';
+    if (type === 'RETIRO_OWNER') return 'bg-purple-100';
+    return 'bg-red-100';
+  };
+  const movementTextColor = (type: CashMovement['type']) => {
+    if (type === 'INGRESO') return 'text-green-700';
+    if (type === 'RETIRO_OWNER') return 'text-purple-700';
+    return 'text-red-700';
+  };
 
   const totals = activeSession?.totalsPerMethod || {};
   const initialCash = activeSession?.initialCash || 0;
@@ -127,6 +150,20 @@ export function CloseCashModal() {
     setMovError('');
   };
 
+  const handleDeleteMovement = async (movId: number) => {
+    if (!activeSession) return;
+    setDeletingMovId(movId);
+    try {
+      await deleteCashMovement(activeSession.id, movId);
+      await refreshSession();
+    } catch {
+      // silently fail — movement may already be gone
+    } finally {
+      setDeletingMovId(null);
+      setConfirmDeleteId(null);
+    }
+  };
+
   const getOpenDuration = () => {
     if (!activeSession?.openedAt) return '';
     const diff = Date.now() - new Date(activeSession.openedAt).getTime();
@@ -201,11 +238,18 @@ export function CloseCashModal() {
                 Ingreso
               </button>
               <button
-                onClick={() => { setMovType('RETIRO'); setShowMovementForm(true); }}
+                onClick={() => { setMovType('RETIRO_GASTO'); setShowMovementForm(true); }}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 transition-colors cursor-pointer"
               >
                 <i className="ri-arrow-up-line"></i>
-                Retiro
+                Retiro gasto
+              </button>
+              <button
+                onClick={() => { setMovType('RETIRO_OWNER'); setShowMovementForm(true); }}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-500 text-white text-sm font-medium rounded-lg hover:bg-purple-600 transition-colors cursor-pointer"
+              >
+                <i className="ri-user-line"></i>
+                Extracción
               </button>
             </div>
           )}
@@ -213,7 +257,7 @@ export function CloseCashModal() {
 
         {showMovementForm && (
           <div className="px-4 md:px-6 py-4 border-b border-gray-100 bg-gray-50">
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2 mb-3 flex-wrap">
               <button
                 onClick={() => setMovType('INGRESO')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
@@ -226,15 +270,26 @@ export function CloseCashModal() {
                 Ingreso
               </button>
               <button
-                onClick={() => setMovType('RETIRO')}
+                onClick={() => setMovType('RETIRO_GASTO')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
-                  movType === 'RETIRO'
+                  movType === 'RETIRO_GASTO'
                     ? 'bg-red-500 text-white'
                     : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-100'
                 }`}
               >
                 <i className="ri-arrow-up-line"></i>
-                Retiro
+                Retiro gasto
+              </button>
+              <button
+                onClick={() => setMovType('RETIRO_OWNER')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
+                  movType === 'RETIRO_OWNER'
+                    ? 'bg-purple-500 text-white'
+                    : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <i className="ri-user-line"></i>
+                Extracción
               </button>
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
@@ -285,29 +340,50 @@ export function CloseCashModal() {
             {movements.map(m => (
               <div key={m.id} className="flex items-center justify-between px-4 md:px-6 py-3">
                 <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    m.type === 'INGRESO' ? 'bg-green-100' : 'bg-red-100'
-                  }`}>
-                    <i className={`text-sm ${
-                      m.type === 'INGRESO'
-                        ? 'ri-arrow-down-line text-green-600'
-                        : 'ri-arrow-up-line text-red-600'
-                    }`}></i>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${movementBg(m.type)}`}>
+                    <i className={`text-sm ${movementIcon(m.type)}`}></i>
                   </div>
                   <div>
-                    <p className={`text-sm font-semibold ${m.type === 'INGRESO' ? 'text-green-700' : 'text-red-700'}`}>
-                      {m.type === 'INGRESO' ? 'Ingreso' : 'Retiro'}
+                    <p className={`text-sm font-semibold ${movementTextColor(m.type)}`}>
+                      {movementLabel(m.type)}
                     </p>
                     {m.description && (
                       <p className="text-xs text-gray-500">{m.description}</p>
                     )}
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className={`text-sm font-bold ${m.type === 'INGRESO' ? 'text-green-700' : 'text-red-700'}`}>
-                    {m.type === 'INGRESO' ? '+' : '-'}${fmt(m.amount)}
-                  </p>
-                  <p className="text-xs text-gray-400">{fmtTime(m.createdAt)}</p>
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <p className={`text-sm font-bold ${movementTextColor(m.type)}`}>
+                      {m.type === 'INGRESO' ? '+' : '-'}${fmt(m.amount)}
+                    </p>
+                    <p className="text-xs text-gray-400">{fmtTime(m.createdAt)}</p>
+                  </div>
+                  {confirmDeleteId === m.id ? (
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleDeleteMovement(m.id)}
+                        disabled={deletingMovId === m.id}
+                        className="px-2 py-1 bg-red-500 text-white text-xs font-semibold rounded-lg hover:bg-red-600 transition-colors cursor-pointer disabled:opacity-60"
+                      >
+                        {deletingMovId === m.id ? <i className="ri-loader-4-line animate-spin"></i> : 'Sí, anular'}
+                      </button>
+                      <button
+                        onClick={() => setConfirmDeleteId(null)}
+                        className="px-2 py-1 border border-gray-300 text-gray-600 text-xs rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                      >
+                        No
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setConfirmDeleteId(m.id)}
+                      className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                      title="Anular movimiento"
+                    >
+                      <i className="ri-delete-bin-line text-sm"></i>
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
