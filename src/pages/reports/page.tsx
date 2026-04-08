@@ -26,6 +26,7 @@ interface DisplaySale {
 
 interface DisplaySession {
   id: string;
+  numericId: number;
   userName: string;
   openedAt: string;
   closedAt: string;
@@ -44,6 +45,7 @@ interface DisplaySession {
   mpDifference: number;
   totalsJson: Record<string, number>;
   actualJson: Record<string, number>;
+  netMovements: number;
 }
 
 interface TopClient {
@@ -84,7 +86,8 @@ function toDisplaySession(s: CashSession): DisplaySession {
   const actual = s.actualJson ?? {};
 
   const totalCash = totals.CASH ?? 0;
-  const expectedCash = s.initialCash + totalCash;
+  const netMov = s.netMovements ?? 0;
+  const expectedCash = s.initialCash + totalCash + netMov;
   const actualCash = (actual.CASH !== undefined) ? actual.CASH : expectedCash;
 
   const totalCard = (totals.CREDIT_CARD ?? 0) + (totals.DEBIT_CARD ?? 0);
@@ -97,6 +100,7 @@ function toDisplaySession(s: CashSession): DisplaySession {
 
   return {
     id: `CAJA-${String(s.id).padStart(4, '0')}`,
+    numericId: s.id,
     userName: s.userName,
     openedAt: s.openedAt,
     closedAt: s.closedAt || '',
@@ -115,6 +119,7 @@ function toDisplaySession(s: CashSession): DisplaySession {
     mpDifference: actualMp - totalMp,
     totalsJson: totals,
     actualJson: actual,
+    netMovements: s.netMovements ?? 0,
   };
 }
 
@@ -923,7 +928,7 @@ export default function ReportsPage() {
                                 setSelectedCashSession(session);
                                 setSelectedSessionMovements([]);
                                 setLoadingMovements(true);
-                                listCashMovements(session.id)
+                                listCashMovements(session.numericId)
                                   .then(setSelectedSessionMovements)
                                   .catch(() => setSelectedSessionMovements([]))
                                   .finally(() => setLoadingMovements(false));
@@ -1317,36 +1322,40 @@ export default function ReportsPage() {
                 ) : (
                   <div className="border border-gray-200 rounded-xl overflow-hidden">
                     <div className="divide-y divide-gray-100">
-                      {selectedSessionMovements.map(m => (
-                        <div key={m.id} className="flex items-center justify-between px-3 py-2.5">
-                          <div className="flex items-center gap-2">
-                            <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${m.type === 'INGRESO' ? 'bg-green-100' : 'bg-red-100'}`}>
-                              <i className={`text-xs ${m.type === 'INGRESO' ? 'ri-arrow-down-line text-green-600' : 'ri-arrow-up-line text-red-600'}`}></i>
+                      {selectedSessionMovements.map(m => {
+                        const movBg = m.type === 'INGRESO' ? 'bg-green-100' : m.type === 'RETIRO_OWNER' ? 'bg-purple-100' : 'bg-red-100';
+                        const movIcon = m.type === 'INGRESO' ? 'ri-arrow-down-line text-green-600' : m.type === 'RETIRO_OWNER' ? 'ri-user-line text-purple-600' : 'ri-arrow-up-line text-red-600';
+                        const movColor = m.type === 'INGRESO' ? 'text-green-700' : m.type === 'RETIRO_OWNER' ? 'text-purple-700' : 'text-red-700';
+                        const movLabel = m.type === 'INGRESO' ? 'Ingreso' : m.type === 'RETIRO_OWNER' ? 'Extracción' : 'Retiro gasto';
+                        return (
+                          <div key={m.id} className="flex items-center justify-between px-3 py-2.5">
+                            <div className="flex items-center gap-2">
+                              <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${movBg}`}>
+                                <i className={`text-xs ${movIcon}`}></i>
+                              </div>
+                              <div>
+                                <p className={`text-xs font-semibold ${movColor}`}>{movLabel}</p>
+                                {m.description && <p className="text-xs text-gray-400">{m.description}</p>}
+                              </div>
                             </div>
-                            <div>
-                              <p className={`text-xs font-semibold ${m.type === 'INGRESO' ? 'text-green-700' : 'text-red-700'}`}>
-                                {m.type === 'INGRESO' ? 'Ingreso' : 'Retiro'}
+                            <div className="text-right">
+                              <p className={`text-xs font-bold ${movColor}`}>
+                                {m.type === 'INGRESO' ? '+' : '-'}${m.amount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                               </p>
-                              {m.description && <p className="text-xs text-gray-400">{m.description}</p>}
+                              <p className="text-xs text-gray-400">
+                                {new Date(m.createdAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}
+                              </p>
                             </div>
                           </div>
-                          <div className="text-right">
-                            <p className={`text-xs font-bold ${m.type === 'INGRESO' ? 'text-green-700' : 'text-red-700'}`}>
-                              {m.type === 'INGRESO' ? '+' : '-'}${m.amount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
-                            </p>
-                            <p className="text-xs text-gray-400">
-                              {new Date(m.createdAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                     <div className="flex items-center justify-between px-3 py-2 bg-gray-50 border-t border-gray-200">
                       <span className="text-xs font-semibold text-gray-600">Neto movimientos</span>
                       {(() => {
                         const net = selectedSessionMovements.reduce((s, m) => m.type === 'INGRESO' ? s + m.amount : s - m.amount, 0);
                         return (
-                          <span className={`text-xs font-bold ${net >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+                          <span className={`text-xs font-bold ${net >= 0 ? 'text-green-700' : 'text-amber-600'}`}>
                             {net >= 0 ? '+' : ''}${net.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                           </span>
                         );
@@ -1400,7 +1409,7 @@ export default function ReportsPage() {
                               {diff === 0 ? (
                                 <span className="text-xs text-gray-400">—</span>
                               ) : (
-                                <span className={`text-xs font-bold ${diff > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                <span className={`text-xs font-bold ${diff > 0 ? 'text-green-600' : 'text-amber-600'}`}>
                                   {diff > 0 ? '+' : ''}${diff.toLocaleString('es-AR')}
                                 </span>
                               )}
