@@ -114,8 +114,9 @@ export function PaymentModal({ total, orderItems, products, client, receiptNumbe
   }
   * { box-sizing: border-box; }
   body {
-    font-family: 'Courier New', Courier, monospace;
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 13pt;
+    font-weight: normal;
     width: 74mm;
     margin: 0;
     color: #000;
