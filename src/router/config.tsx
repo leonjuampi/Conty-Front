@@ -23,6 +23,12 @@ const SuperAdminPage = lazy(() => import('../pages/superadmin/page'));
 const ForgotPasswordPage = lazy(() => import('../pages/forgot-password/page'));
 const ResetPasswordPage = lazy(() => import('../pages/reset-password/page'));
 const MfaVerifyPage = lazy(() => import('../pages/mfa-verify/page'));
+const TiendaOnlinePage = lazy(() => import('../pages/tienda-online/page'));
+const StoreHome = lazy(() => import('../pages/store/StoreHome'));
+const StoreProductDetail = lazy(() => import('../pages/store/ProductDetail'));
+const StoreCart = lazy(() => import('../pages/store/Cart'));
+const StoreCheckout = lazy(() => import('../pages/store/Checkout'));
+const StoreOrderConfirmed = lazy(() => import('../pages/store/OrderConfirmed'));
 
 const routes: RouteObject[] = [
   {
@@ -131,6 +137,19 @@ const routes: RouteObject[] = [
     path: '/mfa-verify',
     element: <MfaVerifyPage />,
   },
+  {
+    path: '/tienda-online',
+    element: (
+      <RoleRoute allowedRoleIds={[ROLE_IDS.ADMIN, ROLE_IDS.OWNER]}>
+        <TiendaOnlinePage />
+      </RoleRoute>
+    ),
+  },
+  { path: '/s/:slug',                       element: <StoreHome /> },
+  { path: '/s/:slug/producto/:productId',   element: <StoreProductDetail /> },
+  { path: '/s/:slug/carrito',               element: <StoreCart /> },
+  { path: '/s/:slug/checkout',              element: <StoreCheckout /> },
+  { path: '/s/:slug/pedido/:orderId',       element: <StoreOrderConfirmed /> },
   {
     path: '*',
     element: <NotFoundPage />,
