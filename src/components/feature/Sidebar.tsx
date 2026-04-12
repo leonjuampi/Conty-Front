@@ -21,6 +21,7 @@ const ALL_MENU_ITEMS = [
   { path: '/stock', icon: 'ri-stack-line', label: 'Stock', roleIds: [1, 2, 3] },
   { path: '/inventory', icon: 'ri-box-3-line', label: 'Mercadería y Costos', roleIds: [1, 2] },
   { path: '/audit', icon: 'ri-file-list-3-line', label: 'Auditoría', roleIds: [1, 2] },
+  { path: '/tienda-online', icon: 'ri-store-2-line', label: 'Tienda Online', roleIds: [1, 2] },
   { path: '/settings', icon: 'ri-settings-3-line', label: 'Configuración', roleIds: [1, 2] },
   { path: '/superadmin', icon: 'ri-shield-star-line', label: 'Super Admin', roleIds: [1] },
 ];
