@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { listUsers, createUser, getUserBranches, replaceUserBranches, type OrgUser } from '../../../services/users.service';
 import { listBranches, type Branch } from '../../../services/branches.service';
 import { useAuth } from '../../../context/AuthContext';
+import { ChangePasswordModal } from '../../../components/feature/ChangePasswordModal';
+import { MFASetupModal } from '../../../components/feature/MFASetupModal';
 
 const ROLE_ID_LABELS: Record<number, string> = { 1: 'Admin', 2: 'Owner', 3: 'Usuario' };
 const ROLE_COLORS: Record<number, string> = {
@@ -30,6 +32,9 @@ export default function UserManagement() {
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState('');
   const [saved, setSaved] = useState(false);
+
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [showMFA, setShowMFA] = useState(false);
 
   const [editUser, setEditUser] = useState<OrgUser | null>(null);
   const [editBranchIds, setEditBranchIds] = useState<number[]>([]);
@@ -458,6 +463,39 @@ export default function UserManagement() {
           </div>
         </div>
       )}
+      {/* Seguridad de la cuenta */}
+      <div className="border-t border-gray-200 pt-6 space-y-3">
+        <h3 className="text-base font-bold text-gray-700">Seguridad de tu cuenta</h3>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={() => setShowChangePassword(true)}
+            className="flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-200 hover:border-brand-400 hover:bg-brand-50 transition-all cursor-pointer text-left flex-1"
+          >
+            <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-brand-100 shrink-0">
+              <i className="ri-lock-password-line text-brand-600 text-lg"></i>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-800 text-sm">Cambiar contraseña</p>
+              <p className="text-xs text-gray-500 mt-0.5">Actualizá tu contraseña de acceso</p>
+            </div>
+          </button>
+          <button
+            onClick={() => setShowMFA(true)}
+            className="flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-200 hover:border-brand-400 hover:bg-brand-50 transition-all cursor-pointer text-left flex-1"
+          >
+            <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-brand-100 shrink-0">
+              <i className="ri-shield-keyhole-line text-brand-600 text-lg"></i>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-800 text-sm">Autenticación MFA</p>
+              <p className="text-xs text-gray-500 mt-0.5">Configurá la verificación en dos pasos</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      {showChangePassword && <ChangePasswordModal onClose={() => setShowChangePassword(false)} />}
+      {showMFA && <MFASetupModal onClose={() => setShowMFA(false)} />}
     </div>
   );
 }
