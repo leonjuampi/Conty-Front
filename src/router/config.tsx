@@ -24,6 +24,7 @@ const ForgotPasswordPage = lazy(() => import('../pages/forgot-password/page'));
 const ResetPasswordPage = lazy(() => import('../pages/reset-password/page'));
 const MfaVerifyPage = lazy(() => import('../pages/mfa-verify/page'));
 const TiendaOnlinePage = lazy(() => import('../pages/tienda-online/page'));
+const PosPage = lazy(() => import('../pages/pos/page'));
 const StoreHome = lazy(() => import('../pages/store/StoreHome'));
 const StoreProductDetail = lazy(() => import('../pages/store/ProductDetail'));
 const StoreCart = lazy(() => import('../pages/store/Cart'));
@@ -136,6 +137,10 @@ const routes: RouteObject[] = [
   {
     path: '/mfa-verify',
     element: <MfaVerifyPage />,
+  },
+  {
+    path: '/pos',
+    element: <ProtectedRoute><PosPage /></ProtectedRoute>,
   },
   {
     path: '/tienda-online',
