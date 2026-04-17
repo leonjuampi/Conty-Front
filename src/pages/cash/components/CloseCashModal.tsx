@@ -15,8 +15,8 @@ export function CloseCashModal() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Movements
-  const [movements, setMovements] = useState<CashMovement[]>(activeSession?.movements ?? []);
+  // Movements — leemos directo del contexto para que refreshSession() los actualice en tiempo real
+  const movements = activeSession?.movements ?? [];
   const [showMovementForm, setShowMovementForm] = useState(false);
   const [movType, setMovType] = useState<'INGRESO' | 'RETIRO_GASTO' | 'RETIRO_OWNER'>('RETIRO_GASTO');
   const [movAmount, setMovAmount] = useState('');
@@ -25,10 +25,6 @@ export function CloseCashModal() {
   const [movError, setMovError] = useState('');
   const [deletingMovId, setDeletingMovId] = useState<number | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
-
-  useEffect(() => {
-    setMovements(activeSession?.movements ?? []);
-  }, [activeSession?.id]);
 
   const netMovements = movements.reduce(
     (sum, m) => (m.type === 'INGRESO' ? sum + m.amount : sum - m.amount),
