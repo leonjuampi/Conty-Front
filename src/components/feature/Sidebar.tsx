@@ -1,9 +1,6 @@
-import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCash } from '../../context/CashContext';
-import { ChangePasswordModal } from './ChangePasswordModal';
-import { MFASetupModal } from './MFASetupModal';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -21,6 +18,7 @@ const ALL_MENU_ITEMS = [
   { path: '/stock', icon: 'ri-stack-line', label: 'Stock', roleIds: [1, 2, 3] },
   { path: '/inventory', icon: 'ri-box-3-line', label: 'Mercadería y Costos', roleIds: [1, 2] },
   { path: '/audit', icon: 'ri-file-list-3-line', label: 'Auditoría', roleIds: [1, 2] },
+  { path: '/tienda-online', icon: 'ri-store-2-line', label: 'Tienda Online', roleIds: [1, 2] },
   { path: '/settings', icon: 'ri-settings-3-line', label: 'Configuración', roleIds: [1, 2] },
   { path: '/superadmin', icon: 'ri-shield-star-line', label: 'Super Admin', roleIds: [1] },
 ];
@@ -30,8 +28,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
   const { hasCashOpen, activeSession } = useCash();
-  const [showChangePassword, setShowChangePassword] = useState(false);
-  const [showMFA, setShowMFA] = useState(false);
 
   const menuItems = ALL_MENU_ITEMS.filter(
     item => currentUser && item.roleIds.includes(currentUser.roleId)
@@ -76,11 +72,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
-        <div className="p-6 border-b border-gray-700">
+        <div className="px-4 py-3 border-b border-gray-700">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <img src="/LOGO-BYN-COMPLETO.png" alt="Conty" className="h-14 brightness-0 invert" />
-            </div>
+            <img src="/LOGO-BYN-COMPLETO.png" alt="Conty" className="h-10 brightness-0 invert" />
             <button
               onClick={onClose}
               className="md:hidden w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white transition-colors cursor-pointer"
@@ -91,8 +85,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </div>
 
         {/* Estado de Caja */}
-        <div className="px-4 pt-4 pb-2">
-          <div className={`px-3 py-2 rounded-lg ${hasCashOpen ? 'bg-green-500/20 border border-green-500/30' : 'bg-red-500/20 border border-red-500/30'}`}>
+        <div className="px-3 pt-3 pb-1">
+          <div className={`px-3 py-1.5 rounded-lg ${hasCashOpen ? 'bg-green-500/20 border border-green-500/30' : 'bg-red-500/20 border border-red-500/30'}`}>
             <div className="flex items-center gap-2">
               <i className={`ri-safe-line text-sm ${hasCashOpen ? 'text-green-400' : 'text-red-400'}`}></i>
               <span className={`text-xs font-semibold ${hasCashOpen ? 'text-green-400' : 'text-red-400'}`}>
@@ -100,26 +94,26 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               </span>
             </div>
             {hasCashOpen && activeSession && (
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-gray-400 mt-0.5">
                 Desde: {formatTime(activeSession.openedAt)}
               </p>
             )}
           </div>
         </div>
 
-        <nav className="flex-1 p-4 overflow-y-auto">
-          <ul className="space-y-2">
+        <nav className="flex-1 px-3 py-2 overflow-y-auto">
+          <ul className="space-y-0.5">
             {menuItems.map(item => (
               <li key={item.path}>
                 <button
                   onClick={() => handleNavigation(item.path)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all cursor-pointer ${
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all cursor-pointer ${
                     location.pathname === item.path
                       ? 'bg-gradient-to-r from-brand-500 to-brand-600 text-white shadow-lg'
                       : 'text-gray-300 hover:bg-gray-700 hover:text-white'
                   }`}
                 >
-                  <i className={`${item.icon} text-xl`}></i>
+                  <i className={`${item.icon} text-lg`}></i>
                   <span className="font-medium text-sm">{item.label}</span>
                 </button>
               </li>
@@ -127,9 +121,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           </ul>
         </nav>
 
-        <div className="p-4 border-t border-gray-700 space-y-2">
-          <div className="flex items-center gap-3 px-4 py-3 bg-gray-700/50 rounded-lg">
-            <div className="w-9 h-9 flex items-center justify-center bg-gradient-to-r from-brand-500 to-brand-600 rounded-full text-white font-bold text-sm shrink-0">
+        <div className="p-3 border-t border-gray-700 space-y-1">
+          <div className="flex items-center gap-3 px-3 py-2 bg-gray-700/50 rounded-lg">
+            <div className="w-8 h-8 flex items-center justify-center bg-gradient-to-r from-brand-500 to-brand-600 rounded-full text-white font-bold text-sm shrink-0">
               {nameInitial}
             </div>
             <div className="min-w-0">
@@ -140,28 +134,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             </div>
           </div>
           <button
-            onClick={() => setShowChangePassword(true)}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-300 hover:bg-gray-600/50 hover:text-white transition-all cursor-pointer whitespace-nowrap text-sm"
-          >
-            <i className="ri-lock-password-line text-lg"></i>
-            <span className="font-medium">Cambiar contraseña</span>
-          </button>
-          <button
-            onClick={() => setShowMFA(true)}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-300 hover:bg-gray-600/50 hover:text-white transition-all cursor-pointer whitespace-nowrap text-sm"
-          >
-            <i className="ri-shield-keyhole-line text-lg"></i>
-            <span className="font-medium">Autenticación MFA</span>
-          </button>
-          <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-300 hover:bg-red-500/20 hover:text-red-400 transition-all cursor-pointer whitespace-nowrap text-sm"
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-red-500/20 hover:text-red-400 transition-all cursor-pointer whitespace-nowrap text-sm"
           >
             <i className="ri-logout-box-r-line text-lg"></i>
             <span className="font-medium">Cerrar sesión</span>
           </button>
-          {showChangePassword && <ChangePasswordModal onClose={() => setShowChangePassword(false)} />}
-          {showMFA && <MFASetupModal onClose={() => setShowMFA(false)} />}
         </div>
       </div>
     </>

@@ -379,7 +379,7 @@ export default function MovementsTab({ currentUser }: Props) {
                     <option value="ADJUSTMENT">Ajuste</option>
                   </select>
                 </div>
-                {(!currentUser?.branchId && branches.length > 1) && (
+                {branches.length > 1 && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Sucursal</label>
                     <select
