@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '../../components/feature/AppLayout';
 import { StatCard } from './components/StatCard';
 import { SalesChart } from './components/SalesChart';
@@ -27,6 +28,7 @@ interface DashData {
 const LOW_STOCK_KEY = 'conty_low_stock_threshold';
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
   const { hasCashOpen, activeSession } = useCash();
   const { currentUser } = useAuth();
   const [dashData, setDashData] = useState<DashData | null>(null);
@@ -63,9 +65,18 @@ export default function DashboardPage() {
 
   return (
     <AppLayout>
-      <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Dashboard</h1>
-        <p className="text-sm text-gray-600 mt-1">Resumen general del sistema</p>
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Dashboard</h1>
+          <p className="text-sm text-gray-600 mt-1">Resumen general del sistema</p>
+        </div>
+        <button
+          onClick={() => navigate('/pos')}
+          className="flex items-center gap-2 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white px-4 py-2.5 rounded-xl font-semibold text-sm shadow-md transition-all whitespace-nowrap cursor-pointer shrink-0"
+        >
+          <i className="ri-store-2-line text-lg"></i>
+          Punto de Venta
+        </button>
       </div>
 
       {/* Estado de Caja */}

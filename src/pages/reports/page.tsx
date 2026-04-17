@@ -323,6 +323,65 @@ export default function ReportsPage() {
       .finally(() => setLoadingDetail(false));
   };
 
+  const handlePrintTicket = (order: DisplaySale, detail: typeof saleDetail) => {
+    const dateStr = new Date(order.date).toLocaleString('es-AR');
+    const PAYMENT_LABEL: Record<string, string> = {
+      CASH: 'Efectivo', CREDIT_CARD: 'Tarjeta de Crédito',
+      BANK_TRANSFER: 'Transferencia', MERCADO_PAGO: 'Mercado Pago',
+    };
+    const rows = (detail?.items ?? []).map(item => `
+      <tr>
+        <td style="padding:2px 0;word-break:break-word">${item.nameSnapshot}</td>
+        <td style="padding:2px 4px;text-align:center">${item.qty}</td>
+        <td style="padding:2px 0;text-align:right">$${(item.total ?? item.qty * item.unitPrice).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</td>
+      </tr>`).join('');
+    const paymentRows = (detail?.payments ?? []).length > 0
+      ? (detail!.payments).map(p => `
+      <div style="display:flex;justify-content:space-between">
+        <span>${PAYMENT_LABEL[p.method] ?? p.method}:</span>
+        <span>$${p.amount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+      </div>`).join('')
+      : '<div>Sin pago registrado</div>';
+    const html = `<!DOCTYPE html>
+<html><head><meta charset="utf-8"/>
+<style>
+  @page { size: 80mm auto; margin: 3mm 3mm; }
+  * { box-sizing: border-box; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 13pt; width: 74mm; margin: 0; color: #000; }
+  .center { text-align: center; } .bold { font-weight: bold; }
+  .sep { border: none; border-top: 1px dashed #000; margin: 7px 0; }
+  table { width: 100%; border-collapse: collapse; }
+  td { vertical-align: top; font-size: 12pt; padding: 4px 0; }
+  .total-row { font-size: 16pt; font-weight: bold; }
+</style></head><body>
+  <div class="center bold" style="font-size:18pt;letter-spacing:1px">TICKET</div>
+  <div class="center" style="font-size:12pt">${order.id}</div>
+  <div class="center" style="font-size:12pt">${dateStr}</div>
+  <hr class="sep"/>
+  <div><b>Cliente:</b> ${order.clientName}</div>
+  <hr class="sep"/>
+  <table><thead><tr>
+    <td style="padding-bottom:3px"><b>Producto</b></td>
+    <td style="text-align:center;padding-bottom:3px"><b>Cant</b></td>
+    <td style="text-align:right;padding-bottom:3px"><b>Subtotal</b></td>
+  </tr></thead><tbody>${rows}</tbody></table>
+  <hr class="sep"/>
+  <div class="total-row" style="display:flex;justify-content:space-between;margin:4px 0">
+    <span>TOTAL:</span><span>$${order.total.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+  </div>
+  ${paymentRows}
+  <hr class="sep"/>
+  <div class="center" style="margin-top:6px;font-size:12pt">¡Gracias por su compra!</div>
+</body></html>`;
+    const win = window.open('', '_blank', 'width=300,height=600');
+    if (!win) return;
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    win.print();
+    win.close();
+  };
+
   const allTabs = [
     { id: 'summary', label: 'Resumen', icon: 'ri-dashboard-3-line', sellerVisible: false },
     { id: 'clients', label: 'Mejores Clientes', icon: 'ri-user-star-line', sellerVisible: false },
@@ -1211,6 +1270,16 @@ export default function ReportsPage() {
                 <span className="font-bold text-gray-800">Total</span>
                 <span className="text-xl font-bold text-brand-600">${selectedOrder.total.toLocaleString()}</span>
               </div>
+
+              {/* Ver Ticket */}
+              <button
+                onClick={() => handlePrintTicket(selectedOrder, saleDetail)}
+                disabled={loadingDetail}
+                className="w-full flex items-center justify-center gap-2 border border-brand-300 text-brand-600 py-2.5 rounded-xl font-semibold hover:bg-brand-50 transition-all cursor-pointer text-sm disabled:opacity-50"
+              >
+                <i className="ri-printer-line"></i>
+                Ver Ticket
+              </button>
 
               {/* Anular pedido */}
               {selectedOrder.status !== 'CANCELLED' && !showCancelConfirm && (
