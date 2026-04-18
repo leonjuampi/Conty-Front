@@ -10,7 +10,7 @@ import { CloseCashModal } from '../cash/components/CloseCashModal';
 import { useAuth } from '../../context/AuthContext';
 import { useCash } from '../../context/CashContext';
 import { listProducts } from '../../services/products.service';
-import { createSale, listSales, getSale, cancelSale, type Sale } from '../../services/sales.service';
+import { createSale, listSales, getSale, cancelSale, addPayments, listPaymentMethods, type Sale } from '../../services/sales.service';
 
 type PosTab = 'venta' | 'historial' | 'caja';
 
@@ -86,7 +86,19 @@ export default function PosPage() {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
 
+  // Register payment modal (independiente del detalle)
+  const [registerPaymentSale, setRegisterPaymentSale] = useState<{ id: number; total: number; docText: string } | null>(null);
+  const [paymentModalMethod, setPaymentModalMethod] = useState('CASH');
+  const [paymentModalAmount, setPaymentModalAmount] = useState('');
+  const [paymentModalLoading, setPaymentModalLoading] = useState(false);
+  const [paymentModalError, setPaymentModalError] = useState('');
+  const [availableMethods, setAvailableMethods] = useState<{ id: number; name: string }[]>([]);
+
   const cashBlocked = !hasCashOpen;
+
+  useEffect(() => {
+    listPaymentMethods().then(res => setAvailableMethods(res.items)).catch(() => {});
+  }, []);
 
   const loadProducts = useCallback(() => {
     setLoadingProducts(true);
@@ -155,6 +167,13 @@ export default function PosPage() {
     setShowCancelConfirm(false);
     setCancelError('');
     setCancelReason('');
+  };
+
+  const openRegisterPayment = (sale: { id: number; total: number; docText: string }) => {
+    setPaymentModalAmount(String(sale.total));
+    setPaymentModalMethod(availableMethods[0]?.name || 'CASH');
+    setPaymentModalError('');
+    setRegisterPaymentSale(sale);
   };
 
   const handlePrintTicket = (sale: SaleDetail) => {
@@ -551,12 +570,22 @@ export default function PosPage() {
                             </td>
                             <td className="px-4 py-3 text-right font-bold text-gray-800">{fmt(sale.total)}</td>
                             <td className="px-4 py-3 text-right">
-                              <button
-                                onClick={() => openSaleDetail(sale.id)}
-                                className="text-brand-500 hover:text-brand-700 text-xs font-semibold cursor-pointer flex items-center gap-1 ml-auto"
-                              >
-                                <i className="ri-eye-line"></i> Ver
-                              </button>
+                              <div className="flex items-center gap-2 justify-end">
+                                {sale.hasPendingPayment && sale.status !== 'CANCELLED' && (
+                                  <button
+                                    onClick={() => openRegisterPayment({ id: sale.id, total: sale.total, docText: sale.docText || `#${sale.id}` })}
+                                    className="text-amber-600 hover:text-amber-700 text-xs font-semibold cursor-pointer flex items-center gap-1"
+                                  >
+                                    <i className="ri-money-dollar-circle-line"></i> Cobrar
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => openSaleDetail(sale.id)}
+                                  className="text-brand-500 hover:text-brand-700 text-xs font-semibold cursor-pointer flex items-center gap-1"
+                                >
+                                  <i className="ri-eye-line"></i> Ver
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -567,25 +596,37 @@ export default function PosPage() {
                   {/* Mobile cards */}
                   <div className="md:hidden space-y-3">
                     {sales.map(sale => (
-                      <button
+                      <div
                         key={sale.id}
-                        onClick={() => openSaleDetail(sale.id)}
-                        className="w-full bg-white rounded-xl border border-gray-200 p-4 text-left hover:border-brand-300 transition-colors cursor-pointer"
+                        className="w-full bg-white rounded-xl border border-gray-200 p-4 text-left hover:border-brand-300 transition-colors"
                       >
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <p className="font-mono text-xs text-gray-500">{sale.docText || `#${sale.id}`}</p>
-                            <p className="font-semibold text-gray-800 mt-0.5">{sale.customerName || <span className="text-gray-400 italic text-sm">Sin cliente</span>}</p>
-                            <p className="text-xs text-gray-400 mt-0.5">{fmtDate(sale.createdAt)}</p>
+                        <button
+                          onClick={() => openSaleDetail(sale.id)}
+                          className="w-full text-left cursor-pointer"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <p className="font-mono text-xs text-gray-500">{sale.docText || `#${sale.id}`}</p>
+                              <p className="font-semibold text-gray-800 mt-0.5">{sale.customerName || <span className="text-gray-400 italic text-sm">Sin cliente</span>}</p>
+                              <p className="text-xs text-gray-400 mt-0.5">{fmtDate(sale.createdAt)}</p>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <p className="font-bold text-gray-800">{fmt(sale.total)}</p>
+                              <span className={`mt-1 inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${STATUS_COLOR[sale.status] ?? 'bg-gray-100 text-gray-600'}`}>
+                                {STATUS_LABEL[sale.status] ?? sale.status}
+                              </span>
+                            </div>
                           </div>
-                          <div className="text-right shrink-0">
-                            <p className="font-bold text-gray-800">{fmt(sale.total)}</p>
-                            <span className={`mt-1 inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${STATUS_COLOR[sale.status] ?? 'bg-gray-100 text-gray-600'}`}>
-                              {STATUS_LABEL[sale.status] ?? sale.status}
-                            </span>
-                          </div>
-                        </div>
-                      </button>
+                        </button>
+                        {sale.hasPendingPayment && sale.status !== 'CANCELLED' && (
+                          <button
+                            onClick={() => openRegisterPayment({ id: sale.id, total: sale.total, docText: sale.docText || `#${sale.id}` })}
+                            className="mt-3 w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-white py-2 rounded-lg font-semibold transition-all cursor-pointer text-sm"
+                          >
+                            <i className="ri-money-dollar-circle-line"></i> Cobrar
+                          </button>
+                        )}
+                      </div>
                     ))}
                   </div>
                 </>
@@ -788,6 +829,90 @@ export default function PosPage() {
           </div>
         )}
       </div>
+
+      {/* ── Register payment modal ── */}
+      {registerPaymentSale && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm">
+            <div className="bg-gradient-to-r from-brand-500 to-brand-600 rounded-t-2xl p-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-white font-bold text-base">Registrar Pago</h2>
+                <p className="text-brand-100 text-xs mt-0.5">{registerPaymentSale.docText} — {fmt(registerPaymentSale.total)}</p>
+              </div>
+              <button
+                onClick={() => setRegisterPaymentSale(null)}
+                className="w-8 h-8 flex items-center justify-center bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors cursor-pointer"
+              >
+                <i className="ri-close-line text-lg"></i>
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-2">Método de pago</label>
+                <select
+                  value={paymentModalMethod}
+                  onChange={e => setPaymentModalMethod(e.target.value)}
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-400 outline-none"
+                >
+                  {availableMethods.length > 0
+                    ? availableMethods.map(m => <option key={m.id} value={m.name}>{PAYMENT_LABEL[m.name] ?? m.name}</option>)
+                    : Object.entries(PAYMENT_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)
+                  }
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-2">Monto</label>
+                <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-brand-400 overflow-hidden">
+                  <span className="px-3 py-2.5 bg-gray-50 border-r border-gray-300 text-sm font-semibold text-gray-500">$</span>
+                  <input
+                    type="number"
+                    value={paymentModalAmount}
+                    onChange={e => setPaymentModalAmount(e.target.value)}
+                    className="flex-1 px-3 py-2.5 text-sm outline-none"
+                    step="0.01"
+                    min="0.01"
+                  />
+                </div>
+              </div>
+              {paymentModalError && (
+                <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 text-xs px-3 py-2.5 rounded-lg">
+                  <i className="ri-error-warning-line"></i>{paymentModalError}
+                </div>
+              )}
+              <div className="flex gap-3 pt-1">
+                <button
+                  onClick={() => setRegisterPaymentSale(null)}
+                  className="flex-1 bg-gray-100 text-gray-700 font-semibold py-2.5 rounded-xl hover:bg-gray-200 cursor-pointer text-sm"
+                >
+                  Cancelar
+                </button>
+                <button
+                  disabled={paymentModalLoading || !paymentModalAmount || parseFloat(paymentModalAmount) <= 0}
+                  onClick={async () => {
+                    setPaymentModalLoading(true);
+                    setPaymentModalError('');
+                    try {
+                      await addPayments(registerPaymentSale.id, [{ method: paymentModalMethod, amount: parseFloat(paymentModalAmount) }]);
+                      setRegisterPaymentSale(null);
+                      setSalesLoaded(false);
+                      if (selectedSale) closeDetail();
+                      refreshSession();
+                    } catch (e: unknown) {
+                      const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
+                      setPaymentModalError(msg || 'Error al registrar el pago');
+                    } finally {
+                      setPaymentModalLoading(false);
+                    }
+                  }}
+                  className="flex-1 bg-gradient-to-r from-brand-500 to-brand-600 text-white font-bold py-2.5 rounded-xl hover:from-brand-600 hover:to-brand-700 cursor-pointer text-sm disabled:opacity-60 flex items-center justify-center gap-2"
+                >
+                  {paymentModalLoading ? <><i className="ri-loader-4-line animate-spin"></i>Guardando...</> : 'Confirmar'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </AppLayout>
   );
 }

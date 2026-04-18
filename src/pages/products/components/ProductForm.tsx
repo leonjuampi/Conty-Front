@@ -222,27 +222,45 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
             {/* Imagen */}
             <div className="md:col-span-2">
               <label className="block text-sm font-semibold text-gray-700 mb-2">Imagen del Producto</label>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <input type="text" value={formData.image}
-                  onChange={(e) => { setFormData({ ...formData, image: e.target.value }); setImageFile(null); }}
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 text-sm min-h-[48px]"
-                  placeholder="URL de la imagen" />
-                <input ref={imageInputRef} type="file" accept="image/jpeg,image/png,image/gif,image/webp" className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    setImageFile(file);
-                    setFormData({ ...formData, image: URL.createObjectURL(file) });
-                  }} />
-                <button type="button" onClick={() => imageInputRef.current?.click()}
-                  className="px-4 py-3 bg-teal-500 text-white rounded-lg hover:bg-teal-600 cursor-pointer text-sm min-h-[48px] whitespace-nowrap">
-                  <i className="ri-upload-2-line mr-2"></i>Subir
-                </button>
-              </div>
+              <input ref={imageInputRef} type="file" accept="image/jpeg,image/png,image/gif,image/webp" className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  setImageFile(file);
+                  setFormData({ ...formData, image: URL.createObjectURL(file) });
+                }} />
+
+              {/* Slot principal */}
+              <button
+                type="button"
+                onClick={() => imageInputRef.current?.click()}
+                className="w-full h-40 rounded-xl border-2 border-dashed border-brand-400 bg-brand-50/40 hover:bg-brand-50 transition-colors flex flex-col items-center justify-center gap-2 cursor-pointer overflow-hidden relative"
+              >
+                {formData.image ? (
+                  <>
+                    <img src={formData.image} alt="Preview" className="w-full h-full object-cover absolute inset-0" />
+                    <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center gap-1 opacity-0 hover:opacity-100 transition-opacity">
+                      <i className="ri-edit-line text-white text-2xl"></i>
+                      <span className="text-white text-xs font-medium">Cambiar imagen</span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <i className="ri-image-add-line text-3xl text-brand-400"></i>
+                    <span className="text-sm text-brand-500 font-medium">Clic para subir imagen</span>
+                    <span className="text-xs text-gray-400">JPG, PNG, WebP · máx. 2MB</span>
+                  </>
+                )}
+              </button>
+
               {formData.image && (
-                <div className="mt-3 w-32 h-32 rounded-lg overflow-hidden bg-gray-100">
-                  <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
-                </div>
+                <button
+                  type="button"
+                  onClick={() => { setFormData({ ...formData, image: '' }); setImageFile(null); }}
+                  className="mt-2 flex items-center gap-1 text-xs text-red-500 hover:text-red-700 cursor-pointer">
+                  <i className="ri-delete-bin-line"></i>
+                  <span>Quitar imagen</span>
+                </button>
               )}
             </div>
 
