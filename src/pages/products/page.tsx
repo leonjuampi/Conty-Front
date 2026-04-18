@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { AppLayout } from '../../components/feature/AppLayout';
 import { ProductForm } from './components/ProductForm';
 import { CategoryModal } from './components/CategoryModal';
+import { ImportProductsModal } from './components/ImportProductsModal';
 import {
   listProducts,
   getProduct,
@@ -11,7 +12,6 @@ import {
   listCategories,
   createCategory,
   deleteCategory,
-  downloadProductTemplate,
   importProducts,
   uploadProductImage,
   type Category,
@@ -43,11 +43,11 @@ export default function ProductsPage() {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [importLoading, setImportLoading] = useState(false);
   const [importResult, setImportResult] = useState<{ successCount: number; errorCount: number; errors: { row: number; message: string }[] } | null>(null);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalProducts, setTotalProducts] = useState(0);
   const pageSize = 100;
   const totalPages = Math.max(1, Math.ceil(totalProducts / pageSize));
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const categoryNames = categories.map(c => c.name);
   const filterCategories = ['all', ...categoryNames];
@@ -184,9 +184,7 @@ export default function ProductsPage() {
     }
   };
 
-  const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleImportFile = async (file: File) => {
     setImportLoading(true);
     setImportResult(null);
     try {
@@ -196,12 +194,13 @@ export default function ProductsPage() {
         const catId = categories.find(c => c.name === categoryFilter)?.id;
         await fetchProducts(currentPage, searchTerm || undefined, catId);
       }
+      return result;
     } catch (err: any) {
       const msg = err?.response?.data?.message || 'Error al importar el archivo';
       alert(msg);
+      return { successCount: 0, errorCount: 1, errors: [{ row: 0, message: msg }] };
     } finally {
       setImportLoading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -229,17 +228,11 @@ export default function ProductsPage() {
               <i className="ri-price-tag-3-line"></i>
               <span>Categorías</span>
             </button>
-            <button onClick={() => downloadProductTemplate()}
-              className="flex items-center gap-2 px-3 py-2.5 bg-white border border-teal-400 text-teal-600 rounded-lg hover:bg-teal-50 cursor-pointer whitespace-nowrap font-medium text-sm">
-              <i className="ri-download-line"></i>
-              <span>Plantilla CSV</span>
+            <button onClick={() => setShowImportModal(true)}
+              className="flex items-center gap-2 px-3 py-2.5 bg-white border border-teal-500 text-teal-700 rounded-lg hover:bg-teal-50 cursor-pointer whitespace-nowrap font-medium text-sm">
+              <i className="ri-upload-line"></i>
+              <span>Importar</span>
             </button>
-            <label className={`flex items-center gap-2 px-3 py-2.5 bg-white border border-teal-500 text-teal-700 rounded-lg hover:bg-teal-50 cursor-pointer whitespace-nowrap font-medium text-sm ${importLoading ? 'opacity-60 pointer-events-none' : ''}`}>
-              {importLoading
-                ? <><i className="ri-loader-4-line animate-spin"></i><span>Importando...</span></>
-                : <><i className="ri-upload-line"></i><span>Importar CSV</span></>}
-              <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleImportFile} />
-            </label>
             <button onClick={() => { setSelectedProduct(null); setShowForm(true); }}
               className="flex items-center gap-2 px-3 py-2.5 bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-lg hover:shadow-lg cursor-pointer whitespace-nowrap font-medium text-sm">
               <i className="ri-add-line"></i>
@@ -248,31 +241,6 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        {/* Resultado de importación */}
-        {importResult && (
-          <div className={`mb-4 p-4 rounded-xl border ${importResult.errorCount === 0 ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200'}`}>
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="font-semibold text-sm text-gray-800 mb-1">
-                  <i className={`${importResult.errorCount === 0 ? 'ri-checkbox-circle-line text-green-600' : 'ri-error-warning-line text-amber-600'} mr-1`}></i>
-                  Importación completada: {importResult.successCount} productos agregados
-                  {importResult.errorCount > 0 && `, ${importResult.errorCount} con error`}
-                </p>
-                {importResult.errors.length > 0 && (
-                  <ul className="mt-2 space-y-0.5">
-                    {importResult.errors.slice(0, 5).map((err, i) => (
-                      <li key={i} className="text-xs text-red-600">Fila {err.row}: {err.message}</li>
-                    ))}
-                    {importResult.errors.length > 5 && <li className="text-xs text-gray-500">...y {importResult.errors.length - 5} errores más</li>}
-                  </ul>
-                )}
-              </div>
-              <button onClick={() => setImportResult(null)} className="text-gray-400 hover:text-gray-600 cursor-pointer shrink-0">
-                <i className="ri-close-line text-lg"></i>
-              </button>
-            </div>
-          </div>
-        )}
 
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
@@ -436,6 +404,16 @@ export default function ProductsPage() {
           onAdd={handleAddCategory}
           onDelete={handleDeleteCategory}
           onClose={() => setShowCategoryModal(false)}
+        />
+      )}
+
+      {showImportModal && (
+        <ImportProductsModal
+          onImport={handleImportFile}
+          onClose={() => { setShowImportModal(false); setImportResult(null); }}
+          loading={importLoading}
+          result={importResult}
+          onClearResult={() => setImportResult(null)}
         />
       )}
     </AppLayout>
