@@ -18,6 +18,7 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
 
   const [formData, setFormData] = useState({
     name: '',
+    description: '',
     category: '',
     barcode: '',
     cost: '',
@@ -42,6 +43,7 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
     if (product) {
       setFormData({
         name: product.name,
+        description: product.description || '',
         category: product.category,
         barcode: product.barcode,
         cost: product.cost.toString(),
@@ -113,6 +115,7 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
     }
     onSave({
       ...formData,
+      description: formData.description,
       image: imageFile ? '' : formData.image,
       imageFile: imageFile || undefined,
       cost: parseFloat(formData.cost),
@@ -162,6 +165,19 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 text-sm min-h-[48px]"
                 placeholder={isCombo ? 'Ej: Combo Fernet + Coca' : 'Ej: Pizza Muzzarella'}
                 required />
+            </div>
+
+            {/* Descripción */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Descripción
+                <span className="ml-2 text-xs font-normal text-gray-400">(se muestra en la tienda online)</span>
+              </label>
+              <textarea value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={3}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 text-sm"
+                placeholder="Ej: Pizza artesanal con salsa de tomate, muzzarella y orégano." />
             </div>
 
             {/* Categoría */}

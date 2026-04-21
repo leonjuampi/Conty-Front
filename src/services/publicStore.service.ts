@@ -6,7 +6,9 @@ export interface StoreSettings {
   description: string | null;
   logo_url: string | null;
   banner_url: string | null;
+  promo_video_url: string | null;
   whatsapp_number: string;
+  whatsapp_default_message: string | null;
   email: string | null;
   fiscal_address: string | null;
   fiscal_lat: number | null;
@@ -22,6 +24,7 @@ export interface StoreSettings {
   social_instagram: string | null;
   social_facebook: string | null;
   primary_color: string;
+  product_grid_size: 'small' | 'large';
 }
 
 export interface StoreInfo {
