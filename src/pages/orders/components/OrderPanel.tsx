@@ -1,6 +1,7 @@
 
 interface OrderItem {
   productId: string;
+  variantId?: number;
   productName: string;
   quantity: number;
   price: number;
@@ -10,8 +11,8 @@ interface OrderPanelProps {
   orderItems: OrderItem[];
   selectedClient: any;
   total: number;
-  onUpdateQuantity: (productId: string, quantity: number) => void;
-  onRemoveItem: (productId: string) => void;
+  onUpdateQuantity: (productId: string, quantity: number, variantId?: number) => void;
+  onRemoveItem: (productId: string, variantId?: number) => void;
   onFinishOrder: () => void;
   onClearOrder: () => void;
   cashBlocked?: boolean;
@@ -52,15 +53,17 @@ export function OrderPanel({
           </div>
         ) : (
           <div className="space-y-3">
-            {orderItems.map(item => (
-              <div key={item.productId} className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+            {orderItems.map(item => {
+              const itemKey = `${item.productId}-${item.variantId ?? 'default'}`;
+              return (
+              <div key={itemKey} className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-800 text-sm">{item.productName}</h3>
                     <p className="text-brand-600 font-bold text-sm">${item.price.toLocaleString()}</p>
                   </div>
                   <button
-                    onClick={() => onRemoveItem(item.productId)}
+                    onClick={() => onRemoveItem(item.productId, item.variantId)}
                     className="text-red-400 hover:text-red-600 transition-colors cursor-pointer w-7 h-7 flex items-center justify-center"
                   >
                     <i className="ri-delete-bin-line text-base"></i>
@@ -70,14 +73,14 @@ export function OrderPanel({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => onUpdateQuantity(item.productId, item.quantity - 1)}
+                      onClick={() => onUpdateQuantity(item.productId, item.quantity - 1, item.variantId)}
                       className="w-7 h-7 flex items-center justify-center bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors cursor-pointer"
                     >
                       <i className="ri-subtract-line text-gray-600 text-sm"></i>
                     </button>
                     <span className="w-10 text-center font-semibold text-gray-800 text-sm">{item.quantity}</span>
                     <button
-                      onClick={() => onUpdateQuantity(item.productId, item.quantity + 1)}
+                      onClick={() => onUpdateQuantity(item.productId, item.quantity + 1, item.variantId)}
                       className="w-7 h-7 flex items-center justify-center bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors cursor-pointer"
                     >
                       <i className="ri-add-line text-gray-600 text-sm"></i>
@@ -86,7 +89,8 @@ export function OrderPanel({
                   <span className="font-bold text-gray-800 text-sm">${(item.price * item.quantity).toLocaleString()}</span>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

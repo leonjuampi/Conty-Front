@@ -5,6 +5,7 @@ import { OrderPanel } from './components/OrderPanel';
 import { ProductSelector, PosProduct } from './components/ProductSelector';
 import { ClientSelector } from './components/ClientSelector';
 import { PaymentModal } from './components/PaymentModal';
+import { VariantPickerModal } from '../pos/components/VariantPickerModal';
 import { useAuth } from '../../context/AuthContext';
 import { useCash } from '../../context/CashContext';
 import { listProducts } from '../../services/products.service';
@@ -35,6 +36,8 @@ export default function OrdersPage() {
 
   const cashBlocked = !hasCashOpen;
 
+  const [variantPickerProduct, setVariantPickerProduct] = useState<PosProduct | null>(null);
+
   const loadProducts = useCallback(() => {
     setLoadingProducts(true);
     const fetchAll = async () => {
@@ -55,6 +58,7 @@ export default function OrdersPage() {
             image: p.imageUrl,
             active: p.status === 'ACTIVE',
             isCombo: p.isCombo ?? false,
+            hasVariants: p.hasVariants ?? false,
           }));
         all = [...all, ...mapped];
         if (res.items.length < pageSize) break;
@@ -80,47 +84,48 @@ export default function OrdersPage() {
     const product = products.find(p => p.id === productId);
     if (!product) return;
 
-    const currentQty = orderItems.find(i => i.productId === productId)?.quantity ?? 0;
-    if (!product.isCombo && product.stock > 0 && currentQty >= product.stock) {
-      showCartError(`Sin stock suficiente para ${product.name} (disponible: ${product.stock})`);
+    if (product.hasVariants) {
+      setVariantPickerProduct(product);
       return;
     }
 
-    const existingItem = orderItems.find(item => item.productId === productId);
-    if (existingItem) {
-      setOrderItems(orderItems.map(item =>
-        item.productId === productId
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      ));
+    addProductToCart(product.id, product.variantId, product.name, product.price, product.stock, product.isCombo);
+  };
+
+  const addProductToCart = (productId: string, variantId: number, productName: string, price: number, stock: number, isCombo?: boolean) => {
+    const matchKey = (i: OrderItem) => i.productId === productId && i.variantId === variantId;
+    const currentQty = orderItems.find(matchKey)?.quantity ?? 0;
+    if (!isCombo && stock > 0 && currentQty >= stock) {
+      showCartError(`Sin stock suficiente para ${productName} (disponible: ${stock})`);
+      return;
+    }
+    const existing = orderItems.find(matchKey);
+    if (existing) {
+      setOrderItems(orderItems.map(i => matchKey(i) ? { ...i, quantity: i.quantity + 1 } : i));
     } else {
-      setOrderItems([...orderItems, {
-        productId: product.id,
-        variantId: product.variantId,
-        productName: product.name,
-        quantity: 1,
-        price: product.price,
-      }]);
+      setOrderItems([...orderItems, { productId, variantId, productName, quantity: 1, price }]);
     }
   };
 
-  const updateQuantity = (productId: string, quantity: number) => {
+  const handleVariantSelected = (variantId: number, variantName: string, stock: number) => {
+    if (!variantPickerProduct) return;
+    const displayName = variantName ? `${variantPickerProduct.name} - ${variantName}` : variantPickerProduct.name;
+    addProductToCart(variantPickerProduct.id, variantId, displayName, variantPickerProduct.price, stock, false);
+    setVariantPickerProduct(null);
+  };
+
+  const updateQuantity = (productId: string, quantity: number, variantId?: number) => {
+    const matchKey = (i: OrderItem) => i.productId === productId && (variantId === undefined || i.variantId === variantId);
     if (quantity <= 0) {
-      setOrderItems(orderItems.filter(item => item.productId !== productId));
+      setOrderItems(orderItems.filter(i => !matchKey(i)));
     } else {
-      const product = products.find(p => p.id === productId);
-      if (product && product.stock > 0 && quantity > product.stock) {
-        showCartError(`Sin stock suficiente para ${product.name} (disponible: ${product.stock})`);
-        return;
-      }
-      setOrderItems(orderItems.map(item =>
-        item.productId === productId ? { ...item, quantity } : item
-      ));
+      setOrderItems(orderItems.map(i => matchKey(i) ? { ...i, quantity } : i));
     }
   };
 
-  const removeItem = (productId: string) => {
-    setOrderItems(orderItems.filter(item => item.productId !== productId));
+  const removeItem = (productId: string, variantId?: number) => {
+    const matchKey = (i: OrderItem) => i.productId === productId && (variantId === undefined || i.variantId === variantId);
+    setOrderItems(orderItems.filter(i => !matchKey(i)));
   };
 
   const calculateTotal = () => {
@@ -318,6 +323,18 @@ export default function OrdersPage() {
             receiptNumber={receiptNumber}
             onClose={() => { setShowPaymentModal(false); setOrderItems([]); setSelectedClient(null); }}
             onComplete={handlePaymentComplete}
+          />
+        )}
+
+        {variantPickerProduct && (
+          <VariantPickerModal
+            productId={Number(variantPickerProduct.id)}
+            productName={variantPickerProduct.name}
+            productPrice={variantPickerProduct.price}
+            productImage={variantPickerProduct.image}
+            branchId={currentUser?.branchId ?? null}
+            onSelect={handleVariantSelected}
+            onClose={() => setVariantPickerProduct(null)}
           />
         )}
       </div>

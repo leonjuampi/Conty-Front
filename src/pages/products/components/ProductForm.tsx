@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { listProducts } from '../../../services/products.service';
 import type { ComboItem } from '../../../services/products.service';
 import { getElaborationSettings } from '../../../services/elaborationCosts.service';
+import { VariantsSection } from './VariantsSection';
 
 interface ProductFormProps {
   product: any;
@@ -340,6 +341,15 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
                 <p className="text-xs text-purple-500 text-center py-2">El combo debe incluir al menos 1 producto.</p>
               )}
             </div>
+          )}
+
+          {/* Variantes - solo para productos existentes y no-combos */}
+          {product && !isCombo && (
+            <VariantsSection
+              productId={product.id}
+              hasVariants={product.hasVariants ?? false}
+              onVariantsToggled={() => {}}
+            />
           )}
 
           {/* Botones */}

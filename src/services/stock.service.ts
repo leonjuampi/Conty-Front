@@ -55,7 +55,9 @@ export interface InventorySession {
 export interface InventorySessionItem {
   variantId: number;
   productName: string;
-  sku: string;
+  variantName: string;
+  productSku: string;
+  variantSku: string;
   expectedQty: number;
   countedQty: number | null;
   difference: number | null;
