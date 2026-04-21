@@ -11,6 +11,7 @@ export interface PosProduct {
   image: string | null;
   active: boolean;
   isCombo?: boolean;
+  hasVariants?: boolean;
 }
 
 interface ProductSelectorProps {

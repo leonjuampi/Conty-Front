@@ -29,6 +29,7 @@ interface LocalProduct {
   image: string;
   active: boolean;
   isCombo: boolean;
+  hasVariants: boolean;
   comboItems: any[];
 }
 
@@ -72,6 +73,7 @@ export default function ProductsPage() {
         image: p.imageUrl || '',
         active: p.status === 'ACTIVE',
         isCombo: p.isCombo ?? false,
+        hasVariants: p.hasVariants ?? false,
         comboItems: p.comboItems ?? [],
       })));
     } catch {}

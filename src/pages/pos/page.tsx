@@ -5,6 +5,7 @@ import { OrderPanel } from '../orders/components/OrderPanel';
 import { ProductSelector, PosProduct } from '../orders/components/ProductSelector';
 import { ClientSelector } from '../orders/components/ClientSelector';
 import { PaymentModal } from '../orders/components/PaymentModal';
+import { VariantPickerModal } from './components/VariantPickerModal';
 import { OpenCashModal } from '../cash/components/OpenCashModal';
 import { CloseCashModal } from '../cash/components/CloseCashModal';
 import { useAuth } from '../../context/AuthContext';
@@ -94,6 +95,9 @@ export default function PosPage() {
   const [paymentModalError, setPaymentModalError] = useState('');
   const [availableMethods, setAvailableMethods] = useState<{ id: number; name: string }[]>([]);
 
+  // Variant picker state
+  const [variantPickerProduct, setVariantPickerProduct] = useState<PosProduct | null>(null);
+
   const cashBlocked = !hasCashOpen;
 
   useEffect(() => {
@@ -120,6 +124,7 @@ export default function PosPage() {
             image: p.imageUrl,
             active: p.status === 'ACTIVE',
             isCombo: p.isCombo ?? false,
+            hasVariants: p.hasVariants ?? false,
           }));
         all = [...all, ...mapped];
         if (res.items.length < pageSize) break;
@@ -277,40 +282,58 @@ export default function PosPage() {
     if (cashBlocked) return;
     const product = products.find(p => p.id === productId);
     if (!product) return;
-    const currentQty = orderItems.find(i => i.productId === productId)?.quantity ?? 0;
-    if (!product.isCombo && product.stock > 0 && currentQty >= product.stock) {
-      showCartError(`Sin stock suficiente para ${product.name} (disponible: ${product.stock})`);
+
+    // If product has variants, show the picker instead of adding directly
+    if (product.hasVariants) {
+      setVariantPickerProduct(product);
       return;
     }
-    const existing = orderItems.find(i => i.productId === productId);
+
+    addProductToCart(product.id, product.variantId, product.name, product.price, product.stock, product.isCombo);
+  };
+
+  const addProductToCart = (productId: string, variantId: number, productName: string, price: number, stock: number, isCombo?: boolean) => {
+    const matchKey = (i: OrderItem) => i.productId === productId && i.variantId === variantId;
+    const currentQty = orderItems.find(matchKey)?.quantity ?? 0;
+    if (!isCombo && stock > 0 && currentQty >= stock) {
+      showCartError(`Sin stock suficiente para ${productName} (disponible: ${stock})`);
+      return;
+    }
+    const existing = orderItems.find(matchKey);
     if (existing) {
-      setOrderItems(orderItems.map(i => i.productId === productId ? { ...i, quantity: i.quantity + 1 } : i));
+      setOrderItems(orderItems.map(i => matchKey(i) ? { ...i, quantity: i.quantity + 1 } : i));
     } else {
       setOrderItems([...orderItems, {
-        productId: product.id,
-        variantId: product.variantId,
-        productName: product.name,
+        productId,
+        variantId,
+        productName,
         quantity: 1,
-        price: product.price,
+        price,
       }]);
     }
   };
 
-  const updateQuantity = (productId: string, quantity: number) => {
+  const handleVariantSelected = (variantId: number, variantName: string, stock: number) => {
+    if (!variantPickerProduct) return;
+    const displayName = variantName
+      ? `${variantPickerProduct.name} - ${variantName}`
+      : variantPickerProduct.name;
+    addProductToCart(variantPickerProduct.id, variantId, displayName, variantPickerProduct.price, stock, false);
+    setVariantPickerProduct(null);
+  };
+
+  const updateQuantity = (productId: string, quantity: number, variantId?: number) => {
+    const matchKey = (i: OrderItem) => i.productId === productId && (variantId === undefined || i.variantId === variantId);
     if (quantity <= 0) {
-      setOrderItems(orderItems.filter(i => i.productId !== productId));
+      setOrderItems(orderItems.filter(i => !matchKey(i)));
     } else {
-      const product = products.find(p => p.id === productId);
-      if (product && product.stock > 0 && quantity > product.stock) {
-        showCartError(`Sin stock suficiente para ${product.name} (disponible: ${product.stock})`);
-        return;
-      }
-      setOrderItems(orderItems.map(i => i.productId === productId ? { ...i, quantity } : i));
+      setOrderItems(orderItems.map(i => matchKey(i) ? { ...i, quantity } : i));
     }
   };
 
-  const removeItem = (productId: string) => {
-    setOrderItems(orderItems.filter(i => i.productId !== productId));
+  const removeItem = (productId: string, variantId?: number) => {
+    const matchKey = (i: OrderItem) => i.productId === productId && (variantId === undefined || i.variantId === variantId);
+    setOrderItems(orderItems.filter(i => !matchKey(i)));
   };
 
   const calculateTotal = () => orderItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
@@ -652,6 +675,19 @@ export default function PosPage() {
             receiptNumber={receiptNumber}
             onClose={() => { setShowPaymentModal(false); setOrderItems([]); setSelectedClient(null); }}
             onComplete={handlePaymentComplete}
+          />
+        )}
+
+        {/* ── Variant picker modal ── */}
+        {variantPickerProduct && (
+          <VariantPickerModal
+            productId={Number(variantPickerProduct.id)}
+            productName={variantPickerProduct.name}
+            productPrice={variantPickerProduct.price}
+            productImage={variantPickerProduct.image}
+            branchId={currentUser?.branchId ?? null}
+            onSelect={handleVariantSelected}
+            onClose={() => setVariantPickerProduct(null)}
           />
         )}
 

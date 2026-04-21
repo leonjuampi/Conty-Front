@@ -27,7 +27,9 @@ export interface StoreSettingsAdmin {
   description: string | null;
   logo_url: string | null;
   banner_url: string | null;
+  promo_video_url: string | null;
   whatsapp_number: string;
+  whatsapp_default_message: string | null;
   email: string | null;
   notify_email: string | null;
   fiscal_address: string | null;
@@ -44,6 +46,7 @@ export interface StoreSettingsAdmin {
   social_instagram: string | null;
   social_facebook: string | null;
   primary_color: string;
+  product_grid_size: 'small' | 'large';
 }
 
 export interface AdminProductForStore {

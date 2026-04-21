@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { Search, Star } from 'lucide-react';
 import PublicStoreLayout from './PublicStoreLayout';
 import ProductQuickView from './ProductQuickView';
@@ -14,6 +14,23 @@ import {
 
 function moneyAR(n: number) {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 0 }).format(n);
+}
+
+function extractYouTubeId(raw: string): string | null {
+  const s = raw.trim();
+  if (!s) return null;
+  if (/^[a-zA-Z0-9_-]{11}$/.test(s)) return s;
+  const patterns = [
+    /youtu\.be\/([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/,
+  ];
+  for (const p of patterns) {
+    const m = s.match(p);
+    if (m) return m[1];
+  }
+  return null;
 }
 
 function ProductCard({ p, primary, onOpen }: { p: StoreProduct; primary: string; onOpen: (id: number) => void }) {
@@ -60,7 +77,11 @@ function ProductCard({ p, primary, onOpen }: { p: StoreProduct; primary: string;
 
 function StoreHomeInner({ info }: { info: StoreInfo }) {
   const { slug = '' } = useParams<{ slug: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const primary = info.settings?.primary_color || '#10b981';
+  const gridClass = info.settings?.product_grid_size === 'large'
+    ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5'
+    : 'grid grid-cols-2 md:grid-cols-4 gap-3';
   const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:3001/api').replace(/\/api$/, '');
   const banner = info.settings?.banner_url
     ? (info.settings.banner_url.startsWith('http') ? info.settings.banner_url : `${apiBase}${info.settings.banner_url}`)
@@ -69,9 +90,23 @@ function StoreHomeInner({ info }: { info: StoreInfo }) {
   const [categories, setCategories] = useState<StoreCategory[]>([]);
   const [products, setProducts] = useState<StoreProduct[]>([]);
   const [search, setSearch] = useState('');
-  const [activeCat, setActiveCat] = useState<number | null>(null);
+  const initialCat = searchParams.get('cat');
+  const [activeCat, setActiveCat] = useState<number | null>(initialCat ? Number(initialCat) : null);
   const [loading, setLoading] = useState(true);
   const [quickViewId, setQuickViewId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const cat = searchParams.get('cat');
+    setActiveCat(cat ? Number(cat) : null);
+  }, [searchParams]);
+
+  function selectCategory(id: number | null) {
+    setActiveCat(id);
+    const next = new URLSearchParams(searchParams);
+    if (id) next.set('cat', String(id));
+    else next.delete('cat');
+    setSearchParams(next, { replace: true });
+  }
 
   useEffect(() => {
     let alive = true;
@@ -100,7 +135,7 @@ function StoreHomeInner({ info }: { info: StoreInfo }) {
   return (
     <div>
       {banner && (
-        <div className="w-full h-48 md:h-64 bg-gray-200 overflow-hidden">
+        <div className="w-full h-60 md:h-80 lg:h-[28rem] bg-gray-200 overflow-hidden">
           <img src={banner} alt="banner" className="w-full h-full object-cover" />
         </div>
       )}
@@ -123,7 +158,7 @@ function StoreHomeInner({ info }: { info: StoreInfo }) {
             <h2 className="text-lg font-bold text-gray-900 mb-3">Categorías destacadas</h2>
             <div className="flex gap-2 overflow-x-auto pb-2">
               <button
-                onClick={() => setActiveCat(null)}
+                onClick={() => selectCategory(null)}
                 className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-semibold transition-colors ${
                   activeCat === null ? 'text-white' : 'bg-white text-gray-700 border border-gray-200'
                 }`}
@@ -134,7 +169,7 @@ function StoreHomeInner({ info }: { info: StoreInfo }) {
               {featuredCats.map((c) => (
                 <button
                   key={c.id}
-                  onClick={() => setActiveCat(c.id)}
+                  onClick={() => selectCategory(c.id)}
                   className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-semibold transition-colors ${
                     activeCat === c.id ? 'text-white' : 'bg-white text-gray-700 border border-gray-200'
                   }`}
@@ -156,7 +191,7 @@ function StoreHomeInner({ info }: { info: StoreInfo }) {
                 <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
                   <Star className="h-5 w-5" style={{ color: primary }} /> Destacados
                 </h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className={gridClass}>
                   {featured.map((p) => <ProductCard key={`f-${p.id}`} p={p} primary={primary} onOpen={setQuickViewId} />)}
                 </div>
               </div>
@@ -169,14 +204,49 @@ function StoreHomeInner({ info }: { info: StoreInfo }) {
               {filtered.length === 0 ? (
                 <div className="text-center py-12 text-gray-400">No se encontraron productos.</div>
               ) : (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className={gridClass}>
                   {filtered.map((p) => <ProductCard key={p.id} p={p} primary={primary} onOpen={setQuickViewId} />)}
                 </div>
               )}
             </div>
+
           </>
         )}
       </div>
+
+      {!loading && (() => {
+        const videoId = extractYouTubeId(info.settings?.promo_video_url || '');
+        if (!videoId) return null;
+        const params = new URLSearchParams({
+          autoplay: '1',
+          mute: '1',
+          controls: '0',
+          loop: '1',
+          playlist: videoId,
+          modestbranding: '1',
+          rel: '0',
+          playsinline: '1',
+          iv_load_policy: '3',
+          disablekb: '1',
+          fs: '0',
+        }).toString();
+        return (
+          <section className="relative w-full overflow-hidden py-8 md:py-12">
+            <div className="relative w-full overflow-hidden" style={{ paddingBottom: '42%' }}>
+              <iframe
+                src={`https://www.youtube.com/embed/${videoId}?${params}`}
+                title=""
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                style={{ width: '140%', height: '140%' }}
+                frameBorder={0}
+                allow="autoplay; encrypted-media; picture-in-picture"
+              />
+              <div className="absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-gray-50 to-transparent pointer-events-none" />
+              <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-gray-50 to-transparent pointer-events-none" />
+            </div>
+          </section>
+        );
+      })()}
 
       {quickViewId !== null && (() => {
         const openState = isStoreOpenNow(parseSchedule(info.settings?.schedule_json));

@@ -30,6 +30,7 @@ export interface Product {
   status: 'ACTIVE' | 'INACTIVE';
   imageUrl: string | null;
   isCombo: boolean;
+  hasVariants: boolean;
   comboItems: ComboItem[];
   variants: ProductVariant[];
   createdAt: string;
@@ -57,7 +58,8 @@ function mapProduct(row: any): Product {
     categoryName: row.categoryName ?? row.category_name ?? null,
     status:       row.status,
     imageUrl:     row.imageUrl     ?? row.image_url     ?? null,
-    isCombo:      row.isCombo      ?? row.is_combo      ? true : false,
+    isCombo:      !!(row.isCombo ?? row.is_combo),
+    hasVariants:  !!(row.hasVariants ?? row.has_variants),
     comboItems:   Array.isArray(row.comboItems) ? row.comboItems : [],
     createdAt:    row.createdAt    ?? row.created_at    ?? '',
     variants: variantId ? [{
@@ -152,5 +154,49 @@ export async function importProducts(file: File): Promise<{ successCount: number
   const { data } = await api.post('/products/import', form, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
+  return data;
+}
+
+// --- Variant CRUD ---
+
+export async function getProductDetail(id: number, branchId?: number): Promise<any> {
+  const params = branchId ? { branchId } : {};
+  const { data } = await api.get(`/products/${id}`, { params });
+  return data;
+}
+
+export async function createVariant(productId: number, payload: {
+  name: string;
+  sku?: string | null;
+  barcode?: string | null;
+  price?: number | null;
+  cost?: number | null;
+}): Promise<{ id: number }> {
+  const { data } = await api.post(`/products/${productId}/variants`, payload);
+  return data;
+}
+
+export async function updateVariant(variantId: number, payload: {
+  name?: string;
+  sku?: string | null;
+  barcode?: string | null;
+}): Promise<void> {
+  await api.put(`/products/variants/${variantId}`, payload);
+}
+
+export async function deleteVariant(variantId: number): Promise<void> {
+  await api.delete(`/products/variants/${variantId}`);
+}
+
+export async function toggleVariants(productId: number, enable: boolean): Promise<void> {
+  await api.put(`/products/${productId}/toggle-variants`, { enable });
+}
+
+export async function distributeStock(
+  productId: number,
+  branchId: number,
+  distributions: { variantId: number; qty: number }[]
+): Promise<{ distributed: number; remaining: number }> {
+  const { data } = await api.put(`/products/${productId}/distribute-stock`, { branchId, distributions });
   return data;
 }

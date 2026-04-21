@@ -45,12 +45,15 @@ export default function TiendaOnlineConfig() {
         setOrg(r.org);
         setSettings(r.settings || {
           org_id: r.org?.id || 0, store_branch_id: null, display_name: r.org?.name || '', description: null,
-          logo_url: null, banner_url: null, whatsapp_number: '', email: null, notify_email: null,
+          logo_url: null, banner_url: null, promo_video_url: null,
+          whatsapp_number: '', whatsapp_default_message: null,
+          email: null, notify_email: null,
           fiscal_address: null, fiscal_lat: null, fiscal_lng: null,
           pickup_enabled: 1, delivery_enabled: 1, delivery_radius_km: null,
           delivery_cost: 0, delivery_zones: null,
           min_order_amount: 0, payment_methods_text: null, schedule_json: null,
           social_instagram: null, social_facebook: null, primary_color: '#10b981',
+          product_grid_size: 'small',
         } as StoreSettingsAdmin);
         setSlug(r.org?.store_slug || '');
         setEnabled(Boolean(r.org?.store_enabled));
@@ -115,7 +118,9 @@ export default function TiendaOnlineConfig() {
           description: settings.description,
           logo_url: settings.logo_url,
           banner_url: settings.banner_url,
+          promo_video_url: settings.promo_video_url,
           whatsapp_number: settings.whatsapp_number,
+          whatsapp_default_message: settings.whatsapp_default_message,
           email: settings.email,
           notify_email: settings.notify_email,
           fiscal_address: settings.fiscal_address,
@@ -132,6 +137,7 @@ export default function TiendaOnlineConfig() {
           social_instagram: settings.social_instagram,
           social_facebook: settings.social_facebook,
           primary_color: settings.primary_color,
+          product_grid_size: settings.product_grid_size,
         },
       });
       setSaveMsg('Configuración guardada');
@@ -266,6 +272,23 @@ export default function TiendaOnlineConfig() {
               </button>
               <input ref={bannerInput} type="file" accept="image/*" onChange={uploadBanner} className="hidden" />
             </div>
+            <div className="text-xs text-gray-400 mt-1">
+              Tamaño recomendado: <span className="font-semibold text-gray-600">1920×720 px</span> (relación ~8:3, formato panorámico). Máx. 2MB, JPG o PNG.
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label className="text-sm text-gray-600 mb-1 block">Video de YouTube (opcional)</label>
+          <input
+            type="text"
+            value={settings.promo_video_url || ''}
+            onChange={(e) => patchSettings('promo_video_url', e.target.value || null)}
+            placeholder="https://www.youtube.com/watch?v=..."
+            className="w-full px-3 py-2 rounded-lg border border-gray-200"
+          />
+          <div className="text-xs text-gray-400 mt-1">
+            Se muestra al final del listado de productos. Podés pegar el link completo o solo el ID.
           </div>
         </div>
       </section>
@@ -283,7 +306,18 @@ export default function TiendaOnlineConfig() {
               placeholder="5491112345678"
               className="w-full px-3 py-2 rounded-lg border border-gray-200"
             />
-            <div className="text-xs text-gray-400 mt-1">Acá llegan los pedidos vía WhatsApp.</div>
+            <div className="text-xs text-gray-400 mt-1">Acá llegan los pedidos vía WhatsApp y es el número del botón flotante.</div>
+          </div>
+          <div className="md:col-span-2">
+            <label className="text-sm text-gray-600 mb-1 block">Mensaje inicial del botón de WhatsApp</label>
+            <textarea
+              value={settings.whatsapp_default_message || ''}
+              onChange={(e) => patchSettings('whatsapp_default_message', e.target.value || null)}
+              rows={2}
+              placeholder="¡Hola! Quisiera hacer una consulta sobre sus productos."
+              className="w-full px-3 py-2 rounded-lg border border-gray-200"
+            />
+            <div className="text-xs text-gray-400 mt-1">Se precarga cuando un cliente abre el chat desde el botón flotante.</div>
           </div>
           <div>
             <label className="text-sm text-gray-600 mb-1 block">Email</label>
@@ -323,6 +357,50 @@ export default function TiendaOnlineConfig() {
               onChange={(e) => patchSettings('social_facebook', e.target.value || null)}
               className="w-full px-3 py-2 rounded-lg border border-gray-200"
             />
+          </div>
+        </div>
+      </section>
+
+      {/* Presentación del catálogo */}
+      <section className="bg-white rounded-2xl shadow-sm p-5 space-y-4">
+        <div className="font-bold text-gray-900">Presentación del catálogo</div>
+        <div>
+          <label className="text-sm text-gray-600 mb-2 block">Tamaño de las tarjetas de productos</label>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => patchSettings('product_grid_size', 'small')}
+              className={`p-4 rounded-xl border-2 text-left transition-colors ${
+                settings.product_grid_size === 'small'
+                  ? 'border-emerald-500 bg-emerald-50'
+                  : 'border-gray-200 hover:border-gray-300 bg-white'
+              }`}
+            >
+              <div className="font-semibold text-gray-900 mb-1">Compacta</div>
+              <div className="text-xs text-gray-500 mb-3">Más productos por fila (4 en desktop).</div>
+              <div className="grid grid-cols-4 gap-1">
+                {[0,1,2,3,4,5,6,7].map((i) => (
+                  <div key={i} className="aspect-square rounded bg-gray-200" />
+                ))}
+              </div>
+            </button>
+            <button
+              type="button"
+              onClick={() => patchSettings('product_grid_size', 'large')}
+              className={`p-4 rounded-xl border-2 text-left transition-colors ${
+                settings.product_grid_size === 'large'
+                  ? 'border-emerald-500 bg-emerald-50'
+                  : 'border-gray-200 hover:border-gray-300 bg-white'
+              }`}
+            >
+              <div className="font-semibold text-gray-900 mb-1">Amplia</div>
+              <div className="text-xs text-gray-500 mb-3">Fotos más grandes (3 en desktop).</div>
+              <div className="grid grid-cols-3 gap-1">
+                {[0,1,2,3,4,5].map((i) => (
+                  <div key={i} className="aspect-square rounded bg-gray-200" />
+                ))}
+              </div>
+            </button>
           </div>
         </div>
       </section>

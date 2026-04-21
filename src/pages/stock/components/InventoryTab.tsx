@@ -293,8 +293,13 @@ export default function InventoryTab({ currentUser }: Props) {
                                             : item.difference;
                                           return (
                                             <tr key={item.variantId} className="hover:bg-white/60">
-                                              <td className="py-2 text-gray-800 font-medium">{item.productName}</td>
-                                              <td className="py-2 text-gray-400 font-mono text-xs">{item.sku}</td>
+                                              <td className="py-2 text-gray-800 font-medium">
+                                                <div>{item.productName}</div>
+                                                {item.variantName && item.variantName.toLowerCase() !== 'default' && (
+                                                  <div className="text-xs text-gray-500 font-normal">{item.variantName}</div>
+                                                )}
+                                              </td>
+                                              <td className="py-2 text-gray-400 font-mono text-xs">{item.variantSku || item.productSku}</td>
                                               <td className="py-2 text-right text-gray-600">{item.expectedQty}</td>
                                               <td className="py-2 text-right">
                                                 {s.status === 'OPEN' ? (
