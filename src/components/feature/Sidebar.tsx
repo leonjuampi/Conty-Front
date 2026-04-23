@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCash } from '../../context/CashContext';
+import { NotificationBell } from './NotificationBell';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -133,13 +134,16 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               </p>
             </div>
           </div>
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-red-500/20 hover:text-red-400 transition-all cursor-pointer whitespace-nowrap text-sm"
-          >
-            <i className="ri-logout-box-r-line text-lg"></i>
-            <span className="font-medium">Cerrar sesión</span>
-          </button>
+          <div className="flex items-center justify-between px-3 py-1">
+            <NotificationBell dark />
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 hover:bg-red-500/20 hover:text-red-400 transition-all cursor-pointer text-sm"
+            >
+              <i className="ri-logout-box-r-line text-lg"></i>
+              <span className="font-medium">Cerrar sesión</span>
+            </button>
+          </div>
         </div>
       </div>
     </>

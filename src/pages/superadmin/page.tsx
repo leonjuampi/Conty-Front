@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { AppLayout } from '../../components/feature/AppLayout';
 import {
   listOrgs, updateOrgPlan, listDevices, revokeDevice,
@@ -6,6 +7,13 @@ import {
   toggleUserStatus, unlockUser, createOrg,
   OrgItem, DeviceItem, UserItem,
 } from '../../services/superadmin.service';
+import {
+  getSuperadminNotifications,
+  createNotification,
+  deleteNotification,
+  uploadNotificationImage,
+  Notification as AppNotification,
+} from '../../services/notifications.service';
 import { getRoleName } from '../../utils/roles';
 
 const PLAN_LABELS: Record<string, string> = {
@@ -788,6 +796,17 @@ export default function SuperAdminPage() {
   const [usersOrg, setUsersOrg] = useState<OrgItem | null>(null);
   const [showCreateOrg, setShowCreateOrg] = useState(false);
 
+  // Notificaciones
+  const [notifications, setNotifications] = useState<(AppNotification & { is_active: boolean })[]>([]);
+  const [notifTitle, setNotifTitle] = useState('');
+  const [notifBody, setNotifBody] = useState('');
+  const [notifSaving, setNotifSaving] = useState(false);
+  const [notifError, setNotifError] = useState('');
+  const [notifPreview, setNotifPreview] = useState(false);
+  const [imgUploading, setImgUploading] = useState(false);
+  const notifTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const imgInputRef = useRef<HTMLInputElement>(null);
+
   const load = useCallback(async () => {
     setLoading(true);
     try {
@@ -797,7 +816,65 @@ export default function SuperAdminPage() {
     }
   }, []);
 
+  const loadNotifications = useCallback(async () => {
+    try {
+      setNotifications(await getSuperadminNotifications());
+    } catch { /* silencioso */ }
+  }, []);
+
   useEffect(() => { load(); }, [load]);
+  useEffect(() => { loadNotifications(); }, [loadNotifications]);
+
+  const handleCreateNotif = async () => {
+    if (!notifTitle.trim() || !notifBody.trim()) {
+      setNotifError('Completá el título y el mensaje.');
+      return;
+    }
+    setNotifSaving(true);
+    setNotifError('');
+    try {
+      await createNotification(notifTitle.trim(), notifBody.trim());
+      setNotifTitle('');
+      setNotifBody('');
+      loadNotifications();
+    } catch {
+      setNotifError('Error al crear la notificación.');
+    } finally {
+      setNotifSaving(false);
+    }
+  };
+
+  const handleDeleteNotif = async (id: number) => {
+    if (!confirm('¿Desactivar esta notificación?')) return;
+    await deleteNotification(id);
+    loadNotifications();
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImgUploading(true);
+    try {
+      const url = await uploadNotificationImage(file);
+      const apiBase = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001';
+      const fullUrl = `${apiBase}${url}`;
+      const markdown = `\n![imagen](${fullUrl})\n`;
+      const ta = notifTextareaRef.current;
+      if (ta) {
+        const start = ta.selectionStart ?? notifBody.length;
+        const end = ta.selectionEnd ?? notifBody.length;
+        const next = notifBody.slice(0, start) + markdown + notifBody.slice(end);
+        setNotifBody(next);
+      } else {
+        setNotifBody(prev => prev + markdown);
+      }
+    } catch {
+      setNotifError('Error al subir la imagen.');
+    } finally {
+      setImgUploading(false);
+      if (imgInputRef.current) imgInputRef.current.value = '';
+    }
+  };
 
   const filtered = orgs.filter(o =>
     o.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -998,6 +1075,114 @@ export default function SuperAdminPage() {
           onCreated={load}
         />
       )}
+
+      {/* Notificaciones */}
+      <div className="mt-8 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
+          <i className="ri-notification-3-line text-brand-500"></i>
+          <h2 className="text-sm font-semibold text-gray-900">Notificaciones a usuarios</h2>
+        </div>
+
+        <div className="p-5 border-b border-gray-100 space-y-3">
+          <input
+            type="text"
+            value={notifTitle}
+            onChange={e => setNotifTitle(e.target.value)}
+            placeholder="Título (ej: Nueva funcionalidad disponible)"
+            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
+          />
+
+          {/* Toolbar */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setNotifPreview(false)}
+              className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${!notifPreview ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-100'}`}
+            >
+              Editar
+            </button>
+            <button
+              type="button"
+              onClick={() => setNotifPreview(true)}
+              className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${notifPreview ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-100'}`}
+            >
+              Preview
+            </button>
+            <div className="flex-1" />
+            <button
+              type="button"
+              onClick={() => imgInputRef.current?.click()}
+              disabled={imgUploading}
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50 cursor-pointer"
+            >
+              <i className={`${imgUploading ? 'ri-loader-4-line animate-spin' : 'ri-image-add-line'}`}></i>
+              {imgUploading ? 'Subiendo...' : 'Imagen'}
+            </button>
+            <input ref={imgInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+            <span className="text-xs text-gray-400">Soporta **negrita**, *cursiva*, listas, etc.</span>
+          </div>
+
+          {/* Editor / Preview */}
+          {notifPreview ? (
+            <div className="min-h-[120px] border border-gray-200 rounded-xl px-3 py-2.5 prose prose-sm max-w-none text-sm">
+              {notifBody ? (
+                <ReactMarkdown>{notifBody}</ReactMarkdown>
+              ) : (
+                <p className="text-gray-400 italic">Sin contenido aún...</p>
+              )}
+            </div>
+          ) : (
+            <textarea
+              ref={notifTextareaRef}
+              value={notifBody}
+              onChange={e => setNotifBody(e.target.value)}
+              placeholder={'Descripción del mensaje...\n\n**negrita**, *cursiva*, ## Título, - listas'}
+              rows={6}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none font-mono"
+            />
+          )}
+
+          {notifError && <p className="text-xs text-red-500">{notifError}</p>}
+          <button
+            onClick={handleCreateNotif}
+            disabled={notifSaving}
+            className="flex items-center gap-2 px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60 cursor-pointer"
+          >
+            <i className="ri-send-plane-line"></i>
+            {notifSaving ? 'Enviando...' : 'Publicar notificación'}
+          </button>
+        </div>
+
+        <div className="divide-y divide-gray-50">
+          {notifications.length === 0 ? (
+            <p className="text-sm text-gray-400 text-center py-8">No hay notificaciones publicadas.</p>
+          ) : (
+            notifications.map(n => (
+              <div key={n.id} className={`flex items-start justify-between gap-4 px-5 py-4 ${!n.is_active ? 'opacity-40' : ''}`}>
+                <div>
+                  <p className="text-sm font-semibold text-gray-800">{n.title}</p>
+                  <div className="text-xs text-gray-500 mt-0.5 prose prose-xs max-w-none [&_img]:rounded-lg [&_img]:max-h-24 [&_p]:my-0">
+                    <ReactMarkdown>{n.body}</ReactMarkdown>
+                  </div>
+                  <p className="text-[11px] text-gray-400 mt-1">
+                    {new Date(n.created_at).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                    {!n.is_active && ' · Desactivada'}
+                  </p>
+                </div>
+                {n.is_active && (
+                  <button
+                    onClick={() => handleDeleteNotif(n.id)}
+                    className="text-gray-300 hover:text-red-400 transition-colors cursor-pointer shrink-0 mt-0.5"
+                    title="Desactivar"
+                  >
+                    <i className="ri-close-circle-line text-lg"></i>
+                  </button>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+      </div>
     </AppLayout>
   );
 }
