@@ -4,6 +4,8 @@ import { AppRoutes } from './router';
 import { AuthProvider } from './context/AuthContext';
 import { CashProvider } from './context/CashContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { NotificationProvider } from './context/NotificationContext';
+import { NotificationModal } from './components/feature/NotificationModal';
 
 function App() {
   return (
@@ -11,7 +13,10 @@ function App() {
       <AuthProvider>
         <ThemeProvider>
           <CashProvider>
-            <AppRoutes />
+            <NotificationProvider>
+              <NotificationModal />
+              <AppRoutes />
+            </NotificationProvider>
           </CashProvider>
         </ThemeProvider>
       </AuthProvider>
