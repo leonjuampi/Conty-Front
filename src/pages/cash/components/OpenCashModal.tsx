@@ -1,7 +1,8 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { useCash } from '../../../context/CashContext';
+import { getSuggestedInitial } from '../../../services/cash.service';
 
 export function OpenCashModal() {
   const { currentUser } = useAuth();
@@ -9,6 +10,22 @@ export function OpenCashModal() {
   const [initialAmount, setInitialAmount] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState(false);
+  const [suggested, setSuggested] = useState<{ amount: number; closedAt: string | null } | null>(null);
+  const [userEdited, setUserEdited] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    getSuggestedInitial()
+      .then(res => {
+        if (cancelled) return;
+        if (res.amount != null) {
+          setSuggested({ amount: res.amount, closedAt: res.closedAt });
+          setInitialAmount(prev => (prev === '' ? res.amount!.toFixed(2) : prev));
+        }
+      })
+      .catch(() => { /* sin sugerido: queda vacío */ });
+    return () => { cancelled = true; };
+  }, []);
 
   const handleOpenCash = async () => {
     const amount = parseFloat(initialAmount);
@@ -31,7 +48,16 @@ export function OpenCashModal() {
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9.]/g, '');
     setInitialAmount(value);
+    setUserEdited(true);
     setError('');
+  };
+
+  const fmtSuggestedDate = (iso: string | null) => {
+    if (!iso) return null;
+    return new Date(iso).toLocaleDateString('es-AR', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit',
+    });
   };
 
   const currentDate = new Date().toLocaleDateString('es-AR', {
@@ -84,6 +110,16 @@ export function OpenCashModal() {
               className="w-full pl-9 pr-4 py-4 md:py-5 border-2 border-gray-200 rounded-xl text-xl md:text-2xl font-bold text-gray-800 focus:outline-none focus:border-brand-500 transition-colors min-h-[56px]"
             />
           </div>
+          {suggested && (
+            <p className="mt-2 text-xs text-gray-500 flex items-center gap-1">
+              <i className="ri-information-line text-brand-500"></i>
+              Sugerido según último cierre
+              {suggested.closedAt ? ` (${fmtSuggestedDate(suggested.closedAt)})` : ''}: ${suggested.amount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+              {userEdited && parseFloat(initialAmount || '0') !== suggested.amount && (
+                <span className="ml-1 text-amber-600 font-semibold">· editado</span>
+              )}
+            </p>
+          )}
           {error && (
             <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
               <i className="ri-error-warning-line"></i>
