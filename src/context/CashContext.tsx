@@ -12,7 +12,7 @@ interface CashContextType {
   isLoadingSession: boolean;
   hasCashOpen: boolean;
   openCash: (initialAmount: number) => Promise<void>;
-  closeCash: (actualJson: Record<string, number>, note?: string) => Promise<void>;
+  closeCash: (actualJson: Record<string, number>, note?: string, cashLeftForNext?: number | null) => Promise<void>;
   refreshSession: () => Promise<void>;
 }
 
@@ -53,9 +53,13 @@ export function CashProvider({ children }: { children: ReactNode }) {
     await refreshSession();
   };
 
-  const closeCash = async (actualJson: Record<string, number>, note?: string): Promise<void> => {
+  const closeCash = async (
+    actualJson: Record<string, number>,
+    note?: string,
+    cashLeftForNext?: number | null
+  ): Promise<void> => {
     if (!activeSession) throw new Error('No hay sesión abierta');
-    await closeSession(activeSession.id, actualJson, note);
+    await closeSession(activeSession.id, actualJson, note, cashLeftForNext);
     setActiveSession(null);
   };
 

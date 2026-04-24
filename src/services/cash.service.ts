@@ -21,11 +21,17 @@ export interface CashSession {
   status: 'OPEN' | 'CLOSED';
   totalsJson: Record<string, number> | null;
   actualJson: Record<string, number> | null;
+  cashLeftForNext: number | null;
   totalsPerMethod: Record<string, number>;
   totalSales: number;
   totalOrders: number;
   netMovements: number;
   movements?: CashMovement[];
+}
+
+export interface SuggestedInitial {
+  amount: number | null;
+  closedAt: string | null;
 }
 
 export async function getActiveSession(): Promise<CashSession | null> {
@@ -41,9 +47,15 @@ export async function openSession(initialCash: number): Promise<{ id: number }> 
 export async function closeSession(
   sessionId: number,
   actualJson: Record<string, number>,
-  note?: string
-): Promise<{ ok: boolean; totalsPerMethod: Record<string, number>; totalSales: number }> {
-  const { data } = await api.post(`/cash/${sessionId}/close`, { actualJson, note });
+  note?: string,
+  cashLeftForNext?: number | null
+): Promise<{ ok: boolean; totalsPerMethod: Record<string, number>; totalSales: number; cashLeftForNext: number | null }> {
+  const { data } = await api.post(`/cash/${sessionId}/close`, { actualJson, note, cashLeftForNext });
+  return data;
+}
+
+export async function getSuggestedInitial(): Promise<SuggestedInitial> {
+  const { data } = await api.get<SuggestedInitial>('/cash/suggested-initial');
   return data;
 }
 

@@ -84,6 +84,7 @@ export function CloseCashModal() {
   const [confirmed, setConfirmed] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(paymentRows.map(r => [r.key, false]))
   );
+  const [cashLeftForNext, setCashLeftForNext] = useState<string>('');
 
   const paymentMethodKeys = paymentRows.map(r => r.key).sort().join(',');
 
@@ -105,10 +106,20 @@ export function CloseCashModal() {
     for (const row of paymentRows) {
       actualJson[row.key] = parseFloat(actualAmounts[row.key]) || 0;
     }
+    const leftRaw = cashLeftForNext.trim();
+    let leftForNext: number | null = null;
+    if (leftRaw !== '') {
+      const parsed = parseFloat(leftRaw);
+      if (isNaN(parsed) || parsed < 0) {
+        setError('El monto que queda en caja debe ser mayor o igual a 0');
+        return;
+      }
+      leftForNext = parsed;
+    }
     setLoading(true);
     setError('');
     try {
-      await closeCash(actualJson);
+      await closeCash(actualJson, undefined, leftForNext);
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setError(msg || 'Error al cerrar la caja');
@@ -470,6 +481,27 @@ export function CloseCashModal() {
             </div>
           );
         })}
+      </div>
+
+      <div className="bg-white rounded-xl p-4 md:p-6 border-2 border-gray-100 mb-4 md:mb-6">
+        <h2 className="text-lg md:text-xl font-bold text-gray-800 flex items-center mb-2">
+          <i className="ri-safe-2-line mr-2 text-brand-600"></i>
+          Monto que queda en caja
+        </h2>
+        <p className="text-sm text-gray-500 mb-4">
+          Opcional. Si dejás efectivo en la caja para la próxima apertura, indicá cuánto. Se va a sugerir automáticamente al abrir caja la próxima vez en esta sucursal.
+        </p>
+        <div className="relative max-w-xs">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">$</span>
+          <input
+            type="text"
+            inputMode="decimal"
+            value={cashLeftForNext}
+            onChange={(e) => setCashLeftForNext(e.target.value.replace(/[^0-9.]/g, ''))}
+            placeholder="0.00"
+            className="w-full pl-8 pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-lg text-base font-bold text-gray-800 focus:outline-none focus:border-brand-500 transition-colors min-h-[52px]"
+          />
+        </div>
       </div>
 
       <div className="bg-white rounded-xl p-4 md:p-6 border-2 border-gray-200">
