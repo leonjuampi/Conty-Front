@@ -148,7 +148,12 @@ export default function OrdersPage() {
     setShowPaymentModal(true);
   };
 
-  const handlePaymentComplete = async (data: { paymentMethod: string; amountPaid: number; notes: string; deliveryPlatform: string | null; pendingPayment: boolean }) => {
+  const handlePaymentComplete = async (data: {
+    payments: Array<{ method: string; amount: number; note?: string }>;
+    notes: string;
+    deliveryPlatform: string | null;
+    pendingPayment: boolean;
+  }) => {
     if (!currentUser?.branchId) throw new Error('Sin sucursal activa');
 
     const sale = await createSale({
@@ -161,9 +166,7 @@ export default function OrdersPage() {
         qty: item.quantity,
         unitPrice: item.price,
       })),
-      payments: data.pendingPayment
-        ? []
-        : [{ method: data.paymentMethod, amount: calculateTotal(), note: data.notes || undefined }],
+      payments: data.payments,
       note: data.pendingPayment ? (data.notes || undefined) : undefined,
       deliveryPlatform: data.deliveryPlatform,
     });

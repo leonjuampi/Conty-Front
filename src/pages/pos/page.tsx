@@ -94,6 +94,8 @@ export default function PosPage() {
   const [paymentModalLoading, setPaymentModalLoading] = useState(false);
   const [paymentModalError, setPaymentModalError] = useState('');
   const [availableMethods, setAvailableMethods] = useState<{ id: number; name: string }[]>([]);
+  const [pendingMultiMode, setPendingMultiMode] = useState(false);
+  const [pendingPayments, setPendingPayments] = useState<Array<{ method: string; amount: number }>>([]);
 
   // Variant picker state
   const [variantPickerProduct, setVariantPickerProduct] = useState<PosProduct | null>(null);
@@ -178,6 +180,8 @@ export default function PosPage() {
     setPaymentModalAmount(String(sale.total));
     setPaymentModalMethod(availableMethods[0]?.name || 'CASH');
     setPaymentModalError('');
+    setPendingMultiMode(false);
+    setPendingPayments([]);
     setRegisterPaymentSale(sale);
   };
 
@@ -346,7 +350,8 @@ export default function PosPage() {
   };
 
   const handlePaymentComplete = async (data: {
-    paymentMethod: string; amountPaid: number; notes: string;
+    payments: Array<{ method: string; amount: number; note?: string }>;
+    notes: string;
     deliveryPlatform: string | null; pendingPayment: boolean;
   }) => {
     if (!currentUser?.branchId) throw new Error('Sin sucursal activa');
@@ -356,9 +361,7 @@ export default function PosPage() {
       docType: 'TICKET',
       customerId: selectedClient?.id ?? null,
       items: orderItems.map(i => ({ variantId: i.variantId, qty: i.quantity, unitPrice: i.price })),
-      payments: data.pendingPayment
-        ? []
-        : [{ method: data.paymentMethod, amount: calculateTotal(), note: data.notes || undefined }],
+      payments: data.payments,
       note: data.pendingPayment ? (data.notes || undefined) : undefined,
       deliveryPlatform: data.deliveryPlatform,
     });
@@ -867,88 +870,221 @@ export default function PosPage() {
       </div>
 
       {/* ── Register payment modal ── */}
-      {registerPaymentSale && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm">
-            <div className="bg-gradient-to-r from-brand-500 to-brand-600 rounded-t-2xl p-4 flex items-center justify-between">
-              <div>
-                <h2 className="text-white font-bold text-base">Registrar Pago</h2>
-                <p className="text-brand-100 text-xs mt-0.5">{registerPaymentSale.docText} — {fmt(registerPaymentSale.total)}</p>
-              </div>
-              <button
-                onClick={() => setRegisterPaymentSale(null)}
-                className="w-8 h-8 flex items-center justify-center bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors cursor-pointer"
-              >
-                <i className="ri-close-line text-lg"></i>
-              </button>
-            </div>
-            <div className="p-5 space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-2">Método de pago</label>
-                <select
-                  value={paymentModalMethod}
-                  onChange={e => setPaymentModalMethod(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-400 outline-none"
-                >
-                  {availableMethods.length > 0
-                    ? availableMethods.map(m => <option key={m.id} value={m.name}>{PAYMENT_LABEL[m.name] ?? m.name}</option>)
-                    : Object.entries(PAYMENT_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)
-                  }
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-2">Monto</label>
-                <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-brand-400 overflow-hidden">
-                  <span className="px-3 py-2.5 bg-gray-50 border-r border-gray-300 text-sm font-semibold text-gray-500">$</span>
-                  <input
-                    type="number"
-                    value={paymentModalAmount}
-                    onChange={e => setPaymentModalAmount(e.target.value)}
-                    className="flex-1 px-3 py-2.5 text-sm outline-none"
-                    step="0.01"
-                    min="0.01"
-                  />
+      {registerPaymentSale && (() => {
+        const saleTotal = registerPaymentSale.total;
+        const roundMoney = (n: number) => Math.round(n * 100) / 100;
+        const pendingTotalPaid = roundMoney(pendingPayments.reduce((s, p) => s + p.amount, 0));
+        const pendingRemaining = roundMoney(saleTotal - pendingTotalPaid);
+        const methodOptions = availableMethods.length > 0
+          ? availableMethods.map(m => ({ key: m.name, label: PAYMENT_LABEL[m.name] ?? m.name }))
+          : Object.entries(PAYMENT_LABEL).map(([k, v]) => ({ key: k, label: v }));
+
+        const addToPendingList = () => {
+          const amt = parseFloat(paymentModalAmount);
+          if (!amt || amt <= 0) { setPaymentModalError('Ingresá un monto válido'); return; }
+          if (amt - pendingRemaining > 0.009) {
+            setPaymentModalError(`El monto excede lo que resta ($${pendingRemaining.toFixed(2)})`);
+            return;
+          }
+          setPaymentModalError('');
+          setPendingPayments([...pendingPayments, { method: paymentModalMethod, amount: roundMoney(amt) }]);
+          setPaymentModalAmount('');
+        };
+
+        const confirmPayments = async () => {
+          setPaymentModalLoading(true);
+          setPaymentModalError('');
+          try {
+            let payload: Array<{ method: string; amount: number }>;
+            if (pendingMultiMode) {
+              if (pendingPayments.length === 0) {
+                setPaymentModalError('Agregá al menos un pago');
+                setPaymentModalLoading(false);
+                return;
+              }
+              payload = pendingPayments;
+            } else {
+              const amt = parseFloat(paymentModalAmount);
+              if (!amt || amt <= 0) {
+                setPaymentModalError('Ingresá un monto válido');
+                setPaymentModalLoading(false);
+                return;
+              }
+              payload = [{ method: paymentModalMethod, amount: amt }];
+            }
+            await addPayments(registerPaymentSale.id, payload);
+            setRegisterPaymentSale(null);
+            setSalesLoaded(false);
+            if (selectedSale) closeDetail();
+            refreshSession();
+          } catch (e: unknown) {
+            const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
+            setPaymentModalError(msg || 'Error al registrar el pago');
+          } finally {
+            setPaymentModalLoading(false);
+          }
+        };
+
+        const canConfirm = pendingMultiMode
+          ? pendingPayments.length > 0
+          : !!paymentModalAmount && parseFloat(paymentModalAmount) > 0;
+
+        return (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm">
+              <div className="bg-gradient-to-r from-brand-500 to-brand-600 rounded-t-2xl p-4 flex items-center justify-between">
+                <div>
+                  <h2 className="text-white font-bold text-base">Registrar Pago</h2>
+                  <p className="text-brand-100 text-xs mt-0.5">{registerPaymentSale.docText} — {fmt(saleTotal)}</p>
                 </div>
-              </div>
-              {paymentModalError && (
-                <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 text-xs px-3 py-2.5 rounded-lg">
-                  <i className="ri-error-warning-line"></i>{paymentModalError}
-                </div>
-              )}
-              <div className="flex gap-3 pt-1">
                 <button
                   onClick={() => setRegisterPaymentSale(null)}
-                  className="flex-1 bg-gray-100 text-gray-700 font-semibold py-2.5 rounded-xl hover:bg-gray-200 cursor-pointer text-sm"
+                  className="w-8 h-8 flex items-center justify-center bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors cursor-pointer"
                 >
-                  Cancelar
+                  <i className="ri-close-line text-lg"></i>
                 </button>
+              </div>
+              <div className="p-5 space-y-4">
                 <button
-                  disabled={paymentModalLoading || !paymentModalAmount || parseFloat(paymentModalAmount) <= 0}
-                  onClick={async () => {
-                    setPaymentModalLoading(true);
-                    setPaymentModalError('');
-                    try {
-                      await addPayments(registerPaymentSale.id, [{ method: paymentModalMethod, amount: parseFloat(paymentModalAmount) }]);
-                      setRegisterPaymentSale(null);
-                      setSalesLoaded(false);
-                      if (selectedSale) closeDetail();
-                      refreshSession();
-                    } catch (e: unknown) {
-                      const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
-                      setPaymentModalError(msg || 'Error al registrar el pago');
-                    } finally {
-                      setPaymentModalLoading(false);
+                  type="button"
+                  onClick={() => {
+                    if (pendingMultiMode) {
+                      setPendingMultiMode(false);
+                      setPendingPayments([]);
+                      setPaymentModalAmount(String(saleTotal));
+                      setPaymentModalError('');
+                    } else {
+                      setPendingMultiMode(true);
+                      setPaymentModalAmount('');
+                      setPaymentModalError('');
                     }
                   }}
-                  className="flex-1 bg-gradient-to-r from-brand-500 to-brand-600 text-white font-bold py-2.5 rounded-xl hover:from-brand-600 hover:to-brand-700 cursor-pointer text-sm disabled:opacity-60 flex items-center justify-center gap-2"
+                  className={`w-full p-2.5 rounded-lg border-2 cursor-pointer flex items-center justify-center gap-2 text-xs font-semibold transition-all ${pendingMultiMode ? 'border-brand-600 bg-brand-50 text-brand-700' : 'border-dashed border-gray-300 bg-white text-gray-600 hover:border-gray-400'}`}
                 >
-                  {paymentModalLoading ? <><i className="ri-loader-4-line animate-spin"></i>Guardando...</> : 'Confirmar'}
+                  <i className={pendingMultiMode ? 'ri-check-line' : 'ri-add-line'}></i>
+                  {pendingMultiMode ? 'Usando múltiples medios' : 'Usar múltiples medios de pago'}
                 </button>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-2">Método de pago</label>
+                  <select
+                    value={paymentModalMethod}
+                    onChange={e => setPaymentModalMethod(e.target.value)}
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-400 outline-none"
+                  >
+                    {methodOptions.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-2">Monto</label>
+                  <div className="flex items-stretch gap-2">
+                    <div className="flex items-center flex-1 border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-brand-400 overflow-hidden">
+                      <span className="px-3 py-2.5 bg-gray-50 border-r border-gray-300 text-sm font-semibold text-gray-500">$</span>
+                      <input
+                        type="number"
+                        value={paymentModalAmount}
+                        onChange={e => setPaymentModalAmount(e.target.value)}
+                        onKeyDown={e => { if (pendingMultiMode && e.key === 'Enter') { e.preventDefault(); addToPendingList(); } }}
+                        className="flex-1 px-3 py-2.5 text-sm outline-none min-w-0"
+                        step="0.01"
+                        min="0.01"
+                      />
+                    </div>
+                    {pendingMultiMode && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const half = roundMoney(saleTotal / 2);
+                            setPaymentModalAmount(String(Math.min(half, pendingRemaining)));
+                          }}
+                          disabled={pendingRemaining <= 0}
+                          className="px-2.5 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 text-xs font-semibold hover:bg-gray-50 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        >Mitad</button>
+                        <button
+                          type="button"
+                          onClick={() => { if (pendingRemaining > 0) setPaymentModalAmount(String(pendingRemaining)); }}
+                          disabled={pendingRemaining <= 0}
+                          className="px-2.5 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 text-xs font-semibold hover:bg-gray-50 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        >Resto</button>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {pendingMultiMode && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={addToPendingList}
+                      disabled={pendingRemaining <= 0}
+                      className="w-full py-2 rounded-lg bg-brand-600 text-white text-sm font-semibold hover:bg-brand-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      <i className="ri-add-line"></i>Agregar pago
+                    </button>
+
+                    {pendingPayments.length > 0 && (
+                      <div className="border border-gray-200 rounded-lg divide-y divide-gray-100">
+                        {pendingPayments.map((p, idx) => (
+                          <div key={idx} className="flex items-center justify-between px-3 py-2 text-sm">
+                            <span className="font-semibold text-gray-700">{PAYMENT_LABEL[p.method] ?? p.method}</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-gray-800">{fmt(p.amount)}</span>
+                              <button
+                                onClick={() => setPendingPayments(pendingPayments.filter((_, i) => i !== idx))}
+                                className="w-7 h-7 flex items-center justify-center rounded-md text-red-500 hover:bg-red-50 cursor-pointer"
+                                title="Quitar"
+                              >
+                                <i className="ri-delete-bin-line"></i>
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 text-xs space-y-1">
+                      <div className="flex justify-between"><span className="text-gray-600">Total:</span><span className="font-semibold text-gray-800">{fmt(saleTotal)}</span></div>
+                      <div className="flex justify-between"><span className="text-gray-600">Pagado:</span><span className="font-semibold text-gray-800">{fmt(pendingTotalPaid)}</span></div>
+                      <div className="flex justify-between pt-1 border-t border-gray-200">
+                        <span className={`font-semibold ${pendingRemaining > 0.009 ? 'text-amber-600' : 'text-green-600'}`}>
+                          {pendingRemaining > 0.009 ? 'Resta:' : 'Completo:'}
+                        </span>
+                        <span className={`font-bold ${pendingRemaining > 0.009 ? 'text-amber-600' : 'text-green-600'}`}>
+                          {fmt(pendingRemaining)}
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {paymentModalError && (
+                  <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 text-xs px-3 py-2.5 rounded-lg">
+                    <i className="ri-error-warning-line"></i>{paymentModalError}
+                  </div>
+                )}
+
+                <div className="flex gap-3 pt-1">
+                  <button
+                    onClick={() => setRegisterPaymentSale(null)}
+                    className="flex-1 bg-gray-100 text-gray-700 font-semibold py-2.5 rounded-xl hover:bg-gray-200 cursor-pointer text-sm"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    disabled={paymentModalLoading || !canConfirm}
+                    onClick={confirmPayments}
+                    className="flex-1 bg-gradient-to-r from-brand-500 to-brand-600 text-white font-bold py-2.5 rounded-xl hover:from-brand-600 hover:to-brand-700 cursor-pointer text-sm disabled:opacity-60 flex items-center justify-center gap-2"
+                  >
+                    {paymentModalLoading ? <><i className="ri-loader-4-line animate-spin"></i>Guardando...</> : 'Confirmar'}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </AppLayout>
   );
 }
