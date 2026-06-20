@@ -47,6 +47,10 @@ const FIELD_LABELS: Record<string, string> = {
   itemsCount: 'Cantidad de ítems',
   successCount: 'Éxitos',
   errorCount: 'Errores',
+  paymentsAdded: 'Pagos registrados',
+  paymentIds: 'IDs de pago',
+  method: 'Medio',
+  amount: 'Monto',
   // snake_case (columnas SQL)
   category_id: 'Categoría',
   subcategory_id: 'Subcategoría',
@@ -67,12 +71,39 @@ function labelFor(key: string): string {
   return FIELD_LABELS[key] ?? key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
 }
 
+const PAYMENT_METHOD_LABELS: Record<string, string> = {
+  CASH: 'Efectivo',
+  CREDIT_CARD: 'Tarjeta',
+  DEBIT_CARD: 'Tarjeta de débito',
+  BANK_TRANSFER: 'Transferencia',
+  MERCADO_PAGO: 'Mercado Pago',
+};
+
+function formatMoney(n: unknown): string {
+  const num = typeof n === 'number' ? n : parseFloat(String(n));
+  if (!Number.isFinite(num)) return String(n);
+  return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 2 }).format(num);
+}
+
 function formatValue(value: unknown): string {
   if (value === null || value === undefined) return '—';
   if (typeof value === 'boolean') return value ? 'Sí' : 'No';
-  if (Array.isArray(value)) return value.join(', ');
+  if (Array.isArray(value)) {
+    if (value.every(v => v !== null && typeof v === 'object')) {
+      return value.map(v => {
+        const obj = v as Record<string, unknown>;
+        const entries = Object.entries(obj).map(([k, val]) => `${labelFor(k)}: ${formatValue(val)}`);
+        return entries.join(' · ');
+      }).join(' | ');
+    }
+    return value.join(', ');
+  }
   if (typeof value === 'object') return JSON.stringify(value);
   return String(value);
+}
+
+function isPaymentArray(value: unknown): value is Array<{ method?: string; amount?: number; note?: string }> {
+  return Array.isArray(value) && value.every(v => v !== null && typeof v === 'object' && ('method' in (v as object) || 'amount' in (v as object)));
 }
 
 export default function AuditPage() {
@@ -415,12 +446,33 @@ export default function AuditPage() {
                     {selectedLog.action_type === 'UPDATE' ? 'Nuevos valores' : 'Información'}
                   </h3>
                   <div className="border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100">
-                    {Object.entries(selectedLog.details_json).map(([key, value]) => (
-                      <div key={key} className="flex items-start justify-between px-4 py-2.5 hover:bg-gray-50 gap-4">
-                        <span className="text-xs text-gray-500 shrink-0 pt-0.5 min-w-[110px]">{labelFor(key)}</span>
-                        <span className="text-sm font-semibold text-gray-800 text-right break-all">{formatValue(value)}</span>
-                      </div>
-                    ))}
+                    {Object.entries(selectedLog.details_json).map(([key, value]) => {
+                      if (isPaymentArray(value)) {
+                        return (
+                          <div key={key} className="px-4 py-2.5 bg-white">
+                            <p className="text-xs text-gray-500 mb-2">{labelFor(key)}</p>
+                            <div className="space-y-1.5">
+                              {value.map((p, idx) => (
+                                <div key={idx} className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2">
+                                  <span className="text-sm text-gray-700">
+                                    {p.method ? (PAYMENT_METHOD_LABELS[p.method] ?? p.method) : '—'}
+                                  </span>
+                                  <span className="text-sm font-semibold text-gray-900">
+                                    {p.amount != null ? formatMoney(p.amount) : '—'}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      }
+                      return (
+                        <div key={key} className="flex items-start justify-between px-4 py-2.5 hover:bg-gray-50 gap-4">
+                          <span className="text-xs text-gray-500 shrink-0 pt-0.5 min-w-[110px]">{labelFor(key)}</span>
+                          <span className="text-sm font-semibold text-gray-800 text-right break-all">{formatValue(value)}</span>
+                        </div>
+                      );
+                    })}
                   </div>
                   {selectedLog.action_type === 'UPDATE' && (
                     <p className="text-xs text-gray-400 mt-2 flex items-center gap-1">
@@ -469,6 +521,7 @@ function getModalHeaderColor(action: string) {
 function getEntityLabel(entity: string): string {
   const labels: Record<string, string> = {
     SALE: 'Venta',
+    SALE_PAYMENT: 'Pago de venta',
     PRODUCT: 'Producto',
     CUSTOMER: 'Cliente',
     BRANCH: 'Sucursal',
