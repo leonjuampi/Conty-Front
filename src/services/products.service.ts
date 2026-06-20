@@ -81,6 +81,7 @@ export async function listProducts(params?: {
   pageSize?: number;
   limit?: number;
   offset?: number;
+  branchId?: number;
 }): Promise<{ items: Product[]; total: number; page: number; pageSize: number }> {
   const { data } = await api.get('/products', { params });
   return {

@@ -9,6 +9,7 @@ import { VariantPickerModal } from '../pos/components/VariantPickerModal';
 import { useAuth } from '../../context/AuthContext';
 import { useCash } from '../../context/CashContext';
 import { listProducts } from '../../services/products.service';
+import { getBranch } from '../../services/branches.service';
 import { createSale } from '../../services/sales.service';
 
 interface OrderItem {
@@ -35,6 +36,15 @@ export default function OrdersPage() {
   const navigate = useNavigate();
 
   const cashBlocked = !hasCashOpen;
+  const branchId = currentUser?.branchId ?? undefined;
+
+  const [activePosCode, setActivePosCode] = useState('0001');
+
+  useEffect(() => {
+    const id = currentUser?.branchId;
+    if (!id) return;
+    getBranch(id).then(b => { if (b.posCode) setActivePosCode(b.posCode); }).catch(() => {});
+  }, [currentUser?.branchId]);
 
   const [variantPickerProduct, setVariantPickerProduct] = useState<PosProduct | null>(null);
 
@@ -45,7 +55,7 @@ export default function OrdersPage() {
       let page = 1;
       const pageSize = 100;
       while (true) {
-        const res = await listProducts({ status: 'ACTIVE', page, pageSize });
+        const res = await listProducts({ status: 'ACTIVE', page, pageSize, branchId });
         const mapped: PosProduct[] = res.items
           .filter(p => p.variants && p.variants.length > 0)
           .map(p => ({
@@ -70,7 +80,7 @@ export default function OrdersPage() {
       .then(setProducts)
       .catch(() => {})
       .finally(() => setLoadingProducts(false));
-  }, []);
+  }, [branchId]);
 
   useEffect(() => { loadProducts(); }, [loadProducts]);
 
@@ -158,7 +168,7 @@ export default function OrdersPage() {
 
     const sale = await createSale({
       branchId: currentUser.branchId,
-      posCode: '0001',
+      posCode: activePosCode,
       docType: 'TICKET',
       customerId: selectedClient?.id ?? null,
       items: orderItems.map(item => ({

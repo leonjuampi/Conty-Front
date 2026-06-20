@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { listBranches, createBranch, updateBranch, deleteBranch, type Branch } from '../../../services/branches.service';
 
-const emptyForm = { name: '', address: '', phone: '', channel: 'LOCAL' as Branch['channel'], printerName: '', printerCode: '', status: 'ACTIVE' as Branch['status'] };
+const emptyForm = { name: '', address: '', phone: '', posCode: '', channel: 'LOCAL' as Branch['channel'], printerName: '', printerCode: '', status: 'ACTIVE' as Branch['status'] };
 
 const CHANNEL_LABELS: Record<string, string> = { LOCAL: 'Local', ONLINE: 'Online' };
 const STATUS_COLORS: Record<string, string> = { ACTIVE: 'bg-green-100 text-green-700', INACTIVE: 'bg-gray-100 text-gray-500' };
@@ -41,7 +41,7 @@ export default function BranchesManagement() {
 
   const openEdit = (b: Branch) => {
     setEditing(b);
-    setForm({ name: b.name, address: b.address || '', phone: b.phone || '', channel: b.channel, printerName: b.printerName || '', printerCode: b.printerCode || '', status: b.status });
+    setForm({ name: b.name, address: b.address || '', phone: b.phone || '', posCode: b.posCode || '', channel: b.channel, printerName: b.printerName || '', printerCode: b.printerCode || '', status: b.status });
     setFormError('');
     setShowModal(true);
   };
@@ -55,6 +55,7 @@ export default function BranchesManagement() {
         name: form.name.trim(),
         address: form.address.trim() || null,
         phone: form.phone.trim() || null,
+        posCode: form.posCode.trim() || null,
         channel: form.channel,
         printerName: form.printerName.trim() || null,
         printerCode: form.printerCode.trim() || null,
@@ -126,6 +127,7 @@ export default function BranchesManagement() {
                   <th className="text-left px-4 py-3 font-semibold text-gray-600">Nombre</th>
                   <th className="text-left px-4 py-3 font-semibold text-gray-600">Dirección</th>
                   <th className="text-left px-4 py-3 font-semibold text-gray-600">Teléfono</th>
+                  <th className="text-left px-4 py-3 font-semibold text-gray-600">PV</th>
                   <th className="text-left px-4 py-3 font-semibold text-gray-600">Canal</th>
                   <th className="text-left px-4 py-3 font-semibold text-gray-600">Estado</th>
                   <th className="text-left px-4 py-3 font-semibold text-gray-600">Acciones</th>
@@ -137,6 +139,7 @@ export default function BranchesManagement() {
                     <td className="px-4 py-3 font-medium text-gray-800">{b.name}</td>
                     <td className="px-4 py-3 text-gray-500 text-xs">{b.address || '—'}</td>
                     <td className="px-4 py-3 text-gray-500 text-xs">{b.phone || '—'}</td>
+                    <td className="px-4 py-3 text-gray-500 text-xs font-mono">{b.posCode || '—'}</td>
                     <td className="px-4 py-3">
                       <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
                         {CHANNEL_LABELS[b.channel] || b.channel}
@@ -222,13 +225,25 @@ export default function BranchesManagement() {
                   </select>
                 </div>
               </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Punto de Venta (comprobantes)</label>
+                <input
+                  type="text"
+                  value={form.posCode}
+                  onChange={e => setForm({ ...form, posCode: e.target.value })}
+                  placeholder="Ej: 0001"
+                  maxLength={5}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]"
+                />
+                <p className="text-xs text-gray-400 mt-1">Código único por sucursal. Debe ser distinto entre sucursales de la misma organización.</p>
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Nombre Impresora</label>
                   <input type="text" value={form.printerName} onChange={e => setForm({ ...form, printerName: e.target.value })} placeholder="Ej: Ticket POS-001" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Código POS</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Código Impresora</label>
                   <input type="text" value={form.printerCode} onChange={e => setForm({ ...form, printerCode: e.target.value })} placeholder="Ej: POS-001" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm min-h-[48px]" />
                 </div>
               </div>

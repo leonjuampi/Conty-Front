@@ -1,7 +1,9 @@
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCash } from '../../context/CashContext';
 import { NotificationBell } from './NotificationBell';
+import { listBranches, type Branch } from '../../services/branches.service';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -27,8 +29,16 @@ const ALL_MENU_ITEMS = [
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout, switchBranch } = useAuth();
   const { hasCashOpen, activeSession } = useCash();
+  const [branchList, setBranchList] = useState<Branch[]>([]);
+  const [switchingBranch, setSwitchingBranch] = useState(false);
+
+  useEffect(() => {
+    if ((currentUser?.branchIds?.length ?? 0) >= 1) {
+      listBranches({ status: 'ACTIVE' }).then(r => setBranchList(r.items)).catch(() => {});
+    }
+  }, [currentUser?.branchIds?.length]);
 
   const menuItems = ALL_MENU_ITEMS.filter(
     item => currentUser && item.roleIds.includes(currentUser.roleId)
@@ -84,6 +94,50 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             </button>
           </div>
         </div>
+
+        {/* Indicador / selector de sucursal */}
+        {(currentUser?.branchIds?.length ?? 0) >= 1 && (
+          <div className="px-3 pt-3 pb-1">
+            {(currentUser?.branchIds?.length ?? 0) > 1 ? (
+              <div className="relative">
+                <select
+                  value={currentUser?.branchId ?? ''}
+                  disabled={switchingBranch}
+                  onChange={async e => {
+                    const id = Number(e.target.value);
+                    if (!id || id === currentUser?.branchId) return;
+                    setSwitchingBranch(true);
+                    try { await switchBranch(id); } finally { setSwitchingBranch(false); }
+                  }}
+                  className="w-full appearance-none bg-brand-600/30 border border-brand-500/40 text-white text-xs font-semibold rounded-lg pl-8 pr-8 py-2 cursor-pointer disabled:opacity-60"
+                >
+                  {branchList
+                    .filter(b => currentUser?.branchIds?.includes(b.id))
+                    .map(b => (
+                      <option key={b.id} value={b.id} className="text-gray-800 bg-white">{b.name}</option>
+                    ))
+                  }
+                </select>
+                <i className="ri-store-2-line absolute left-2.5 top-1/2 -translate-y-1/2 text-brand-300 text-sm pointer-events-none"></i>
+                {switchingBranch
+                  ? <i className="ri-loader-4-line animate-spin absolute right-2.5 top-1/2 -translate-y-1/2 text-brand-300 text-sm pointer-events-none"></i>
+                  : <i className="ri-arrow-down-s-line absolute right-2 top-1/2 -translate-y-1/2 text-brand-300 text-sm pointer-events-none"></i>
+                }
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 px-3 py-2 bg-brand-600/20 border border-brand-500/30 rounded-lg">
+                <i className="ri-store-2-line text-brand-300 text-sm shrink-0"></i>
+                {branchList.length === 0 ? (
+                  <i className="ri-loader-4-line animate-spin text-brand-300 text-sm"></i>
+                ) : (
+                  <span className="text-xs font-semibold text-white truncate">
+                    {branchList.find(b => b.id === currentUser?.branchId)?.name ?? 'Sucursal'}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Estado de Caja */}
         <div className="px-3 pt-3 pb-1">

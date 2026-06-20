@@ -6,6 +6,7 @@ export interface Branch {
   name: string;
   address: string | null;
   phone: string | null;
+  posCode: string | null;
   channel: 'LOCAL' | 'ONLINE';
   printerName: string | null;
   printerCode: string | null;
@@ -14,6 +15,11 @@ export interface Branch {
 
 export async function listBranches(params?: { orgId?: number; status?: string }): Promise<{ items: Branch[] }> {
   const { data } = await api.get('/branches', { params });
+  return data;
+}
+
+export async function getBranch(id: number): Promise<Branch> {
+  const { data } = await api.get(`/branches/${id}`);
   return data;
 }
 
