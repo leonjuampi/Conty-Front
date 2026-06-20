@@ -6,6 +6,7 @@ import { listSales, getSale, addPayments, cancelSale, listPaymentMethods, type S
 import { listCustomers, type Customer } from '../../services/customers.service';
 import { listSessions, listCashMovements, type CashSession, type CashMovement } from '../../services/cash.service';
 import { getReports, type TopSeller, type TopProduct, type CategoryProductRow, type ReportStats } from '../../services/reports.service';
+import { listBranches, type Branch } from '../../services/branches.service';
 
 // ── Display types ──────────────────────────────────────────────────
 
@@ -157,6 +158,8 @@ export default function ReportsPage() {
   const [dateFrom, setDateFrom] = useState(defaultDateFrom);
   const [dateTo, setDateTo] = useState(defaultDateTo);
   const [searchQuery, setSearchQuery] = useState('');
+  const [reportBranchId, setReportBranchId] = useState<number | undefined>(currentUser?.branchId ?? undefined);
+  const [branchList, setBranchList] = useState<Branch[]>([]);
   const [selectedReport, setSelectedReport] = useState<'clients' | 'sellers' | 'products' | 'cash' | 'ordertype' | 'history' | 'cashhistory' | 'categories' | 'summary'>('history');
   const [selectedOrder, setSelectedOrder] = useState<DisplaySale | null>(null);
   const [saleDetail, setSaleDetail] = useState<{ items: { nameSnapshot: string; qty: number; unitPrice: number; total: number }[]; payments: { method: string; amount: number }[] } | null>(null);
@@ -189,25 +192,28 @@ export default function ReportsPage() {
   useEffect(() => {
     listCustomers({ limit: 500 }).then(res => setCustomers(res.items)).catch(() => {});
     listPaymentMethods().then(res => setAvailableMethods(res.items)).catch(() => {});
+    if ((currentUser?.branchIds?.length ?? 0) > 1) {
+      listBranches({ status: 'ACTIVE' }).then(r => setBranchList(r.items)).catch(() => {});
+    }
   }, []);
 
   useEffect(() => {
     setLoading(true);
     setLoadError('');
     Promise.all([
-      listSales({ from: toMysql(dateFrom), to: toMysql(dateTo), limit: 500 }).then(res => setRawSales(res.items)).catch(() => setRawSales([])),
-      listSessions({ from: toMysql(dateFrom), to: toMysql(dateTo), limit: 200 }).then(res => setRawSessions(res.items)).catch((e) => {
+      listSales({ from: toMysql(dateFrom), to: toMysql(dateTo), limit: 500, branchId: reportBranchId }).then(res => setRawSales(res.items)).catch(() => setRawSales([])),
+      listSessions({ from: toMysql(dateFrom), to: toMysql(dateTo), limit: 200, branchId: reportBranchId }).then(res => setRawSessions(res.items)).catch((e) => {
         setRawSessions([]);
         setLoadError((e as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Error al cargar los datos');
       }),
-      getReports({ from: toMysql(dateFrom), to: toMysql(dateTo) }).then(res => {
+      getReports({ from: toMysql(dateFrom), to: toMysql(dateTo), branchId: reportBranchId }).then(res => {
         setTopSellers(res.bySeller ?? []);
         setTopProducts(res.topProducts ?? []);
         setCategoryReport(res.byCategory ?? []);
         setReportStats(res.stats ?? null);
       }).catch(() => {}),
     ]).finally(() => setLoading(false));
-  }, [dateFrom, dateTo]);
+  }, [dateFrom, dateTo, reportBranchId]);
 
   const filteredSales = useMemo(() => rawSales.map(toDisplaySale), [rawSales]);
   const filteredSessions = useMemo(() =>
@@ -433,6 +439,22 @@ export default function ReportsPage() {
             <input type="datetime-local" value={dateTo} onChange={e => setDateTo(e.target.value)} className="text-sm text-gray-700 bg-transparent outline-none cursor-pointer w-full" />
           </div>
         </div>
+        {(currentUser?.branchIds?.length ?? 0) > 1 && branchList.length > 0 && (
+          <div className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+            <i className="ri-store-2-line text-gray-400 text-sm"></i>
+            <select
+              value={reportBranchId ?? ''}
+              onChange={e => setReportBranchId(e.target.value ? Number(e.target.value) : undefined)}
+              className="text-sm text-gray-700 bg-transparent outline-none cursor-pointer"
+            >
+              <option value="">Todas las sucursales</option>
+              {branchList
+                .filter(b => currentUser?.branchIds?.includes(b.id))
+                .map(b => <option key={b.id} value={b.id}>{b.name}</option>)
+              }
+            </select>
+          </div>
+        )}
         <div className="flex-1 min-w-0 md:min-w-[200px]">
           <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus-within:border-brand-400 focus-within:ring-1 focus-within:ring-brand-200 transition-all">
             <div className="w-4 h-4 flex items-center justify-center shrink-0">
@@ -1180,7 +1202,7 @@ export default function ReportsPage() {
                       await addPayments(registerPaymentSale.saleId, [{ method: paymentModalMethod, amount: parseFloat(paymentModalAmount) }]);
                       setRegisterPaymentSale(null);
                       // Refrescar ventas
-                      listSales({ from: toMysql(dateFrom), to: toMysql(dateTo), limit: 500 }).then(res => setRawSales(res.items)).catch(() => {});
+                      listSales({ from: toMysql(dateFrom), to: toMysql(dateTo), limit: 500, branchId: reportBranchId }).then(res => setRawSales(res.items)).catch(() => {});
                     } catch (e: unknown) {
                       const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
                       setPaymentModalError(msg || 'Error al registrar el pago');
@@ -1319,7 +1341,7 @@ export default function ReportsPage() {
                           setSaleDetail(null);
                           setShowCancelConfirm(false);
                           setCancelReason('');
-                          listSales({ from: toMysql(dateFrom), to: toMysql(dateTo), limit: 500 }).then(res => setRawSales(res.items)).catch(() => {});
+                          listSales({ from: toMysql(dateFrom), to: toMysql(dateTo), limit: 500, branchId: reportBranchId }).then(res => setRawSales(res.items)).catch(() => {});
                         } catch {
                           // error silenciado, el backend ya valida
                         } finally {

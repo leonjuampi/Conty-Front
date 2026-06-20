@@ -11,6 +11,7 @@ import { CloseCashModal } from '../cash/components/CloseCashModal';
 import { useAuth } from '../../context/AuthContext';
 import { useCash } from '../../context/CashContext';
 import { listProducts } from '../../services/products.service';
+import { getBranch } from '../../services/branches.service';
 import { createSale, listSales, getSale, cancelSale, addPayments, listPaymentMethods, type Sale } from '../../services/sales.service';
 
 type PosTab = 'venta' | 'historial' | 'caja';
@@ -63,6 +64,14 @@ export default function PosPage() {
 
   const [activeTab, setActiveTab] = useState<PosTab>('venta');
 
+  const [activePosCode, setActivePosCode] = useState('0001');
+
+  useEffect(() => {
+    const id = currentUser?.branchId;
+    if (!id) return;
+    getBranch(id).then(b => { if (b.posCode) setActivePosCode(b.posCode); }).catch(() => {});
+  }, [currentUser?.branchId]);
+
   // POS state
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [selectedClient, setSelectedClient] = useState<any>(null);
@@ -106,6 +115,8 @@ export default function PosPage() {
     listPaymentMethods().then(res => setAvailableMethods(res.items)).catch(() => {});
   }, []);
 
+  const branchId = currentUser?.branchId ?? undefined;
+
   const loadProducts = useCallback(() => {
     setLoadingProducts(true);
     const fetchAll = async () => {
@@ -113,7 +124,7 @@ export default function PosPage() {
       let page = 1;
       const pageSize = 100;
       while (true) {
-        const res = await listProducts({ status: 'ACTIVE', page, pageSize });
+        const res = await listProducts({ status: 'ACTIVE', page, pageSize, branchId });
         const mapped: PosProduct[] = res.items
           .filter(p => p.variants && p.variants.length > 0)
           .map(p => ({
@@ -138,7 +149,7 @@ export default function PosPage() {
       .then(setProducts)
       .catch(() => {})
       .finally(() => setLoadingProducts(false));
-  }, []);
+  }, [branchId]);
 
   useEffect(() => { loadProducts(); }, [loadProducts]);
 
@@ -357,7 +368,7 @@ export default function PosPage() {
     if (!currentUser?.branchId) throw new Error('Sin sucursal activa');
     const sale = await createSale({
       branchId: currentUser.branchId,
-      posCode: '0001',
+      posCode: activePosCode,
       docType: 'TICKET',
       customerId: selectedClient?.id ?? null,
       items: orderItems.map(i => ({ variantId: i.variantId, qty: i.quantity, unitPrice: i.price })),
