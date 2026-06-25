@@ -3,6 +3,7 @@ import { AppLayout } from '../../components/feature/AppLayout';
 import { ProductForm } from './components/ProductForm';
 import { CategoryModal } from './components/CategoryModal';
 import { ImportProductsModal } from './components/ImportProductsModal';
+import { ProductBranchesModal } from './components/ProductBranchesModal';
 import {
   listProducts,
   getProduct,
@@ -16,6 +17,7 @@ import {
   uploadProductImage,
   type Category,
 } from '../../services/products.service';
+import { useAuth } from '../../context/AuthContext';
 
 interface LocalProduct {
   id: number;
@@ -34,12 +36,16 @@ interface LocalProduct {
 }
 
 export default function ProductsPage() {
+  const { currentUser } = useAuth();
+  const branchId = currentUser?.branchId ?? undefined;
+
   const [products, setProducts] = useState<LocalProduct[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<LocalProduct | null>(null);
+  const [branchesModalProductId, setBranchesModalProductId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [importLoading, setImportLoading] = useState(false);
@@ -55,7 +61,7 @@ export default function ProductsPage() {
 
   const fetchProducts = useCallback(async (page = 1, search?: string, catId?: number) => {
     try {
-      const params: Parameters<typeof listProducts>[0] = { page, pageSize };
+      const params: Parameters<typeof listProducts>[0] = { page, pageSize, branchId };
       if (search) params.search = search;
       if (catId) params.categoryId = catId;
       const res = await listProducts(params);
@@ -77,7 +83,7 @@ export default function ProductsPage() {
         comboItems: p.comboItems ?? [],
       })));
     } catch {}
-  }, []);
+  }, [branchId]);
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -122,10 +128,10 @@ export default function ProductsPage() {
     try {
       let productId: number;
       if (selectedProduct) {
-        await updateProduct(selectedProduct.id, payload as any);
+        await updateProduct(selectedProduct.id, { ...(payload as any), branchId });
         productId = selectedProduct.id;
       } else {
-        const res = await createProduct(payload as any);
+        const res = await createProduct({ ...(payload as any), branchId });
         productId = res.id;
       }
       // Subir imagen si el usuario eligió un archivo
@@ -144,7 +150,7 @@ export default function ProductsPage() {
   const handleEditProduct = async (product: LocalProduct) => {
     if (product.isCombo) {
       try {
-        const full = await getProduct(product.id);
+        const full = await getProduct(product.id, branchId);
         setSelectedProduct({ ...product, comboItems: full.comboItems ?? [] });
       } catch {
         setSelectedProduct(product);
@@ -301,10 +307,17 @@ export default function ProductsPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-center gap-2">
                       <button onClick={() => handleEditProduct(product)}
+                        title="Editar"
                         className="w-8 h-8 flex items-center justify-center text-brand-600 hover:bg-brand-50 rounded-lg cursor-pointer">
                         <i className="ri-edit-line text-lg"></i>
                       </button>
+                      <button onClick={() => setBranchesModalProductId(product.id)}
+                        title="Disponibilidad por sucursal"
+                        className="w-8 h-8 flex items-center justify-center text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer">
+                        <i className="ri-store-2-line text-lg"></i>
+                      </button>
                       <button onClick={() => handleDelete(product.id)}
+                        title="Eliminar"
                         className="w-8 h-8 flex items-center justify-center text-red-600 hover:bg-red-50 rounded-lg cursor-pointer">
                         <i className="ri-delete-bin-line text-lg"></i>
                       </button>
@@ -339,6 +352,11 @@ export default function ProductsPage() {
                 <button onClick={() => handleEditProduct(product)}
                   className="flex-1 flex items-center justify-center gap-1 px-2 py-2 bg-brand-50 text-brand-600 rounded-lg hover:bg-brand-100 cursor-pointer text-xs font-medium">
                   <i className="ri-edit-line"></i><span>Editar</span>
+                </button>
+                <button onClick={() => setBranchesModalProductId(product.id)}
+                  title="Sucursales"
+                  className="w-9 h-9 flex items-center justify-center bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 cursor-pointer shrink-0">
+                  <i className="ri-store-2-line"></i>
                 </button>
                 <button onClick={() => handleDelete(product.id)}
                   className="w-9 h-9 flex items-center justify-center bg-red-50 text-red-600 rounded-lg hover:bg-red-100 cursor-pointer shrink-0">
@@ -416,6 +434,18 @@ export default function ProductsPage() {
           loading={importLoading}
           result={importResult}
           onClearResult={() => setImportResult(null)}
+        />
+      )}
+
+      {branchesModalProductId !== null && (
+        <ProductBranchesModal
+          productId={branchesModalProductId}
+          productName={products.find(p => p.id === branchesModalProductId)?.name ?? ''}
+          onClose={() => setBranchesModalProductId(null)}
+          onSaved={() => {
+            const catId = categories.find(c => c.name === categoryFilter)?.id;
+            fetchProducts(currentPage, searchTerm || undefined, catId);
+          }}
         />
       )}
     </AppLayout>

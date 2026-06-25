@@ -9,7 +9,7 @@ import {
 
 const emptyForm = { name: '', origin: '', unitPrice: '' };
 
-export default function MercaderiaTab() {
+export default function MercaderiaTab({ branchId }: { branchId?: number }) {
   const [items, setItems] = useState<RawMaterial[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -26,7 +26,7 @@ export default function MercaderiaTab() {
   const fetchItems = async () => {
     setLoading(true);
     try {
-      const res = await listRawMaterials({ limit: 500 });
+      const res = await listRawMaterials({ limit: 500, branchId });
       setItems(res.items);
     } catch {
       setItems([]);
@@ -35,7 +35,7 @@ export default function MercaderiaTab() {
     }
   };
 
-  useEffect(() => { fetchItems(); }, []);
+  useEffect(() => { fetchItems(); }, [branchId]);
 
   const filtered = items.filter(i =>
     i.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -69,9 +69,9 @@ export default function MercaderiaTab() {
     setFormError('');
     try {
       if (editItem) {
-        await updateRawMaterial(editItem.id, { name, origin: origin || undefined, unitPrice });
+        await updateRawMaterial(editItem.id, { name, origin: origin || undefined, unitPrice, branchId });
       } else {
-        await createRawMaterial({ name, origin: origin || undefined, unitPrice });
+        await createRawMaterial({ name, origin: origin || undefined, unitPrice, branchId });
       }
       closeModal();
       await fetchItems();

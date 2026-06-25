@@ -7,7 +7,7 @@ import {
 } from '../../../services/elaborationCosts.service';
 import { calcularTotal } from './CostosTab';
 
-export function TotalesTab() {
+export function TotalesTab({ branchId }: { branchId?: number }) {
   const [costs, setCosts] = useState<ElaborationCost[]>([]);
   const [loading, setLoading] = useState(true);
   const [costosLocal, setCostosLocal] = useState(0);
@@ -16,22 +16,23 @@ export function TotalesTab() {
   const [savingCostos, setSavingCostos] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     Promise.all([
-      listElaborationCosts().catch(() => [] as ElaborationCost[]),
-      getElaborationSettings().catch(() => ({ monthly_local_cost: 0 })),
+      listElaborationCosts({ branchId }).catch(() => [] as ElaborationCost[]),
+      getElaborationSettings({ branchId }).catch(() => ({ monthly_local_cost: 0 })),
     ]).then(([costsData, settings]) => {
       setCosts(costsData);
       setCostosLocal(settings.monthly_local_cost);
       setTempCostos(String(settings.monthly_local_cost));
     }).finally(() => setLoading(false));
-  }, []);
+  }, [branchId]);
 
   const handleSaveCostos = async () => {
     const valor = parseFloat(tempCostos);
     if (isNaN(valor) || valor < 0) { setIsEditingCostos(false); return; }
     setSavingCostos(true);
     try {
-      await updateElaborationSettings(valor);
+      await updateElaborationSettings(valor, branchId);
       setCostosLocal(valor);
     } catch {
       alert('Error al guardar');

@@ -13,6 +13,7 @@ import { calcularTotal } from './CostosTab';
 interface Props {
   cost: ElaborationCost | null;
   allCosts: ElaborationCost[];
+  branchId?: number;
   onClose: () => void;
   onSaved: () => void;
 }
@@ -49,7 +50,7 @@ function itemToRow(item: ElaborationCostItem): Row {
   };
 }
 
-export function EditCostModal({ cost, allCosts, onClose, onSaved }: Props) {
+export function EditCostModal({ cost, allCosts, branchId, onClose, onSaved }: Props) {
   const isNew = !cost;
 
   const [name, setName] = useState(cost?.name ?? '');
@@ -66,7 +67,7 @@ export function EditCostModal({ cost, allCosts, onClose, onSaved }: Props) {
   const [salePrice, setSalePrice] = useState('');
 
   useEffect(() => {
-    listRawMaterials({ limit: 500 }).then((r) => setRawMaterials(r.items)).catch(() => {});
+    listRawMaterials({ limit: 500, branchId }).then((r) => setRawMaterials(r.items)).catch(() => {});
     if (canGenerateProduct) {
       listCategories().then((r) => setCategories(r.items)).catch(() => {});
     }
@@ -139,9 +140,9 @@ export function EditCostModal({ cost, allCosts, onClose, onSaved }: Props) {
       }
 
       if (cost) {
-        await updateElaborationCost(cost.id, { name: name.trim(), items, productId });
+        await updateElaborationCost(cost.id, { name: name.trim(), items, productId, branchId });
       } else {
-        await createElaborationCost({ name: name.trim(), items, productId });
+        await createElaborationCost({ name: name.trim(), items, productId, branchId });
       }
       onSaved();
       onClose();

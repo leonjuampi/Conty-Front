@@ -10,6 +10,7 @@ export interface Branch {
   channel: 'LOCAL' | 'ONLINE';
   printerName: string | null;
   printerCode: string | null;
+  monthlyLocalCost?: number;
   status: 'ACTIVE' | 'INACTIVE';
 }
 
