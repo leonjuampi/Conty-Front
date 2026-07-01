@@ -155,11 +155,16 @@ export default function PosPage() {
 
   const loadSales = useCallback(() => {
     setLoadingSales(true);
-    listSales({ limit: 100 })
+    listSales({ limit: 100, branchId })
       .then(res => { setSales(res.items); setSalesLoaded(true); })
       .catch(() => setSales([]))
       .finally(() => setLoadingSales(false));
-  }, []);
+  }, [branchId]);
+
+  useEffect(() => {
+    // Cuando cambia la sucursal activa, invalidar el historial cargado
+    setSalesLoaded(false);
+  }, [branchId]);
 
   useEffect(() => {
     if (activeTab === 'historial' && !salesLoaded) loadSales();
