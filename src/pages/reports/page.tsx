@@ -190,7 +190,7 @@ export default function ReportsPage() {
   const [loadError, setLoadError] = useState('');
 
   useEffect(() => {
-    listCustomers({ limit: 500 }).then(res => setCustomers(res.items)).catch(() => {});
+    listCustomers({ limit: 10000 }).then(res => setCustomers(res.items)).catch(() => {});
     listPaymentMethods().then(res => setAvailableMethods(res.items)).catch(() => {});
     if ((currentUser?.branchIds?.length ?? 0) > 1) {
       listBranches({ status: 'ACTIVE' }).then(r => setBranchList(r.items)).catch(() => {});
@@ -201,8 +201,8 @@ export default function ReportsPage() {
     setLoading(true);
     setLoadError('');
     Promise.all([
-      listSales({ from: toMysql(dateFrom), to: toMysql(dateTo), limit: 500, branchId: reportBranchId }).then(res => setRawSales(res.items)).catch(() => setRawSales([])),
-      listSessions({ from: toMysql(dateFrom), to: toMysql(dateTo), limit: 200, branchId: reportBranchId }).then(res => setRawSessions(res.items)).catch((e) => {
+      listSales({ from: toMysql(dateFrom), to: toMysql(dateTo), limit: 10000, branchId: reportBranchId }).then(res => setRawSales(res.items)).catch(() => setRawSales([])),
+      listSessions({ from: toMysql(dateFrom), to: toMysql(dateTo), limit: 2000, branchId: reportBranchId }).then(res => setRawSessions(res.items)).catch((e) => {
         setRawSessions([]);
         setLoadError((e as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Error al cargar los datos');
       }),
@@ -1202,7 +1202,7 @@ export default function ReportsPage() {
                       await addPayments(registerPaymentSale.saleId, [{ method: paymentModalMethod, amount: parseFloat(paymentModalAmount) }]);
                       setRegisterPaymentSale(null);
                       // Refrescar ventas
-                      listSales({ from: toMysql(dateFrom), to: toMysql(dateTo), limit: 500, branchId: reportBranchId }).then(res => setRawSales(res.items)).catch(() => {});
+                      listSales({ from: toMysql(dateFrom), to: toMysql(dateTo), limit: 10000, branchId: reportBranchId }).then(res => setRawSales(res.items)).catch(() => {});
                     } catch (e: unknown) {
                       const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
                       setPaymentModalError(msg || 'Error al registrar el pago');
@@ -1341,7 +1341,7 @@ export default function ReportsPage() {
                           setSaleDetail(null);
                           setShowCancelConfirm(false);
                           setCancelReason('');
-                          listSales({ from: toMysql(dateFrom), to: toMysql(dateTo), limit: 500, branchId: reportBranchId }).then(res => setRawSales(res.items)).catch(() => {});
+                          listSales({ from: toMysql(dateFrom), to: toMysql(dateTo), limit: 10000, branchId: reportBranchId }).then(res => setRawSales(res.items)).catch(() => {});
                         } catch {
                           // error silenciado, el backend ya valida
                         } finally {
