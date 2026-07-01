@@ -15,6 +15,7 @@ export interface ElaborationCostItem {
 
 export interface ElaborationCost {
   id: number;
+  branch_id: number | null;
   name: string;
   product_id: number | null;
   items: ElaborationCostItem[];
@@ -29,17 +30,27 @@ export interface ItemInput {
   formula: string;
 }
 
-export async function listElaborationCosts(): Promise<ElaborationCost[]> {
-  const { data } = await api.get('/elaboration-costs');
+export async function listElaborationCosts(params?: { branchId?: number }): Promise<ElaborationCost[]> {
+  const { data } = await api.get('/elaboration-costs', { params });
   return data;
 }
 
-export async function createElaborationCost(body: { name: string; items: ItemInput[]; productId?: number }) {
+export async function createElaborationCost(body: {
+  name: string;
+  items: ItemInput[];
+  productId?: number;
+  branchId?: number | null;
+}) {
   const { data } = await api.post('/elaboration-costs', body);
   return data as { id: number };
 }
 
-export async function updateElaborationCost(id: number, body: { name?: string; items?: ItemInput[]; productId?: number }) {
+export async function updateElaborationCost(id: number, body: {
+  name?: string;
+  items?: ItemInput[];
+  productId?: number;
+  branchId?: number | null;
+}) {
   const { data } = await api.put(`/elaboration-costs/${id}`, body);
   return data;
 }
@@ -49,12 +60,12 @@ export async function deleteElaborationCost(id: number) {
   return data;
 }
 
-export async function getElaborationSettings(): Promise<{ monthly_local_cost: number }> {
-  const { data } = await api.get('/elaboration-costs/settings');
+export async function getElaborationSettings(params?: { branchId?: number }): Promise<{ monthly_local_cost: number }> {
+  const { data } = await api.get('/elaboration-costs/settings', { params });
   return data;
 }
 
-export async function updateElaborationSettings(monthly_local_cost: number) {
-  const { data } = await api.put('/elaboration-costs/settings', { monthly_local_cost });
+export async function updateElaborationSettings(monthly_local_cost: number, branchId?: number) {
+  const { data } = await api.put('/elaboration-costs/settings', { monthly_local_cost, branchId });
   return data;
 }

@@ -37,7 +37,7 @@ export function calcularTotal(cost: ElaborationCost, allCosts: ElaborationCost[]
   }, 0);
 }
 
-export function CostosTab() {
+export function CostosTab({ branchId }: { branchId?: number }) {
   const [costs, setCosts] = useState<ElaborationCost[]>([]);
   const [loading, setLoading] = useState(true);
   const [editTarget, setEditTarget] = useState<ElaborationCost | null>(null);
@@ -48,7 +48,7 @@ export function CostosTab() {
   const fetchCosts = async () => {
     setLoading(true);
     try {
-      const data = await listElaborationCosts();
+      const data = await listElaborationCosts({ branchId });
       setCosts(data);
     } catch {
       setCosts([]);
@@ -57,7 +57,7 @@ export function CostosTab() {
     }
   };
 
-  useEffect(() => { fetchCosts(); }, []);
+  useEffect(() => { fetchCosts(); }, [branchId]);
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
@@ -184,6 +184,7 @@ export function CostosTab() {
         <EditCostModal
           cost={editTarget}
           allCosts={costs}
+          branchId={branchId}
           onClose={() => { setIsNewModal(false); setEditTarget(null); }}
           onSaved={fetchCosts}
         />

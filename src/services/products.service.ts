@@ -46,7 +46,10 @@ export interface Category {
 function mapProduct(row: any): Product {
   const variantId    = row.first_variant_id    ?? row.variantId    ?? null;
   const variantSku   = row.first_variant_sku   ?? row.variantSku   ?? row.sku ?? null;
-  const variantPrice = row.first_variant_price ?? row.variantPrice ?? row.price ?? 0;
+  // branch_price tiene prioridad si existe (precio de la lista de la sucursal)
+  const variantPrice = row.branch_price != null
+    ? row.branch_price
+    : (row.first_variant_price ?? row.variantPrice ?? row.price ?? 0);
   const variantCost  = row.first_variant_cost  ?? row.variantCost  ?? row.cost  ?? 0;
   const variantStock = row.stock ?? 0;
 
@@ -90,8 +93,9 @@ export async function listProducts(params?: {
   };
 }
 
-export async function getProduct(id: number): Promise<Product> {
-  const { data } = await api.get(`/products/${id}`);
+export async function getProduct(id: number, branchId?: number): Promise<Product> {
+  const params = branchId ? { branchId } : {};
+  const { data } = await api.get(`/products/${id}`, { params });
   return mapProduct(data);
 }
 
@@ -103,6 +107,7 @@ export async function createProduct(payload: {
   isCombo?: boolean;
   comboItems?: ComboItem[];
   variants?: Partial<ProductVariant>[];
+  branchId?: number | null;
 }): Promise<{ id: number }> {
   const { data } = await api.post('/products', payload);
   return data;
@@ -114,6 +119,27 @@ export async function updateProduct(id: number, payload: Partial<Product> & { co
 
 export async function deleteProduct(id: number): Promise<void> {
   await api.delete(`/products/${id}`);
+}
+
+// ─── Visibilidad por sucursal ─────────────────────────────────────────────
+
+export interface ProductBranch {
+  branchId: number;
+  branchName: string;
+  isAvailable: boolean;
+}
+
+export async function getProductBranches(productId: number): Promise<{ items: ProductBranch[] }> {
+  const { data } = await api.get(`/products/${productId}/branches`);
+  return data;
+}
+
+export async function setProductBranchAvailability(
+  productId: number,
+  branchId: number,
+  isAvailable: boolean
+): Promise<void> {
+  await api.put(`/products/${productId}/branches/${branchId}`, { isAvailable });
 }
 
 export async function listCategories(): Promise<{ items: Category[] }> {

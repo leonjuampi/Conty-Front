@@ -2,6 +2,7 @@ import { api } from './api';
 
 export interface RawMaterial {
   id: number;
+  branch_id: number | null;
   name: string;
   origin: string | null;
   unit_price: number;
@@ -9,17 +10,32 @@ export interface RawMaterial {
   updated_at: string;
 }
 
-export async function listRawMaterials(params?: { search?: string; limit?: number; offset?: number }) {
+export async function listRawMaterials(params?: {
+  search?: string;
+  limit?: number;
+  offset?: number;
+  branchId?: number;
+}) {
   const { data } = await api.get('/raw-materials', { params });
   return data as { items: RawMaterial[]; total: number };
 }
 
-export async function createRawMaterial(body: { name: string; origin?: string; unitPrice: number }) {
+export async function createRawMaterial(body: {
+  name: string;
+  origin?: string;
+  unitPrice: number;
+  branchId?: number | null;
+}) {
   const { data } = await api.post('/raw-materials', body);
   return data as { id: number };
 }
 
-export async function updateRawMaterial(id: number, body: { name?: string; origin?: string; unitPrice?: number }) {
+export async function updateRawMaterial(id: number, body: {
+  name?: string;
+  origin?: string;
+  unitPrice?: number;
+  branchId?: number | null;
+}) {
   const { data } = await api.put(`/raw-materials/${id}`, body);
   return data;
 }
