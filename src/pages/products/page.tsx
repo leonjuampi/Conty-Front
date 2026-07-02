@@ -14,7 +14,8 @@ import {
   createCategory,
   deleteCategory,
   importProducts,
-  uploadProductImage,
+  addProductImage,
+  setPrimaryProductImage,
   type Category,
 } from '../../services/products.service';
 import { useAuth } from '../../context/AuthContext';
@@ -134,9 +135,20 @@ export default function ProductsPage() {
         const res = await createProduct({ ...(payload as any), branchId });
         productId = res.id;
       }
-      // Subir imagen si el usuario eligió un archivo
-      if (data.imageFile) {
-        await uploadProductImage(productId, data.imageFile);
+      // Al crear un producto nuevo, subir las imágenes elegidas y marcar la principal
+      const newFiles: File[] = Array.isArray(data.newImageFiles) ? data.newImageFiles : [];
+      if (newFiles.length > 0) {
+        const uploaded: { id: number }[] = [];
+        for (const file of newFiles) {
+          try {
+            const r = await addProductImage(productId, file);
+            uploaded.push({ id: r.image.id });
+          } catch { /* omitir imagen que falla */ }
+        }
+        const primaryIdx: number = typeof data.newPrimaryIdx === 'number' ? data.newPrimaryIdx : 0;
+        if (uploaded[primaryIdx] && primaryIdx !== 0) {
+          try { await setPrimaryProductImage(productId, uploaded[primaryIdx].id); } catch {}
+        }
       }
       const filterCatId = categories.find(c => c.name === categoryFilter)?.id;
       await fetchProducts(currentPage, searchTerm || undefined, filterCatId);

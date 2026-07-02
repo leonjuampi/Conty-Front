@@ -1,6 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
-import { listProducts } from '../../../services/products.service';
-import type { ComboItem } from '../../../services/products.service';
+import {
+  listProducts,
+  listProductImages,
+  addProductImage,
+  deleteProductImage,
+  setPrimaryProductImage,
+  MAX_PRODUCT_IMAGES,
+} from '../../../services/products.service';
+import type { ComboItem, ProductImage } from '../../../services/products.service';
 import { getElaborationSettings } from '../../../services/elaborationCosts.service';
 import { VariantsSection } from './VariantsSection';
 
@@ -26,8 +33,13 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
     image: '',
     active: true,
   });
-  const [imageFile, setImageFile] = useState<File | null>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
+  // Modo edición: imágenes ya guardadas en el backend
+  const [images, setImages] = useState<ProductImage[]>([]);
+  const [imagesLoading, setImagesLoading] = useState(false);
+  // Modo creación: archivos locales pendientes de subir
+  const [newFiles, setNewFiles] = useState<File[]>([]);
+  const [newPrimaryIdx, setNewPrimaryIdx] = useState(0);
   const [isCombo, setIsCombo] = useState(false);
   const [comboItems, setComboItems] = useState<ComboItem[]>([]);
   const [comboSearch, setComboSearch] = useState('');
@@ -53,8 +65,80 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
       });
       setIsCombo(product.isCombo ?? false);
       setComboItems(product.comboItems ?? []);
+
+      // Cargar imágenes del producto existente
+      setImagesLoading(true);
+      listProductImages(product.id)
+        .then(res => setImages(res.items))
+        .catch(() => setImages([]))
+        .finally(() => setImagesLoading(false));
     }
   }, [product]);
+
+  const isEditing = !!product;
+  const totalImages = isEditing ? images.length : newFiles.length;
+  const canAddMore = totalImages < MAX_PRODUCT_IMAGES;
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    if (isEditing) {
+      try {
+        const res = await addProductImage(product.id, file);
+        setImages(prev => [...prev, res.image]);
+      } catch (err: any) {
+        const msg = err?.response?.data?.message || 'Error al subir la imagen';
+        alert(msg);
+      }
+    } else {
+      if (newFiles.length >= MAX_PRODUCT_IMAGES) return;
+      setNewFiles(prev => [...prev, file]);
+    }
+  };
+
+  const handleRemoveImage = async (imageOrIdx: ProductImage | number) => {
+    if (isEditing && typeof imageOrIdx !== 'number') {
+      const img = imageOrIdx;
+      if (!confirm('¿Eliminar esta imagen?')) return;
+      try {
+        await deleteProductImage(product.id, img.id);
+        setImages(prev => {
+          const remaining = prev.filter(i => i.id !== img.id);
+          // Si borramos la principal, el backend ya promovió la siguiente. Reflejamos localmente.
+          if (img.is_primary && remaining.length > 0) {
+            remaining[0] = { ...remaining[0], is_primary: 1 };
+          }
+          return remaining;
+        });
+      } catch {
+        alert('Error al eliminar la imagen');
+      }
+    } else if (!isEditing && typeof imageOrIdx === 'number') {
+      const idx = imageOrIdx;
+      setNewFiles(prev => prev.filter((_, i) => i !== idx));
+      setNewPrimaryIdx(prev => {
+        if (idx < prev) return prev - 1;
+        if (idx === prev) return 0;
+        return prev;
+      });
+    }
+  };
+
+  const handleSetPrimary = async (imageOrIdx: ProductImage | number) => {
+    if (isEditing && typeof imageOrIdx !== 'number') {
+      const img = imageOrIdx;
+      if (img.is_primary) return;
+      try {
+        await setPrimaryProductImage(product.id, img.id);
+        setImages(prev => prev.map(i => ({ ...i, is_primary: i.id === img.id ? 1 : 0 })));
+      } catch {
+        alert('Error al marcar como principal');
+      }
+    } else if (!isEditing && typeof imageOrIdx === 'number') {
+      setNewPrimaryIdx(imageOrIdx);
+    }
+  };
 
   // Buscar productos para agregar como componentes del combo
   useEffect(() => {
@@ -116,8 +200,11 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
     onSave({
       ...formData,
       description: formData.description,
-      image: imageFile ? '' : formData.image,
-      imageFile: imageFile || undefined,
+      // En modo creación no hay URL previa: la imagen se genera al subir.
+      // En modo edición, la gestión ya se hizo on-the-fly contra el backend.
+      image: isEditing ? formData.image : '',
+      newImageFiles: !isEditing ? newFiles : undefined,
+      newPrimaryIdx: !isEditing ? newPrimaryIdx : undefined,
       cost: parseFloat(formData.cost),
       price: parseFloat(formData.price),
       isCombo,
@@ -236,48 +323,94 @@ export function ProductForm({ product, categories, onSave, onClose }: ProductFor
               </div>
             </div>
 
-            {/* Imagen */}
+            {/* Imágenes */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Imagen del Producto</label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-semibold text-gray-700">
+                  Imágenes del producto
+                  <span className="ml-2 text-xs font-normal text-gray-400">(hasta {MAX_PRODUCT_IMAGES}, la principal se usa en el POS)</span>
+                </label>
+                <span className="text-xs text-gray-500">{totalImages}/{MAX_PRODUCT_IMAGES}</span>
+              </div>
+
               <input ref={imageInputRef} type="file" accept="image/jpeg,image/png,image/gif,image/webp" className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-                  setImageFile(file);
-                  setFormData({ ...formData, image: URL.createObjectURL(file) });
-                }} />
+                onChange={handleFileSelect} />
 
-              {/* Slot principal */}
-              <button
-                type="button"
-                onClick={() => imageInputRef.current?.click()}
-                className="w-full h-40 rounded-xl border-2 border-dashed border-brand-400 bg-brand-50/40 hover:bg-brand-50 transition-colors flex flex-col items-center justify-center gap-2 cursor-pointer overflow-hidden relative"
-              >
-                {formData.image ? (
-                  <>
-                    <img src={formData.image} alt="Preview" className="w-full h-full object-cover absolute inset-0" />
-                    <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center gap-1 opacity-0 hover:opacity-100 transition-opacity">
-                      <i className="ri-edit-line text-white text-2xl"></i>
-                      <span className="text-white text-xs font-medium">Cambiar imagen</span>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <i className="ri-image-add-line text-3xl text-brand-400"></i>
-                    <span className="text-sm text-brand-500 font-medium">Clic para subir imagen</span>
-                    <span className="text-xs text-gray-400">JPG, PNG, WebP · máx. 2MB</span>
-                  </>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                {isEditing
+                  ? images.map((img) => (
+                      <div key={img.id} className={`relative aspect-square rounded-xl overflow-hidden border-2 ${img.is_primary ? 'border-brand-500 ring-2 ring-brand-200' : 'border-gray-200'}`}>
+                        <img src={img.image_url} alt="" className="w-full h-full object-cover" />
+                        {img.is_primary === 1 && (
+                          <div className="absolute top-1 left-1 bg-brand-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center gap-1">
+                            <i className="ri-star-fill text-[10px]"></i>
+                            <span>POS</span>
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                          {!img.is_primary && (
+                            <button type="button" onClick={() => handleSetPrimary(img)}
+                              title="Marcar como principal"
+                              className="w-8 h-8 rounded-full bg-white text-brand-600 hover:bg-brand-50 flex items-center justify-center cursor-pointer">
+                              <i className="ri-star-line"></i>
+                            </button>
+                          )}
+                          <button type="button" onClick={() => handleRemoveImage(img)}
+                            title="Eliminar"
+                            className="w-8 h-8 rounded-full bg-white text-red-600 hover:bg-red-50 flex items-center justify-center cursor-pointer">
+                            <i className="ri-delete-bin-line"></i>
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  : newFiles.map((file, idx) => {
+                      const isPrimary = idx === newPrimaryIdx;
+                      const url = URL.createObjectURL(file);
+                      return (
+                        <div key={idx} className={`relative aspect-square rounded-xl overflow-hidden border-2 ${isPrimary ? 'border-brand-500 ring-2 ring-brand-200' : 'border-gray-200'}`}>
+                          <img src={url} alt="" className="w-full h-full object-cover" />
+                          {isPrimary && (
+                            <div className="absolute top-1 left-1 bg-brand-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center gap-1">
+                              <i className="ri-star-fill text-[10px]"></i>
+                              <span>POS</span>
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                            {!isPrimary && (
+                              <button type="button" onClick={() => handleSetPrimary(idx)}
+                                title="Marcar como principal"
+                                className="w-8 h-8 rounded-full bg-white text-brand-600 hover:bg-brand-50 flex items-center justify-center cursor-pointer">
+                                <i className="ri-star-line"></i>
+                              </button>
+                            )}
+                            <button type="button" onClick={() => handleRemoveImage(idx)}
+                              title="Quitar"
+                              className="w-8 h-8 rounded-full bg-white text-red-600 hover:bg-red-50 flex items-center justify-center cursor-pointer">
+                              <i className="ri-close-line"></i>
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })
+                }
+
+                {canAddMore && !imagesLoading && (
+                  <button type="button" onClick={() => imageInputRef.current?.click()}
+                    className="aspect-square rounded-xl border-2 border-dashed border-brand-400 bg-brand-50/40 hover:bg-brand-50 transition-colors flex flex-col items-center justify-center gap-1 cursor-pointer">
+                    <i className="ri-image-add-line text-2xl text-brand-400"></i>
+                    <span className="text-xs text-brand-500 font-medium text-center px-1">Agregar</span>
+                  </button>
                 )}
-              </button>
 
-              {formData.image && (
-                <button
-                  type="button"
-                  onClick={() => { setFormData({ ...formData, image: '' }); setImageFile(null); }}
-                  className="mt-2 flex items-center gap-1 text-xs text-red-500 hover:text-red-700 cursor-pointer">
-                  <i className="ri-delete-bin-line"></i>
-                  <span>Quitar imagen</span>
-                </button>
+                {imagesLoading && (
+                  <div className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center">
+                    <i className="ri-loader-4-line animate-spin text-brand-500 text-xl"></i>
+                  </div>
+                )}
+              </div>
+
+              {totalImages === 0 && !imagesLoading && (
+                <p className="mt-2 text-xs text-gray-400">JPG, PNG, WebP · máx. 5MB cada una</p>
               )}
             </div>
 

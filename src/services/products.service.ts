@@ -175,6 +175,41 @@ export async function uploadProductImage(id: number, file: File): Promise<{ imag
   return data;
 }
 
+// ─── Múltiples imágenes por producto ─────────────────────────────────────
+
+export interface ProductImage {
+  id: number;
+  product_id: number;
+  image_url: string;
+  sort_order: number;
+  is_primary: number;
+  created_at?: string;
+}
+
+export const MAX_PRODUCT_IMAGES = 5;
+
+export async function listProductImages(productId: number): Promise<{ items: ProductImage[]; max: number }> {
+  const { data } = await api.get(`/products/${productId}/images`);
+  return data;
+}
+
+export async function addProductImage(productId: number, file: File): Promise<{ image: ProductImage }> {
+  const form = new FormData();
+  form.append('image', file);
+  const { data } = await api.post(`/products/${productId}/images`, form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return data;
+}
+
+export async function deleteProductImage(productId: number, imageId: number): Promise<void> {
+  await api.delete(`/products/${productId}/images/${imageId}`);
+}
+
+export async function setPrimaryProductImage(productId: number, imageId: number): Promise<void> {
+  await api.patch(`/products/${productId}/images/${imageId}/primary`);
+}
+
 export async function importProducts(file: File): Promise<{ successCount: number; errorCount: number; errors: { row: number; message: string }[] }> {
   const form = new FormData();
   form.append('file', file);

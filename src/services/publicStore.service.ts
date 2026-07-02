@@ -51,8 +51,16 @@ export interface StoreProduct {
   stock: number;
 }
 
+export interface StoreProductImage {
+  id: number;
+  image_url: string;
+  sort_order: number;
+  is_primary: number;
+}
+
 export interface StoreProductDetail extends StoreProduct {
   variants: { id: number; name: string | null; sku: string; price: number | null; stock: number }[];
+  images?: StoreProductImage[];
 }
 
 export interface CartItem {

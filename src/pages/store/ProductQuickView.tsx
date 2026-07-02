@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { X, Minus, Plus, ShoppingCart } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { X, Minus, Plus, ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getStoreProductDetail, type StoreProductDetail } from '../../services/publicStore.service';
 import { useCart } from './cartStore';
 
@@ -25,6 +25,7 @@ export default function ProductQuickView({ slug, productId, primary, onClose, cl
   const [variantId, setVariantId] = useState<number | null>(null);
   const [qty, setQty] = useState(1);
   const [adding, setAdding] = useState(false);
+  const [activeImageIdx, setActiveImageIdx] = useState(0);
 
   useEffect(() => {
     let alive = true;
@@ -49,9 +50,17 @@ export default function ProductQuickView({ slug, productId, primary, onClose, cl
     };
   }, [onClose]);
 
-  const img = product?.image_url
-    ? (product.image_url.startsWith('http') ? product.image_url : `${apiBase}${product.image_url}`)
-    : null;
+  const resolve = (u: string) => (u.startsWith('http') ? u : `${apiBase}${u}`);
+  const gallery = useMemo(() => {
+    if (!product) return [] as string[];
+    const urls = (product.images ?? [])
+      .slice()
+      .sort((a, b) => (b.is_primary - a.is_primary) || (a.sort_order - b.sort_order))
+      .map((i) => resolve(i.image_url));
+    if (urls.length === 0 && product.image_url) urls.push(resolve(product.image_url));
+    return urls;
+  }, [product, apiBase]);
+  const activeImg = gallery[activeImageIdx] ?? gallery[0] ?? null;
 
   const selectedVariant = variantId && product ? product.variants.find((v) => v.id === variantId) : null;
   const price = Number(selectedVariant?.price ?? product?.price ?? 0);
@@ -97,13 +106,56 @@ export default function ProductQuickView({ slug, productId, primary, onClose, cl
           <div className="flex items-center justify-center h-80 text-gray-400">Producto no encontrado</div>
         ) : (
           <div className="flex flex-col max-h-[90vh]">
-            <div className="bg-gray-100 shrink-0 h-56 md:h-64 flex items-center justify-center">
-              {img ? (
-                <img src={img} alt={product.name} className="max-h-full max-w-full object-contain" />
+            <div className="bg-gray-100 shrink-0 relative aspect-square sm:aspect-[4/3] max-h-[55vh] flex items-center justify-center overflow-hidden">
+              {activeImg ? (
+                <img src={activeImg} alt={product.name} className="w-full h-full object-cover" />
               ) : (
                 <div className="text-gray-300 text-6xl">📦</div>
               )}
+              {gallery.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); setActiveImageIdx((i) => (i - 1 + gallery.length) % gallery.length); }}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/85 hover:bg-white shadow"
+                    aria-label="Anterior"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); setActiveImageIdx((i) => (i + 1) % gallery.length); }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/85 hover:bg-white shadow"
+                    aria-label="Siguiente"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+                    {gallery.map((_, i) => (
+                      <span
+                        key={i}
+                        className={`h-1.5 rounded-full transition-all ${i === activeImageIdx ? 'w-6 bg-white' : 'w-1.5 bg-white/60'}`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
+
+            {gallery.length > 1 && (
+              <div className="shrink-0 px-4 pt-3 flex gap-2 overflow-x-auto">
+                {gallery.map((url, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setActiveImageIdx(i)}
+                    className={`shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImageIdx ? 'border-gray-900' : 'border-transparent opacity-70 hover:opacity-100'}`}
+                  >
+                    <img src={url} alt="" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
 
             <div className="p-5 overflow-y-auto flex-1">
               {product.category_name && <div className="text-xs text-gray-400 mb-1">{product.category_name}</div>}

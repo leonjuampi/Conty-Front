@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Minus, Plus, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Minus, Plus, ShoppingCart } from 'lucide-react';
 import PublicStoreLayout from './PublicStoreLayout';
 import { getStoreProductDetail, type StoreProductDetail, type StoreInfo } from '../../services/publicStore.service';
 import { useCart } from './cartStore';
@@ -21,6 +21,7 @@ function ProductDetailInner({ info }: { info: StoreInfo }) {
   const [variantId, setVariantId] = useState<number | null>(null);
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
+  const [activeImageIdx, setActiveImageIdx] = useState(0);
 
   useEffect(() => {
     let alive = true;
@@ -34,9 +35,16 @@ function ProductDetailInner({ info }: { info: StoreInfo }) {
   if (loading) return <div className="text-center py-12 text-gray-400">Cargando…</div>;
   if (!product) return <div className="text-center py-12 text-gray-400">Producto no encontrado</div>;
 
-  const img = product.image_url
-    ? (product.image_url.startsWith('http') ? product.image_url : `${apiBase}${product.image_url}`)
-    : null;
+  const resolve = (u: string) => (u.startsWith('http') ? u : `${apiBase}${u}`);
+  const gallery = useMemo(() => {
+    const urls = (product?.images ?? [])
+      .slice()
+      .sort((a, b) => (b.is_primary - a.is_primary) || (a.sort_order - b.sort_order))
+      .map((i) => resolve(i.image_url));
+    if (urls.length === 0 && product?.image_url) urls.push(resolve(product.image_url));
+    return urls;
+  }, [product, apiBase]);
+  const activeImg = gallery[activeImageIdx] ?? gallery[0] ?? null;
 
   const selectedVariant = variantId ? product.variants.find((v) => v.id === variantId) : null;
   const price = selectedVariant?.price ?? product.price;
@@ -65,11 +73,47 @@ function ProductDetailInner({ info }: { info: StoreInfo }) {
       </button>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white rounded-2xl shadow-sm overflow-hidden">
-        <div className="aspect-square bg-gray-100">
-          {img ? (
-            <img src={img} alt={product.name} className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-300 text-7xl">📦</div>
+        <div className="flex flex-col">
+          <div className="relative aspect-square bg-gray-100 overflow-hidden">
+            {activeImg ? (
+              <img src={activeImg} alt={product.name} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-gray-300 text-7xl">📦</div>
+            )}
+            {gallery.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setActiveImageIdx((i) => (i - 1 + gallery.length) % gallery.length)}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/85 hover:bg-white shadow"
+                  aria-label="Anterior"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveImageIdx((i) => (i + 1) % gallery.length)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/85 hover:bg-white shadow"
+                  aria-label="Siguiente"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </>
+            )}
+          </div>
+          {gallery.length > 1 && (
+            <div className="px-3 py-3 flex gap-2 overflow-x-auto">
+              {gallery.map((url, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setActiveImageIdx(i)}
+                  className={`shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImageIdx ? 'border-gray-900' : 'border-transparent opacity-70 hover:opacity-100'}`}
+                >
+                  <img src={url} alt="" className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
           )}
         </div>
 
