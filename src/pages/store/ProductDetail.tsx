@@ -74,9 +74,21 @@ function ProductDetailInner({ info }: { info: StoreInfo }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white rounded-2xl shadow-sm overflow-hidden">
         <div className="flex flex-col">
-          <div className="relative aspect-square bg-gray-100 overflow-hidden">
+          <div className="relative aspect-square bg-gray-100 overflow-hidden flex items-center justify-center">
             {activeImg ? (
-              <img src={activeImg} alt={product.name} className="w-full h-full object-cover" />
+              <>
+                <img
+                  src={activeImg}
+                  alt=""
+                  aria-hidden="true"
+                  className="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-60"
+                />
+                <img
+                  src={activeImg}
+                  alt={product.name}
+                  className="relative max-w-full max-h-full object-contain drop-shadow-md"
+                />
+              </>
             ) : (
               <div className="w-full h-full flex items-center justify-center text-gray-300 text-7xl">📦</div>
             )}

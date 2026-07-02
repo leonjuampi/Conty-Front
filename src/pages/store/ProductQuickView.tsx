@@ -108,7 +108,19 @@ export default function ProductQuickView({ slug, productId, primary, onClose, cl
           <div className="flex flex-col max-h-[90vh]">
             <div className="bg-gray-100 shrink-0 relative aspect-square sm:aspect-[4/3] max-h-[55vh] flex items-center justify-center overflow-hidden">
               {activeImg ? (
-                <img src={activeImg} alt={product.name} className="w-full h-full object-cover" />
+                <>
+                  <img
+                    src={activeImg}
+                    alt=""
+                    aria-hidden="true"
+                    className="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-60"
+                  />
+                  <img
+                    src={activeImg}
+                    alt={product.name}
+                    className="relative max-w-full max-h-full object-contain drop-shadow-md"
+                  />
+                </>
               ) : (
                 <div className="text-gray-300 text-6xl">📦</div>
               )}
